@@ -11,23 +11,23 @@ import javax.validation.Valid;
 
 @Slf4j
 @RestController
-@RequestMapping("/member")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class MemberController {
 
     private final MemberService memberService;
 
-    @PostMapping("/signup")
+    @PostMapping("/members/signup")
     public MemberCreateResponse createMember(@RequestBody @Valid MemberCreateRequest dto) {
         return new MemberCreateResponse(memberService.createMember(dto));
     }
 
-    @PostMapping("/signin")
+    @PostMapping("/members/signin")
     public MemberLoginResponse signin(@RequestBody MemberLoginRequest dto) {
         return new MemberLoginResponse(memberService.memberLogin(dto));
     }
 
-    @PutMapping("/")
+    @PutMapping("/member")
     public MemberUpdateResponse updateMember(@RequestBody MemberUpdateRequest dto) {
         return new MemberUpdateResponse(memberService.updateUser(dto));
     }
