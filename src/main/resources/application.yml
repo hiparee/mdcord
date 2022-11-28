@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:mariadb://172.16.10.121:3306/mdcord
+    username: root
+    password: "#3wnffkdl#"
+    driver-class-name: org.mariadb.jdbc.Driver
+  jpa:
+    open-in-view: false
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+
+logging:
+  level:
+    com.lemon: debug
+
+server:
+  error:
+    include-stacktrace: never
