@@ -6,10 +6,11 @@ import com.lemon.mdcode.domain.member.Member;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
+import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,28 +26,22 @@ public class ChannelChat extends BaseEntity {
     @Column(name = "channel_chat_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "channel_id")
-    private ChannelList channelList;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
-
-    @Column(name = "content")
+    @NotBlank
+    @Column(name = "content", nullable = false)
     private String content;
 
-    @Column(name = "file_yn")
+    @NotBlank
+    @Column(name = "file_yn", nullable = false)
+    @ColumnDefault("'N'")
     private String fileYn;
 
-    @OneToMany(mappedBy = "channelChat")
-    private List<AttachFile> attachFiles = new ArrayList<>();
-
-    @Column(name = "fix_yn")
+    @NotBlank
+    @Column(name = "fix_yn", nullable = false)
+    @ColumnDefault("'N'")
     private String fixYn;
 
     @Column(name = "reply_chat_id")
-    private String replyChatId;
+    private Long replyChatId;
 
     @LastModifiedDate
     @Column(name = "update_date")
@@ -55,10 +50,19 @@ public class ChannelChat extends BaseEntity {
     @Column(name = "update_by")
     private String updateBy;
 
-    @Column(name = "delete_yn")
+    @NotBlank
+    @Column(name = "delete_yn", nullable = false)
+    @ColumnDefault("'N'")
     private String deleteYn;
 
     @Column(name = "delete_by")
     private String deleteBy;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "channel_id")
+    private ChannelList channelList;
+
+    @OneToMany(mappedBy = "channelChat")
+    private List<AttachFile> attachFiles = new ArrayList<>();
 
 }
