@@ -18,8 +18,6 @@ public class MemberCreateRequest {
     @NotBlank
     private String password;
 
-    private String useYn;
-
     @NotBlank
     private String createBy;
 
