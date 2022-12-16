@@ -1,6 +1,5 @@
 package com.lemon.mdcode.controller;
 
-import com.lemon.mdcode.domain.member.Member;
 import com.lemon.mdcode.dto.member.*;
 import com.lemon.mdcode.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -18,17 +17,17 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/members/signup")
-    public MemberCreateResponse createMember(@RequestBody @Valid MemberCreateRequest dto) {
+    public MemberCreateResponse createMember(@RequestBody @Valid final MemberCreateRequest dto) {
         return new MemberCreateResponse(memberService.createMember(dto));
     }
 
     @PostMapping("/members/signin")
-    public MemberLoginResponse signin(@RequestBody MemberLoginRequest dto) {
+    public MemberLoginResponse signin(@RequestBody final MemberLoginRequest dto) {
         return new MemberLoginResponse(memberService.memberLogin(dto));
     }
 
     @PutMapping("/member")
-    public MemberUpdateResponse updateMember(@RequestBody MemberUpdateRequest dto) {
+    public MemberUpdateResponse updateMember(@RequestBody final MemberUpdateRequest dto) {
         return new MemberUpdateResponse(memberService.updateUser(dto));
     }
 
