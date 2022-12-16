@@ -12,6 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ChatController {
 
-    private final ChannelChatService chatService;
+//    private final ChannelChatService chatService;
 
 }
