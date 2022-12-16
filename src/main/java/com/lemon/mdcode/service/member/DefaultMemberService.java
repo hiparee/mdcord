@@ -11,6 +11,7 @@ import com.lemon.mdcode.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -25,7 +26,19 @@ public class DefaultMemberService implements MemberService {
 
     private final String LOGIN_USE_YN = "Y";
 
+
     @Override
+    @Transactional
+    public Member memberLogin(final MemberLoginRequest dto) {
+        Member member = memberRepository.findMemberByIdAndUseYn(dto.getMemberId(), LOGIN_USE_YN).orElseThrow(() -> new MemberNotFoundException(dto.getMemberId()));
+
+        member.checkPassword(dto.getPassword(), memberPasswordEncoder);
+
+        return member;
+    }
+
+    @Override
+    @Transactional
     public Member createMember(final MemberCreateRequest dto) {
         Optional<Member> checkDuplicated = memberRepository.findMemberById(dto.getMemberId());
 
@@ -39,22 +52,13 @@ public class DefaultMemberService implements MemberService {
                 .password(dto.getPassword())
                 .passwordEncoder(memberPasswordEncoder)
                 .createBy(dto.getCreateBy())
-                .createDate(LocalDateTime.now())
                 .build();
 
         return memberRepository.save(member);
     }
 
     @Override
-    public Member memberLogin(final MemberLoginRequest dto) {
-        Member member = memberRepository.findMemberByIdAndUseYn(dto.getMemberId(), LOGIN_USE_YN).orElseThrow(() -> new MemberNotFoundException(dto.getMemberId()));
-
-        member.checkPassword(dto.getPassword(), memberPasswordEncoder);
-
-        return member;
-    }
-
-    @Override
+    @Transactional
     public Member updateUser(final MemberUpdateRequest dto) {
         Member member = getMemberById(dto.getMemberId());
 
