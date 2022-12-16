@@ -3,7 +3,6 @@ package com.lemon.mdcode.domain.member;
 import com.lemon.mdcode.common.exception.PasswordNotMachedException;
 import com.lemon.mdcode.domain.BaseEntity;
 import com.lemon.mdcode.domain.channel.ChannelMember;
-import com.lemon.mdcode.domain.chat.ChannelChat;
 import com.lemon.mdcode.dto.member.MemberPasswordEncoder;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -33,7 +32,7 @@ public class Member extends BaseEntity {
     private String id;
 
     @NotBlank
-    @Column(name = "name", nullable = false)
+    @Column(name = "member_name", nullable = false)
     private String name;
 
     @NotBlank
@@ -43,8 +42,7 @@ public class Member extends BaseEntity {
     @Column(name = "icon_file_id")
     private Integer iconFileId;
 
-    @NotBlank
-    @Column(name = "use_yn", nullable = false)
+    @Column(name = "use_yn")
     @ColumnDefault("'Y'")
     private String useYn;
 

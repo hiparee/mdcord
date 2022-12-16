@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 @MappedSuperclass
 public abstract class BaseEntity {
 
-    @NotBlank
     @Column(name = "create_date")
     private LocalDateTime createDate = LocalDateTime.now();
 

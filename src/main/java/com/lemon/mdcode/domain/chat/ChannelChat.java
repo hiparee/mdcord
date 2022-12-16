@@ -2,11 +2,11 @@ package com.lemon.mdcode.domain.chat;
 
 import com.lemon.mdcode.domain.BaseEntity;
 import com.lemon.mdcode.domain.channel.ChannelList;
-import com.lemon.mdcode.domain.member.Member;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
@@ -17,6 +17,7 @@ import java.util.List;
 
 @Getter
 @Entity
+@DynamicInsert
 @Table(name = "channel_chat")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChannelChat extends BaseEntity {
@@ -30,13 +31,11 @@ public class ChannelChat extends BaseEntity {
     @Column(name = "content", nullable = false)
     private String content;
 
-    @NotBlank
-    @Column(name = "file_yn", nullable = false)
+    @Column(name = "file_yn")
     @ColumnDefault("'N'")
     private String fileYn;
 
-    @NotBlank
-    @Column(name = "fix_yn", nullable = false)
+    @Column(name = "fix_yn")
     @ColumnDefault("'N'")
     private String fixYn;
 
@@ -50,8 +49,7 @@ public class ChannelChat extends BaseEntity {
     @Column(name = "update_by")
     private String updateBy;
 
-    @NotBlank
-    @Column(name = "delete_yn", nullable = false)
+    @Column(name = "delete_yn")
     @ColumnDefault("'N'")
     private String deleteYn;
 
