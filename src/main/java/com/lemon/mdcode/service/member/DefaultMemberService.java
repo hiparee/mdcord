@@ -26,7 +26,7 @@ public class DefaultMemberService implements MemberService {
     private final String LOGIN_USE_YN = "Y";
 
     @Override
-    public Member createMember(MemberCreateRequest dto) {
+    public Member createMember(final MemberCreateRequest dto) {
         Optional<Member> checkDuplicated = memberRepository.findMemberById(dto.getMemberId());
 
         if(checkDuplicated.isPresent()) {
@@ -46,7 +46,7 @@ public class DefaultMemberService implements MemberService {
     }
 
     @Override
-    public Member memberLogin(MemberLoginRequest dto) {
+    public Member memberLogin(final MemberLoginRequest dto) {
         Member member = memberRepository.findMemberByIdAndUseYn(dto.getMemberId(), LOGIN_USE_YN).orElseThrow(() -> new MemberNotFoundException(dto.getMemberId()));
 
         member.checkPassword(dto.getPassword(), memberPasswordEncoder);
@@ -55,7 +55,7 @@ public class DefaultMemberService implements MemberService {
     }
 
     @Override
-    public Member updateUser(MemberUpdateRequest dto) {
+    public Member updateUser(final MemberUpdateRequest dto) {
         Member member = getMemberById(dto.getMemberId());
 
         member.updateMemberInfo(
@@ -67,7 +67,7 @@ public class DefaultMemberService implements MemberService {
         return memberRepository.save(member);
     }
 
-    private Member getMemberById(String memberId) {
+    private Member getMemberById(final String memberId) {
         return memberRepository.findMemberById(memberId).orElseThrow(() -> new MemberNotFoundException(memberId));
     }
 
