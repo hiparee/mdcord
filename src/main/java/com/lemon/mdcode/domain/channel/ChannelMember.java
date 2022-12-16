@@ -1,5 +1,7 @@
 package com.lemon.mdcode.domain.channel;
 
+import com.lemon.mdcode.domain.BaseEntity;
+import com.lemon.mdcode.domain.member.Member;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,24 +14,19 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "channel_member")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ChannelMember {
+public class ChannelMember extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "channel_member_id")
-    private Integer id;
+    private Long id;
 
-    @Column(name = "channel_id")
-    private Integer channelId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "channel_id")
+    private ChannelList channelList;
 
-    @Column(name = "member_id")
-    private String memberId;
-
-    @CreatedDate
-    @Column(name = "create_date")
-    private LocalDateTime createDate;
-
-    @Column(name = "create_by")
-    private String createBy;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
 
 }

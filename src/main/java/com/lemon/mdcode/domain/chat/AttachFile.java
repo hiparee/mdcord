@@ -1,5 +1,6 @@
 package com.lemon.mdcode.domain.chat;
 
+import com.lemon.mdcode.domain.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,15 +13,16 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "attach_file")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class AttachFile {
+public class AttachFile extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "attach_file_id")
-    private Integer id;
+    private Long id;
 
-    @Column(name = "channel_chat_id")
-    private Integer channelChatId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "channel_chat_id")
+    private ChannelChat channelChat;
 
     @Column(name = "origin_file_name")
     private String originFileName;
@@ -33,12 +35,5 @@ public class AttachFile {
 
     @Column(name = "file_size")
     private Integer fileSize;
-
-    @CreatedDate
-    @Column(name = "create_date")
-    private LocalDateTime createDate;
-
-    @Column(name = "create_by")
-    private String createBy;
 
 }
