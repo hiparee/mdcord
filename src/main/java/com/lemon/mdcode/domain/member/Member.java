@@ -12,11 +12,11 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.util.Assert;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,22 +32,19 @@ public class Member extends BaseEntity {
     @Column(name = "member_id")
     private String id;
 
-    @Column(name = "name")
+    @NotBlank
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "password")
+    @NotBlank
+    @Column(name = "password", nullable = false)
     private String password;
 
     @Column(name = "icon_file_id")
     private Integer iconFileId;
 
-    @OneToMany(mappedBy = "member")
-    private List<ChannelChat> channelChats = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member")
-    private List<ChannelMember> channelMembers = new ArrayList<>();
-
-    @Column(name = "use_yn")
+    @NotBlank
+    @Column(name = "use_yn", nullable = false)
     @ColumnDefault("'Y'")
     private String useYn;
 
@@ -57,6 +54,9 @@ public class Member extends BaseEntity {
 
     @Column(name = "update_by")
     private String updateBy;
+
+    @OneToMany(mappedBy = "member")
+    private List<ChannelMember> channelMembers = new ArrayList<>();
 
     @Builder
     public Member(String id, String name, String password, MemberPasswordEncoder passwordEncoder, String createBy) {

@@ -5,11 +5,13 @@ import com.lemon.mdcode.domain.chat.ChannelChat;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
+import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -23,17 +25,10 @@ public class ChannelList extends BaseEntity {
     @Column(name = "channel_id")
     private Long id;
 
-    @Column(name = "parent_id")
-    private Long parentId;
-
-    @Column(name = "use_yn")
+    @NotBlank
+    @Column(name = "use_yn", nullable = false)
+    @ColumnDefault("'Y'")
     private String useYn;
-
-    @OneToMany(mappedBy = "channelList")
-    private List<ChannelChat> channelChats;
-
-    @OneToMany(mappedBy = "channelList")
-    private List<ChannelMember> channelMembers;
 
     @LastModifiedDate
     @Column(name = "update_date")
@@ -42,4 +37,16 @@ public class ChannelList extends BaseEntity {
     @Column(name = "update_by")
     private String updateBy;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private ChannelList parent;
+
+    @OneToMany(mappedBy = "parent")
+    private List<ChannelList> child = new ArrayList<>();
+
+    @OneToMany(mappedBy = "channelList")
+    private List<ChannelChat> channelChats;
+
+    @OneToMany(mappedBy = "channelList")
+    private List<ChannelMember> channelMembers;
 }
