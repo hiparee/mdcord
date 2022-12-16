@@ -1,0 +1,26 @@
+package com.lemon.mdcode.dto.channel;
+
+import com.lemon.mdcode.domain.channel.ChannelList;
+import lombok.Getter;
+
+import java.time.LocalDateTime;
+
+@Getter
+public class ChannelListCreateResponse {
+
+    private Long id;
+
+    private String name;
+
+    private LocalDateTime createDate;
+
+    private String createBy;
+
+    public ChannelListCreateResponse(ChannelList dto) {
+        this.id = dto.getId();
+        this.name = dto.getName();
+        this.createDate = dto.getCreateDate();
+        this.createBy = dto.getCreateBy();
+    }
+
+}
