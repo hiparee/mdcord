@@ -60,6 +60,7 @@ public class DefaultChannelListService implements ChannelListService {
 
     private ChannelListResponse toChannelListResponse(ChannelList channelList) {
         return ChannelListResponse.builder()
+                    .id(channelList.getId())
                     .name(channelList.getName())
                     .parentId(channelList.getParentId())
                     .useYn(channelList.getUseYn())

@@ -6,6 +6,8 @@ import lombok.Getter;
 @Getter
 public class ChannelListResponse {
 
+    private Long id;
+
     private String name;
 
     private Long parentId;
@@ -13,7 +15,8 @@ public class ChannelListResponse {
     private String useYn;
 
     @Builder
-    public ChannelListResponse(String name, Long parentId, String useYn) {
+    public ChannelListResponse(Long id, String name, Long parentId, String useYn) {
+        this.id = id;
         this.name = name;
         this.parentId = parentId;
         this.useYn = useYn;
