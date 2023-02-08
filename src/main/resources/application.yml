@@ -1,7 +1,7 @@
 spring:
   datasource:
-#    url: jdbc:mariadb://172.16.10.121:3306/mdcord
-    url: jdbc:mariadb://localhost:3306/mdcode
+#    url: jdbc:mariadb://localhost:3306/mdcode
+    url: jdbc:mariadb://172.16.10.121:3306/mdcord
     username: root
     password: "#3wnffkdl#"
     driver-class-name: org.mariadb.jdbc.Driver
@@ -9,14 +9,29 @@ spring:
     open-in-view: false
     show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     properties:
       hibernate:
         format_sql: true
 
+springdoc:
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  api-docs:
+    enabled: true   # swagger 필요없어질 경우 false
+    path: /api-docs
+  packages-to-scan: com.lemon.mdcord.controller
+  swagger-ui:
+    operations-sorter: alpha # 알파벳 오름차순 : alpha, HTTP method순 : method
+    tags-sorter: alpha
+    disable-swagger-default-url: true # TODO - 다시 알아보기
+    display-request-duration: true
+
 logging:
   level:
-    com.lemon: debug
+    org.hibernate.SQL: debug
+#    com.lemon: debug
+# TODO - 이거 경로 여러개 어떻게 하는지 알아보기
 
 server:
   error:

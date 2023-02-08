@@ -64,7 +64,7 @@ public class JpaMemberService implements MemberService {
         member.updateMemberInfo(
                 dto.getName(), dto.getPassword(),
                 memberPasswordEncoder, dto.getIconFileId(),
-                dto.getUseYn(), dto.getUpdateBy()
+                dto.getUseYn(), "수정 필요" // TODO - 수정 필요
         );
 
         return memberRepository.save(member);
