@@ -32,17 +32,18 @@ public class Member extends BaseEntity {
     private String id;
 
     @NotBlank
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, length = 10)
     private String name;
 
     @NotBlank
-    @Column(name = "password", nullable = false)
+    @Column(name = "password", nullable = false, length = 100)
     private String password;
 
+    // TODO - 별도의 테이블이 없으면 String이 낫지않을려나? 물어보기
     @Column(name = "icon_file_id")
     private Integer iconFileId;
 
-    @Column(name = "use_yn")
+    @Column(name = "use_yn", nullable = false, length = 1)
     @ColumnDefault("'Y'")
     private String useYn;
 

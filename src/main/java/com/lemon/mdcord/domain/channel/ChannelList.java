@@ -31,13 +31,13 @@ public class ChannelList extends BaseEntity {
     private Long id;
 
     @NotBlank
-    @Column(name = "channel_name", nullable = false)
+    @Column(name = "channel_name", nullable = false, length = 50)
     private String name;
 
     @Column(name = "parent_id")
     private Long parentId;
 
-    @Column(name = "use_yn")
+    @Column(name = "use_yn", nullable = false, length = 1)
     @ColumnDefault("'Y'")
     private String useYn;
 
@@ -48,7 +48,7 @@ public class ChannelList extends BaseEntity {
     @Column(name = "update_by")
     private String updateBy;
 
-    @Column(name = "dept")
+    @Column(name = "dept", length = 1)
     private Integer dept;
 
     @OneToMany(mappedBy = "parentId")

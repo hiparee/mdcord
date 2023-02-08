@@ -20,15 +20,15 @@ public class AttachFile extends BaseEntity {
     private Long id;
 
     @NotBlank
-    @Column(name = "origin_file_name", nullable = false)
+    @Column(name = "origin_file_name", nullable = false, length = 255)
     private String originFileName;
 
     @NotBlank
-    @Column(name = "real_file_name", nullable = false)
+    @Column(name = "real_file_name", nullable = false, length = 255)
     private String realFileName;
 
     @NotBlank
-    @Column(name = "file_ext", nullable = false)
+    @Column(name = "file_ext", nullable = false, length = 10)
     private String fileExt;
 
     @NotBlank
