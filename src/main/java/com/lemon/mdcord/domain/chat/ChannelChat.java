@@ -2,6 +2,7 @@ package com.lemon.mdcord.domain.chat;
 
 import com.lemon.mdcord.domain.BaseEntity;
 import com.lemon.mdcord.domain.channel.ChannelList;
+import com.lemon.mdcord.domain.member.Member;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -59,6 +60,10 @@ public class ChannelChat extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "channel_id")
     private ChannelList channelList;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     @OneToMany(mappedBy = "channelChat")
     private List<AttachFile> attachFiles = new ArrayList<>();
