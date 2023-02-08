@@ -48,11 +48,10 @@ public class ChannelList extends BaseEntity {
     @Column(name = "update_by")
     private String updateBy;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent")
-    private ChannelList parent;
+    @Column(name = "dept")
+    private Integer dept;
 
-    @OneToMany(mappedBy = "parent")
+    @OneToMany(mappedBy = "parentId")
     private List<ChannelList> child = new ArrayList<>();
 
     @OneToMany(mappedBy = "channelList")
