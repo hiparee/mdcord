@@ -18,7 +18,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class DefaultMemberService implements MemberService {
+public class JpaMemberService implements MemberService {
     private final MemberRepository memberRepository;
 
     private final MemberPasswordEncoder memberPasswordEncoder;
@@ -50,7 +50,7 @@ public class DefaultMemberService implements MemberService {
                 .name(dto.getName())
                 .password(dto.getPassword())
                 .passwordEncoder(memberPasswordEncoder)
-                .createBy(dto.getCreateBy())
+                .createBy("수정필요") // TODO - 수정 필요
                 .build();
 
         return memberRepository.save(member);

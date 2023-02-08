@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class DefaultMemberDetailsService implements UserDetailsService {
+public class JpaMemberDetailsService implements UserDetailsService {
 
     private final MemberRepository memberRepository;
 
