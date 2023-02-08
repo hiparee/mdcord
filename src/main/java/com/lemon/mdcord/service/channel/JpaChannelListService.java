@@ -34,7 +34,7 @@ public class JpaChannelListService implements ChannelListService {
         ChannelList channelList = ChannelList.builder()
                 .name(dto.getName())
                 .parentId(dto.getParentId())
-                .createBy(dto.getCreateBy())
+                .createBy("수정 필요") // TODO - 수정 필요
                 .build();
 
         return channelListRepository.save(channelList);
