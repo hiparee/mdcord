@@ -1,7 +1,12 @@
 package com.lemon.mdcord.common.config;
 
-import lombok.extern.slf4j.Slf4j;
+import com.lemon.mdcord.common.security.jwt.JwtAccessDeniedHandler;
+import com.lemon.mdcord.common.security.jwt.JwtAuthenticationEntryPoint;
+import com.lemon.mdcord.common.security.jwt.JwtFilterConfigurer;
+import com.lemon.mdcord.common.security.jwt.JwtProvider;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -13,9 +18,13 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-@Slf4j
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class WebSecurityConfig {
+
+    private final JwtProvider jwtProvider;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -26,6 +35,7 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .httpBasic().disable()
+                .formLogin().disable()
                 .csrf().disable()
                 .cors()
             .and()
@@ -37,11 +47,16 @@ public class WebSecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
                 .authorizeRequests()
-//                .antMatchers(HttpMethod.POST,"/member/signup").permitAll()
-//                .antMatchers(HttpMethod.GET, "member/signin").permitAll()
-                .antMatchers("/**").permitAll()
-//                .antMatchers("/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**").authenticated()
-                .anyRequest().authenticated();
+                .antMatchers(HttpMethod.POST, "/api/members/signin").permitAll()
+                .antMatchers("/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**").permitAll()
+                .anyRequest().authenticated()
+//                .antMatchers("/**").permitAll()
+            .and()
+                .exceptionHandling()
+                    .accessDeniedHandler(jwtAccessDeniedHandler)
+                    .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+            .and()
+                .apply(new JwtFilterConfigurer(jwtProvider));
 
         return http.build();
     }

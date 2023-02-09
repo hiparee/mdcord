@@ -2,6 +2,7 @@ package com.lemon.mdcord.service.member;
 
 import com.lemon.mdcord.common.exception.MemberNotFoundException;
 import com.lemon.mdcord.domain.member.Member;
+import com.lemon.mdcord.domain.member.MemberRole;
 import com.lemon.mdcord.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;
@@ -23,7 +24,7 @@ public class JpaMemberDetailsService implements UserDetailsService {
         return User.builder()
                 .username(member.getId())
                 .password(member.getPassword())
-                .roles("USER")
+                .roles(MemberRole.USER.getValue())
                 .build();
     }
 }

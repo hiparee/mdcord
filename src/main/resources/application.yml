@@ -1,7 +1,12 @@
+server:
+  port: 8080
+  error:
+    include-stacktrace: never
+
 spring:
   datasource:
-#    url: jdbc:mariadb://localhost:3306/mdcode
-    url: jdbc:mariadb://172.16.10.121:3306/mdcord
+    url: jdbc:mariadb://localhost:3306/mdcode
+#    url: jdbc:mariadb://172.16.10.121:3306/mdcord
     username: root
     password: "#3wnffkdl#"
     driver-class-name: org.mariadb.jdbc.Driver
@@ -9,7 +14,7 @@ spring:
     open-in-view: false
     show-sql: true
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true
@@ -33,6 +38,7 @@ logging:
 #    com.lemon: debug
 # TODO - 이거 경로 여러개 어떻게 하는지 알아보기
 
-server:
-  error:
-    include-stacktrace: never
+jwt:
+  header: Authorization
+  secret: QHp4Y3YoKTAxQCNAenhjdigpMDFAI0B6eGN2KCkwMUAj
+  validity-in-seconds: 300
