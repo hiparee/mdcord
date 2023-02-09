@@ -1,24 +1,38 @@
 package com.lemon.mdcord.common.config;
 
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springdoc.core.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@OpenAPIDefinition(
-        info = @Info(
-                title = "MDCODE API 명세서",
-//                description = "API 명세서",
-                version = "v1"
-//                contact = @Contact(
-//                        name = "담당자명",
-//                        email = "담당자이메일"
-//                )
-        )
-)
 @Configuration
 public class SwaggerConfig {
+
+    @Bean
+    public OpenAPI openAPI() {
+        Info info = new Info()
+                .version("v1.0.0")
+                .title("MDCODE API 명세서");
+
+        String jwtSchemeName = "Authentication";
+        SecurityRequirement requirement = new SecurityRequirement().addList(jwtSchemeName);
+        Components components = new Components()
+                .addSecuritySchemes(jwtSchemeName, new SecurityScheme()
+                        .name(jwtSchemeName)
+                        .type(SecurityScheme.Type.HTTP)
+                        .scheme("bearer")
+                        .bearerFormat("JWT")
+                );
+
+        return new OpenAPI()
+                .info(info)
+                .addSecurityItem(requirement)
+                .components(components);
+    }
 
     @Bean
     public GroupedOpenApi memberOpenApi() {
