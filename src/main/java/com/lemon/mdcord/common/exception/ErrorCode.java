@@ -14,7 +14,8 @@ public enum ErrorCode {
     
     INVALID_VALUE("부정확한 값이 입력되었습니다.", 400),
 
-    INTERNAL_ERROR("INTERNAL ERROR", 500);
+    INTERNAL_ERROR("INTERNAL ERROR", 500),
+    UNAUTHORIZED("UNAUTHORIZED", 401);
 
     private final String message;
     private final int status;

@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 @Tag(name = "Member Controller")
@@ -26,8 +27,8 @@ public class MemberController {
 
     @Operation(summary = "로그인", description = "로그인 API")
     @PostMapping("/members/signin")
-    public MemberLoginResponse signin(@RequestBody final MemberLoginRequest dto) {
-        return new MemberLoginResponse(memberService.memberLogin(dto));
+    public MemberLoginResponse signin(@RequestBody final MemberLoginRequest dto, HttpServletResponse response) {
+        return new MemberLoginResponse(memberService.memberLogin(dto, response));
     }
 
     @Operation(summary = "사용자 정보 수정", description = "사용자 정보 수정 API")

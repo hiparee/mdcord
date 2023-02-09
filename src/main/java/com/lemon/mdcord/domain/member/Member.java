@@ -47,6 +47,11 @@ public class Member extends BaseEntity {
     @ColumnDefault("'Y'")
     private String useYn;
 
+    // TODO - ERD 반영 필요
+    @Column(name = "type", nullable = false, length = 10)
+    @Enumerated(EnumType.STRING)
+    private MemberRole memberRole;
+
     @LastModifiedDate
     @Column(name = "update_date")
     private LocalDateTime updateDate;
@@ -66,6 +71,7 @@ public class Member extends BaseEntity {
         this.id = id;
         this.name = name;
         this.password = this.encodePassword(password, passwordEncoder);
+        this.memberRole = MemberRole.USER;
         super.setCreateBy(createBy);
     }
 
