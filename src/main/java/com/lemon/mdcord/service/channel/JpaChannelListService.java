@@ -8,6 +8,8 @@ import com.lemon.mdcord.dto.channel.MultipleChannelListResponse;
 import com.lemon.mdcord.repository.ChannelListRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,10 +33,12 @@ public class JpaChannelListService implements ChannelListService {
             throw new ChannelListDuplicatedException(dto.getName());
         }
 
+        String currentMemberId = getAuthentication().getName();
+
         ChannelList channelList = ChannelList.builder()
                 .name(dto.getName())
                 .parentId(dto.getParentId())
-                .createBy("수정 필요") // TODO - 수정 필요
+                .createBy(currentMemberId)
                 .build();
 
         return channelListRepository.save(channelList);
@@ -57,6 +61,11 @@ public class JpaChannelListService implements ChannelListService {
                 .channelCount(channelListResponses.size())
                 .build();
     }
+
+    private static Authentication getAuthentication() {
+        return SecurityContextHolder.getContext().getAuthentication();
+    }
+
 
     private ChannelListResponse toChannelListResponse(ChannelList channelList) {
         return ChannelListResponse.builder()
