@@ -9,23 +9,32 @@ import com.lemon.mdcord.dto.member.MemberLoginRequest;
 import com.lemon.mdcord.dto.member.MemberPasswordEncoder;
 import com.lemon.mdcord.dto.member.MemberUpdateRequest;
 import com.lemon.mdcord.repository.MemberRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Optional;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class JpaMemberService implements MemberService {
     private final MemberRepository memberRepository;
     private final MemberPasswordEncoder memberPasswordEncoder;
     private final JwtProvider jwtProvider;
+    private final String header;
     private final String LOGIN_USE_YN = "Y";
+
+    public JpaMemberService(MemberRepository memberRepository, MemberPasswordEncoder memberPasswordEncoder, JwtProvider jwtProvider, @Value("${jwt.header}") String header) {
+        this.memberRepository = memberRepository;
+        this.memberPasswordEncoder = memberPasswordEncoder;
+        this.jwtProvider = jwtProvider;
+        this.header = header;
+    }
 
     @Override
     @Transactional
@@ -46,12 +55,14 @@ public class JpaMemberService implements MemberService {
             throw new MemberDuplicatedException(dto.getMemberId());
         }
 
+        String currentMemberId = getAuthentication().getName();
+
         Member member = Member.builder()
                 .id(dto.getMemberId())
                 .name(dto.getName())
                 .password(dto.getPassword())
                 .passwordEncoder(memberPasswordEncoder)
-                .createBy("수정필요") // TODO - 수정 필요
+                .createBy(currentMemberId)
                 .build();
 
         return memberRepository.save(member);
@@ -62,13 +73,19 @@ public class JpaMemberService implements MemberService {
     public Member updateUser(final MemberUpdateRequest dto) {
         Member member = getMemberById(dto.getMemberId());
 
+        String currentMemberId = getAuthentication().getName();
+
         member.updateMemberInfo(
                 dto.getName(), dto.getPassword(),
                 memberPasswordEncoder, dto.getIconFileId(),
-                dto.getUseYn(), "수정 필요" // TODO - 수정 필요
+                dto.getUseYn(), currentMemberId
         );
 
         return memberRepository.save(member);
+    }
+
+    private static Authentication getAuthentication() {
+        return SecurityContextHolder.getContext().getAuthentication();
     }
 
     private Member getMemberById(final String memberId) {
@@ -81,11 +98,15 @@ public class JpaMemberService implements MemberService {
     }
 
     private void saveTokenInCookie(String token, HttpServletResponse response) {
-        Cookie cookie = new Cookie("access-token", token);
-        cookie.setMaxAge(60*5);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        response.addCookie(cookie);
+        ResponseCookie cookie = ResponseCookie.from(header, token)
+                .maxAge(1800)
+                .path("/")
+                .secure(true)
+                .httpOnly(true)
+                .sameSite("None") // TODO - sameSite 값 변경 가능한지 확인
+                .build();
+
+        response.setHeader("Set-Cookie", cookie.toString());
     }
 
 }

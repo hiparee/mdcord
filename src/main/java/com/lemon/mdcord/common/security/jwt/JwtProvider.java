@@ -12,8 +12,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.security.Key;
 import java.util.Date;
@@ -70,10 +70,20 @@ public class JwtProvider {
      * @return 토큰 앞에 "Bearer "가 붙어있지 않다면 불완전한 토큰으로 판단하여 null
      */
     public String resolveToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader(header);
-        if(StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
+        Cookie[] cookies = request.getCookies();
+        if(cookies != null) {
+            for(Cookie cookie : cookies) {
+                if (cookie.getName().equals(header)) {
+                    return cookie.getValue();
+                }
+            }
         }
+//        String bearerToken = request.getHeader(header);
+//        if(StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+//        if(StringUtils.hasText(bearerToken)) {
+//            return bearerToken;
+//            return bearerToken.substring(7);
+//        }
         return null;
     }
 
@@ -91,6 +101,8 @@ public class JwtProvider {
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
+            
+            // TODO - refresh token을 만든다면 아마도 여기서 만들어야 할듯
 
             return !claims.getExpiration().before(new Date());
         } catch (ExpiredJwtException e) {
