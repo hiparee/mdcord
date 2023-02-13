@@ -42,4 +42,5 @@ logging:
 jwt:
   header: Authorization
   secret: QHp4Y3YoKTAxQCNAenhjdigpMDFAI0B6eGN2KCkwMUAj
-  validity-in-seconds: 1800
+  validity-in-seconds: 86400
+#  validity-in-seconds: 180
