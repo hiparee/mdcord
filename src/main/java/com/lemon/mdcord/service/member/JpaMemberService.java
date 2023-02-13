@@ -103,16 +103,4 @@ public class JpaMemberService implements MemberService {
         jwtProvider.createTokenInCookie(token, response);
     }
 
-    private void saveTokenInCookie(String token, HttpServletResponse response) {
-        ResponseCookie cookie = ResponseCookie.from(header, token)
-                .maxAge(validitySeconds)
-                .path("/")
-                .secure(true)
-                .httpOnly(true)
-                .sameSite("None")
-                .build();
-
-        response.setHeader("Set-Cookie", cookie.toString());
-    }
-
 }
