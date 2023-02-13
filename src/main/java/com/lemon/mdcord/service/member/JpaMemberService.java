@@ -27,13 +27,19 @@ public class JpaMemberService implements MemberService {
     private final MemberPasswordEncoder memberPasswordEncoder;
     private final JwtProvider jwtProvider;
     private final String header;
+    private final long validitySeconds;
     private final String LOGIN_USE_YN = "Y";
 
-    public JpaMemberService(MemberRepository memberRepository, MemberPasswordEncoder memberPasswordEncoder, JwtProvider jwtProvider, @Value("${jwt.header}") String header) {
+    public JpaMemberService(MemberRepository memberRepository
+            , MemberPasswordEncoder memberPasswordEncoder
+            , JwtProvider jwtProvider
+            , @Value("${jwt.header}") String header
+            , @Value("${jwt.validity-in-seconds}") long validitySeconds) {
         this.memberRepository = memberRepository;
         this.memberPasswordEncoder = memberPasswordEncoder;
         this.jwtProvider = jwtProvider;
         this.header = header;
+        this.validitySeconds = validitySeconds;
     }
 
     @Override
@@ -94,16 +100,16 @@ public class JpaMemberService implements MemberService {
 
     private void createToken(Member member, HttpServletResponse response) {
         String token = jwtProvider.createToken(member.getId(), member.getMemberRole().getValue());
-        saveTokenInCookie(token, response);
+        jwtProvider.createTokenInCookie(token, response);
     }
 
     private void saveTokenInCookie(String token, HttpServletResponse response) {
         ResponseCookie cookie = ResponseCookie.from(header, token)
-                .maxAge(1800)
+                .maxAge(validitySeconds)
                 .path("/")
                 .secure(true)
                 .httpOnly(true)
-                .sameSite("None") // TODO - sameSite 값 변경 가능한지 확인
+                .sameSite("None")
                 .build();
 
         response.setHeader("Set-Cookie", cookie.toString());

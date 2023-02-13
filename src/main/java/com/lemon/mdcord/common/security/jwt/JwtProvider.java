@@ -7,6 +7,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,7 +16,11 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.security.Key;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,18 +31,18 @@ public class JwtProvider {
 
     private final String header;
     private final Key key;
-    private final long validityMilliSeconds;
+    private final long validitySeconds;
     private final UserDetailsService userDetailsService;
     private final SignatureAlgorithm signatureAlgorithm;
 
     public JwtProvider(
             @Value("${jwt.secret}") String secret
             , @Value("${jwt.header}") String header
-            , @Value("${jwt.validity-in-seconds}") long validityMilliSeconds
+            , @Value("${jwt.validity-in-seconds}") long validitySeconds
             , JpaMemberDetailsService memberDetailsService) {
         this.header = header;
         this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
-        this.validityMilliSeconds = validityMilliSeconds * 1000;
+        this.validitySeconds = validitySeconds;
         this.userDetailsService = memberDetailsService;
         this.signatureAlgorithm = SignatureAlgorithm.HS256;
     }
@@ -50,7 +55,7 @@ public class JwtProvider {
      */
     public String createToken(String memberId, String MemberRole) {
         Date now = new Date();
-        Date expiration = new Date(now.getTime() + this.validityMilliSeconds);
+        Date expiration = new Date(now.getTime() + validitySeconds * 1000);
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("member", memberId);
@@ -65,9 +70,9 @@ public class JwtProvider {
     }
 
     /**
-     * 정해진 Http Headers의 값을 가져와서 토큰을 확인
+     * Cookie에 정해진 header값이 있다면 값 리턴
      * @param request
-     * @return 토큰 앞에 "Bearer "가 붙어있지 않다면 불완전한 토큰으로 판단하여 null
+     * @return
      */
     public String resolveToken(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
@@ -84,6 +89,9 @@ public class JwtProvider {
 //            return bearerToken;
 //            return bearerToken.substring(7);
 //        }
+
+        // TODO - 처음 로그인할 때도 이 log가 찍힐 것이라서 만료가 된 것인지 구분이 불가능함. 방법 있을지 고민해보기
+//        log.error("Cookies don't have headers set");
         return null;
     }
 
@@ -91,20 +99,14 @@ public class JwtProvider {
      * 토큰 검증
      * resolveToken()에서 얻은 토큰을 검증
      * @param token
-     * @return 토큰의 만료 시간과 현재 시간을 비교
-     *         현재 시간이 만료 시간을 넘겼다면 false
+     * @return
      */
-    public boolean validateToken(String token) {
+    public boolean validateToken(String token, HttpServletResponse response) {
         try {
-            Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
-            
-            // TODO - refresh token을 만든다면 아마도 여기서 만들어야 할듯
+            Claims claims = getClaims(token);
+            if(updateToken(claims, response)) return true;
 
-            return !claims.getExpiration().before(new Date());
+            return validateExpiration(claims);
         } catch (ExpiredJwtException e) {
             log.info("Expired JWT.");
             throw new UserAuthenticationException("Throw expired token exception", e);
@@ -130,6 +132,65 @@ public class JwtProvider {
             log.error("Exception Message : {}", e.getMessage());
             throw new UserAuthenticationException("Throw exception", e);
         }
+    }
+
+    /**
+     * token claims 구하기
+     * @param token
+     * @return
+     */
+    private Claims getClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
+    /**
+     * 토큰 검증 시, 만료되지 않았으면서 유효 시간의 1/3 이하면 갱신
+     * @param claims
+     */
+    private boolean updateToken(Claims claims, HttpServletResponse response) {
+        LocalDateTime expiration = claims.getExpiration().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        LocalDateTime now = LocalDateTime.now();
+
+        long seconds = Duration.between(now, expiration).getSeconds();
+
+        if(validateExpiration(claims) && seconds <= validitySeconds/3) {
+            String token = createToken((String) claims.get("member"), (String) claims.get("role"));
+            createTokenInCookie(token, response);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * 토큰의 만료 시간과 현재 시간을 비교
+     * 현재 시간이 만료 시간을 넘겼다면 false
+     * @param claims
+     * @return
+     */
+    private boolean validateExpiration(Claims claims) {
+        return !claims.getExpiration().before(new Date());
+    }
+
+    /**
+     * 토큰을 쿠키에 저장
+     * @param token
+     * @param response
+     */
+    public void createTokenInCookie(String token, HttpServletResponse response) {
+        ResponseCookie cookie = ResponseCookie.from(header, token)
+                .maxAge(validitySeconds)
+                .path("/")
+                .secure(true)
+                .httpOnly(true)
+                .sameSite("None")
+                .build();
+
+        response.setHeader("Set-Cookie", cookie.toString());
     }
 
     /**
