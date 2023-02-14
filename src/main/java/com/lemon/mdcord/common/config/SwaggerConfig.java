@@ -16,7 +16,7 @@ public class SwaggerConfig {
     public OpenAPI openAPI() {
         Info info = new Info()
                 .version("v1.0.0")
-                .title("MDCODE API 명세서");
+                .title("MDCORD API 명세서");
 
         String jwtSchemeName = "Authentication";
         SecurityRequirement requirement = new SecurityRequirement().addList(jwtSchemeName);
