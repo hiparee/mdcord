@@ -50,7 +50,7 @@ public class WebSecurityConfig {
             .and()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/api/members/signin").permitAll()
-                .antMatchers("/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**", "/").permitAll()
+                .antMatchers("/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**", "/", "/js/**", "/css/**").permitAll()
                 .anyRequest().authenticated()
 //                .antMatchers("/**").permitAll()
             .and()
@@ -67,7 +67,7 @@ public class WebSecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring()
                 .antMatchers(
-                    "/js/**", "/css/**"
+
                 );
     }
 
