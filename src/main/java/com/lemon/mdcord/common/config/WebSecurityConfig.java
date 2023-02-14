@@ -37,7 +37,7 @@ public class WebSecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring()
                 .antMatchers(
-                        "/**/js/**", "/**/css/**", "/static/**"
+//                        "/**/js/**", "/**/css/**", "/static/**"
                 );
     }
 
@@ -57,10 +57,10 @@ public class WebSecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
                 .authorizeRequests()
-                    .antMatchers(HttpMethod.POST, "/api/members/signin").permitAll()
-                    .antMatchers(HttpMethod.GET, "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**", "/", "/**/js/**", "/**/css/**", "/index.html").permitAll()
-                    .anyRequest().authenticated()
-//                .antMatchers("/**").permitAll()
+//                    .antMatchers(HttpMethod.POST, "/api/members/signin").permitAll()
+//                    .antMatchers(HttpMethod.GET, "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**", "/", "/**/js/**", "/**/css/**", "/index.html").permitAll()
+//                    .anyRequest().authenticated()
+                .antMatchers("/**").permitAll()
             .and()
                 .exceptionHandling()
                     .accessDeniedHandler(jwtAccessDeniedHandler)
