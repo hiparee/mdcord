@@ -34,6 +34,14 @@ public class WebSecurityConfig {
     }
 
     @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring()
+                .antMatchers(
+                        "/js/**", "/css/**", "/static/**"
+                );
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .httpBasic().disable()
@@ -61,14 +69,6 @@ public class WebSecurityConfig {
                 .apply(new JwtFilterConfigurer(jwtProvider));
 
         return http.build();
-    }
-
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring()
-                .antMatchers(
-                    "/js/**", "/css/**"
-                );
     }
 
     @Bean
