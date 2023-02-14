@@ -136,15 +136,8 @@ task deleteVueBuildFiles(type: Delete) {
  * deleteVueBuildFiles task는 빌드 결과물을 제거하기 위하여 별도 만든 task이고,
  * npmInstall task는 node plugin에서 제공하는 task입니다.
  */
-task npmBuild(type: NpmTask, dependsOn: ['deleteVueBuildFiles', 'npmInstall', 'copyDistToStatic']) {
+task npmBuild(type: NpmTask, dependsOn: ['deleteVueBuildFiles', 'npmInstall']) {
 	args = ["run", "build"]
-}
-
-/* dist 하위 파일을 static 폴더에 복사 */
-task copyDistToStatic(type: Copy) {
-	from("${project.projectDir}/vue/dist/")
-	into("${project.projectDir}/src/main/resources/static/")
-	includeEmptyDirs = true
 }
 
 /**
