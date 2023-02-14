@@ -67,7 +67,7 @@ public class WebSecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring()
                 .antMatchers(
-
+                    "/js/**", "/css/**"
                 );
     }
 
