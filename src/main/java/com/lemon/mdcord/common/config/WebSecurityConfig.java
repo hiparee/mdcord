@@ -18,6 +18,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.List;
+
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig {
@@ -48,7 +50,7 @@ public class WebSecurityConfig {
             .and()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/api/members/signin").permitAll()
-                .antMatchers("/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**").permitAll()
+                .antMatchers("/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**", "/").permitAll()
                 .anyRequest().authenticated()
 //                .antMatchers("/**").permitAll()
             .and()
@@ -73,9 +75,14 @@ public class WebSecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.addAllowedOrigin("http://localhost:8081");
-        configuration.addAllowedHeader("*");
-        configuration.addAllowedMethod("*");
+//        configuration.addAllowedOrigin("http://localhost:8081");
+//        configuration.addAllowedOrigin("http://127.0.0.1:5500");
+//        configuration.addAllowedHeader("*");
+//        configuration.addAllowedMethod("*");
+
+        configuration.setAllowedOrigins(List.of("http://localhost:8081", "http://127.0.0.1:5500"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        configuration.setAllowedMethods(List.of("POST", "GET", "PUT"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
