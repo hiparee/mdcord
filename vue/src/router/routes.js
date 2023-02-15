@@ -7,6 +7,7 @@ import Login from "@/views/LoginPage.vue";
 
 const router = createRouter({
   history: createWebHistory(),
+  base: "/vue/",
   routes: [
     {
       path: "/",
