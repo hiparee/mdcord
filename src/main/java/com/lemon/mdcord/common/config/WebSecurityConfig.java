@@ -37,7 +37,7 @@ public class WebSecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring()
                 .antMatchers(
-                        "/js/**", "/css/**", "/favicon.ico", "/img/**", "/fonts/**"
+                        "/assets/**", "/favicon.ico"
                 );
     }
 
