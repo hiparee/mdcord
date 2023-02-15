@@ -33,13 +33,13 @@ public class WebSecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring()
-                .antMatchers(
-                        "/assets/**", "/favicon.ico"
-                );
-    }
+//    @Bean
+//    public WebSecurityCustomizer webSecurityCustomizer() {
+//        return (web) -> web.ignoring()
+//                .antMatchers(
+//                        "/assets/**", "/favicon.ico"
+//                );
+//    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -57,8 +57,9 @@ public class WebSecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
                 .authorizeRequests()
+                    .antMatchers(HttpMethod.GET, "/assets/**", "/favicon.ico", "/", "/login").permitAll()
+                    .antMatchers(HttpMethod.GET, "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**").permitAll()
                     .antMatchers(HttpMethod.POST, "/api/members/signin").permitAll()
-                    .antMatchers(HttpMethod.GET, "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**", "/", "/login").permitAll()
                     .anyRequest().authenticated()
 //                .antMatchers("/**").permitAll()
             .and()
