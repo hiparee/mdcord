@@ -34,6 +34,14 @@ public class WebSecurityConfig {
     }
 
     @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring()
+                .antMatchers(
+                        "/js/**", "/css/**", "/favicon.ico", "/img/**", "/fonts/**"
+                );
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .httpBasic().disable()
@@ -49,9 +57,9 @@ public class WebSecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
                 .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/api/members/signin").permitAll()
-                .antMatchers("/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**", "/", "/js/**", "/css/**").permitAll()
-                .anyRequest().authenticated()
+                    .antMatchers(HttpMethod.POST, "/api/members/signin").permitAll()
+                    .antMatchers(HttpMethod.GET, "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**", "/", "/login").permitAll()
+                    .anyRequest().authenticated()
 //                .antMatchers("/**").permitAll()
             .and()
                 .exceptionHandling()
@@ -61,14 +69,6 @@ public class WebSecurityConfig {
                 .apply(new JwtFilterConfigurer(jwtProvider));
 
         return http.build();
-    }
-
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring()
-                .antMatchers(
-
-                );
     }
 
     @Bean
