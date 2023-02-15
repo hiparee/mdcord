@@ -36,6 +36,7 @@ springdoc:
 logging:
   level:
     org.hibernate.SQL: debug
+    org.springframework.security: debug
 #    com.lemon: debug
 # TODO - 이거 경로 여러개 어떻게 하는지 알아보기
 
