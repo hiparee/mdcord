@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <form>
     <div class="row mb-3">
       <label for="inputEmail3" class="col-sm-2 col-form-label">Email</label>
@@ -73,4 +73,4 @@
 
 <script setup></script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped></style> -->
