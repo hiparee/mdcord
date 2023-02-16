@@ -26,7 +26,7 @@ public class JpaChannelListService implements ChannelListService {
 
     @Override
     @Transactional
-    public ChannelList createChannelList(final ChannelListCreateRequest dto) {
+    public ChannelList createChannel(final ChannelListCreateRequest dto) {
         Optional<ChannelList> checkDuplicated = channelListRepository.findByNameAndParentId(dto.getName(), dto.getParentId());
 
         if(checkDuplicated.isPresent()) {
@@ -45,7 +45,7 @@ public class JpaChannelListService implements ChannelListService {
     }
 
     @Override
-    public MultipleChannelListResponse fetchChannelList() {
+    public MultipleChannelListResponse fetchChannels() {
         List<ChannelList> channelLists = channelListRepository.findAll();
 
         if(channelLists.size() == 0) {
