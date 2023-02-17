@@ -32,17 +32,20 @@ public class JwtProvider {
     private final String header;
     private final Key key;
     private final long validitySeconds;
+    private final String domain;
     private final UserDetailsService userDetailsService;
     private final SignatureAlgorithm signatureAlgorithm;
 
     public JwtProvider(
             @Value("${jwt.secret}") String secret
             , @Value("${jwt.header}") String header
+            , @Value("${jwt.domain}") String domain
             , @Value("${jwt.validity-in-seconds}") long validitySeconds
             , JpaMemberDetailsService memberDetailsService) {
         this.header = header;
         this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
         this.validitySeconds = validitySeconds;
+        this.domain = domain;
         this.userDetailsService = memberDetailsService;
         this.signatureAlgorithm = SignatureAlgorithm.HS256;
     }
@@ -186,7 +189,7 @@ public class JwtProvider {
         ResponseCookie cookie = ResponseCookie.from(header, token)
                 .maxAge(validitySeconds)
                 .path("/")
-                .domain("http://172.16.10.121:9000")
+                .domain(domain)
                 .secure(true)
                 .httpOnly(true)
                 .sameSite("None")
