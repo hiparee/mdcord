@@ -83,6 +83,7 @@ public class WebSecurityConfig {
 
         configuration.setAllowedOrigins(List.of("http://localhost:8081", "http://127.0.0.1:5500", "http://172.16.10.121:9000"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        configuration.setExposedHeaders(List.of("Set-Cookie"));
         configuration.setAllowedMethods(List.of("POST", "GET", "PUT"));
         configuration.setAllowCredentials(true);
 
