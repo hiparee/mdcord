@@ -55,7 +55,7 @@ public class JwtProvider {
      */
     public String createToken(String memberId, String MemberRole) {
         Date now = new Date();
-        Date expiration = new Date(now.getTime() + validitySeconds * 1000);
+        Date expiration = new Date(now.getTime() + (validitySeconds * 1000));
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("member", memberId);
@@ -187,7 +187,7 @@ public class JwtProvider {
                 .path("/")
                 .secure(true)
                 .httpOnly(true)
-                .sameSite("None")
+                .sameSite("Lax")
                 .build();
 
         response.setHeader("Set-Cookie", cookie.toString());
