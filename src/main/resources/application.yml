@@ -46,3 +46,5 @@ jwt:
   secret: QHp4Y3YoKTAxQCNAenhjdigpMDFAI0B6eGN2KCkwMUAj
   validity-in-seconds: 86400
 #  validity-in-seconds: 180
+  domain: 172.16.10.121
+#  domain: localhost
