@@ -186,6 +186,7 @@ public class JwtProvider {
         ResponseCookie cookie = ResponseCookie.from(header, token)
                 .maxAge(validitySeconds)
                 .path("/")
+                .domain("172.16.10.121")
                 .secure(true)
                 .httpOnly(true)
                 .sameSite("Lax")
