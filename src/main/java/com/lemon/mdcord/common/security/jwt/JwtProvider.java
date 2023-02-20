@@ -33,6 +33,7 @@ public class JwtProvider {
     private final Key key;
     private final long validitySeconds;
     private final String domain;
+    private final String profilesActive;
     private final UserDetailsService userDetailsService;
     private final SignatureAlgorithm signatureAlgorithm;
 
@@ -40,12 +41,14 @@ public class JwtProvider {
             @Value("${jwt.secret}") String secret
             , @Value("${jwt.header}") String header
             , @Value("${jwt.domain}") String domain
+            , @Value("${spring.profiles.active}") String profilesActive
             , @Value("${jwt.validity-in-seconds}") long validitySeconds
             , JpaMemberDetailsService memberDetailsService) {
         this.header = header;
         this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
         this.validitySeconds = validitySeconds;
         this.domain = domain;
+        this.profilesActive = profilesActive;
         this.userDetailsService = memberDetailsService;
         this.signatureAlgorithm = SignatureAlgorithm.HS256;
     }
@@ -186,11 +189,13 @@ public class JwtProvider {
      * @param response
      */
     public void createTokenInCookie(String token, HttpServletResponse response) {
+        boolean isProduct = profilesActive.equals("prod") ? true : false;
+
         ResponseCookie cookie = ResponseCookie.from(header, token)
                 .maxAge(validitySeconds)
                 .path("/")
                 .domain(domain)
-//                .secure(true) // SSL 없는 개발환경에서는 적용이 안된다고 함
+                .secure(isProduct)
                 .httpOnly(true)
                 .sameSite("Lax")
                 .build();
