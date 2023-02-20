@@ -190,7 +190,7 @@ public class JwtProvider {
                 .maxAge(validitySeconds)
                 .path("/")
                 .domain(domain)
-                .secure(true)
+//                .secure(true) // SSL 없는 개발환경에서는 적용이 안된다고 함
                 .httpOnly(true)
                 .sameSite("None")
                 .build();
