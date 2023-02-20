@@ -33,7 +33,7 @@ public class JwtProvider {
     private final Key key;
     private final long validitySeconds;
     private final String domain;
-    private final String profilesActive;
+    private final boolean isProduct;
     private final UserDetailsService userDetailsService;
     private final SignatureAlgorithm signatureAlgorithm;
 
@@ -48,7 +48,7 @@ public class JwtProvider {
         this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
         this.validitySeconds = validitySeconds;
         this.domain = domain;
-        this.profilesActive = profilesActive;
+        this.isProduct = profilesActive.equals("prod") ? true : false;
         this.userDetailsService = memberDetailsService;
         this.signatureAlgorithm = SignatureAlgorithm.HS256;
     }
@@ -189,8 +189,6 @@ public class JwtProvider {
      * @param response
      */
     public void createTokenInCookie(String token, HttpServletResponse response) {
-        boolean isProduct = profilesActive.equals("prod") ? true : false;
-
         ResponseCookie cookie = ResponseCookie.from(header, token)
                 .maxAge(validitySeconds)
                 .path("/")
