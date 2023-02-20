@@ -192,7 +192,7 @@ public class JwtProvider {
                 .domain(domain)
 //                .secure(true) // SSL 없는 개발환경에서는 적용이 안된다고 함
                 .httpOnly(true)
-                .sameSite("None")
+//                .sameSite("None")
                 .build();
 
         response.setHeader("Set-Cookie", cookie.toString());
