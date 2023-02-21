@@ -17,8 +17,8 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
                 .status(e.getHttpStatus())
                 .body(
                         new ErrorResponse(
-                                e.getHttpStatus().value(),
-                                e.getHttpStatus().getReasonPhrase(),
+                                e.getErrorCode().getStatus(),
+                                e.getErrorCode().getMessage(),
                                 e.getMessage()
                         )
                 );

@@ -8,7 +8,7 @@ public class MemberDuplicatedException extends AbstractException{
 
     @Override
     public HttpStatus getHttpStatus() {
-        return HttpStatus.BAD_REQUEST;
+        return HttpStatus.CONFLICT;
     }
 
     @Override
