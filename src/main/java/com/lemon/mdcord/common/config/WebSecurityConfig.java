@@ -67,25 +67,20 @@ public class WebSecurityConfig {
         return http.build();
     }
 
-//    @Bean
-//    public CorsConfigurationSource corsConfigurationSource() {
-//        CorsConfiguration configuration = new CorsConfiguration();
-//
-////        configuration.addAllowedOrigin("http://localhost:8081");
-////        configuration.addAllowedOrigin("http://127.0.0.1:5500");
-////        configuration.addAllowedHeader("*");
-////        configuration.addAllowedMethod("*");
-//
-////        configuration.setAllowedOrigins(List.of("http://localhost:8080", "http://127.0.0.1:5500", "http://172.16.10.121:8080"));
-//        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
-//        configuration.setExposedHeaders(List.of("Set-Cookie"));
-//        configuration.setAllowedMethods(List.of("POST", "GET", "PUT"));
-//        configuration.setAllowCredentials(true);
-//
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        source.registerCorsConfiguration("/**", configuration);
-//
-//        return source;
-//    }
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        configuration.setAllowedOrigins(List.of("http://172.16.10.121:8080"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        configuration.setExposedHeaders(List.of("Set-Cookie"));
+        configuration.setAllowedMethods(List.of("POST", "GET", "PUT"));
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+
+        return source;
+    }
 
 }
