@@ -19,7 +19,7 @@ springdoc:
 
 spring:
   datasource:
-    url: jdbc:mariadb://172.16.10.121:3306/mdcord
+    url: jdbc:mariadb://172.16.10.121:3306/mdcord # 추후 개발용 DB가 새로 생성될 시 변경 필요
     username: root
     password: '#3wnffkdl#'
     driver-class-name: org.mariadb.jdbc.Driver
@@ -27,7 +27,9 @@ spring:
     open-in-view: false
     #    show-sql: true
     hibernate:
-      ddl-auto: none # 운영은 무조건 none으로 설정할 것.
+      ddl-auto: none
+      # 개발은 create/update/validate/none 아무거나 상관없음
+      # 하지만 create일 시 모든 테이블 drop 후 새로 create 이므로 주의
     properties:
       hibernate:
         format_sql: true
