@@ -45,7 +45,7 @@ public class SwaggerConfig {
 
     @Bean
     public GroupedOpenApi channelOpenApi() {
-        String[] paths = {"/api/channel-list/**"};
+        String[] paths = {"/api/channels/**"};
 
         return GroupedOpenApi.builder()
                 .group("채널 관련 API")
