@@ -47,8 +47,8 @@ public class JwtProvider {
         this.header = header;
         this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
         this.validitySeconds = validitySeconds;
-        this.domain = profilesActive.equals("dev") ? domain : "localhost"; // TODO - yml 분리시켜야함. 임시 땜빵 조건
-        this.isProduct = profilesActive.equals("prod") ? true : false;
+        this.domain = domain;
+        this.isProduct = profilesActive.equals("prod");
         this.userDetailsService = memberDetailsService;
         this.signatureAlgorithm = SignatureAlgorithm.HS256;
     }
