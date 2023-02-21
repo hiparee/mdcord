@@ -6,16 +6,17 @@
           <div class="card-body p-5 text-center shadow">
             <div class="mb-md-5 mt-md-4 pb-5">
               <pre class="text-white">
-╔╦╗╔╦╗╔═╗╔═╗╦═╗╔╦╗
-║║║ ║║║  ║ ║╠╦╝ ║║
-╩ ╩═╩╝╚═╝╚═╝╩╚══╩╝
-              </pre>
+  ╔╦╗╔╦╗╔═╗╔═╗╦═╗╔╦╗
+  ║║║ ║║║  ║ ║╠╦╝ ║║
+  ╩ ╩═╩╝╚═╝╚═╝╩╚══╩╝
+  </pre
+              >
 
               <div class="form-outline form-white mb-3">
                 <input
                   type="text"
-                  ref="id"
                   id="userId"
+                  v-model="id"
                   class="form-control form-control-lg bg-dark text-white fs-6"
                   placeholder="ID"
                 />
@@ -25,6 +26,7 @@
                 <input
                   type="password"
                   id="password"
+                  v-model="password"
                   class="form-control form-control-lg bg-dark text-white fs-6"
                   placeholder="PASSWORD"
                 />
@@ -64,18 +66,29 @@
 
 <script setup>
 import { useRouter } from "vue-router/dist/vue-router";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, inject } from "vue";
+import axios from "axios";
+import { loginSubmit } from "../api/index.js";
 
-const router = useRouter();
-const id = ref("");
+// const router = useRouter();
+const id = ref("lemon");
+const password = ref("password1234");
+onMounted(() => {
+  onFocus();
+});
 
 const submit = () => {
-  router.push("/");
+  loginSubmit({
+    memberId: id.value+'111',
+    password: password.value,
+  });
 };
 
-onMounted(() => {
-  id.value.focus();
-});
+const onFocus = () => {
+  const elId = document.getElementById("userId");
+  const elPw = document.getElementById("password");
+  return elId.value == "" ? elId.focus() : elPw.focus();
+};
 </script>
 
 <style scoped>

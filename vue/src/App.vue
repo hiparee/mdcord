@@ -12,7 +12,7 @@ import { useRoute } from "vue-router";
 const route = useRoute();
 // const msg = ref('안녕하세요');
 const isLogin = () => {
-  return route.path != "/login";
+  return route.name != "login";
 };
 
 const emitTest = () => {

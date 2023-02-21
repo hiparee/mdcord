@@ -68,7 +68,7 @@ public class WebSecurityConfig {
 //        configuration.addAllowedHeader("*");
 //        configuration.addAllowedMethod("*");
 
-        configuration.setAllowedOrigins(List.of("http://localhost:8080", "http://127.0.0.1:5173", "http://172.16.10.121:8080"));
+        configuration.setAllowedOrigins(List.of("http://172.16.10.121:8080", "http://127.0.0.1:5173" ));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         configuration.setExposedHeaders(List.of("Set-Cookie"));
         configuration.setAllowedMethods(List.of("POST", "GET", "PUT"));

@@ -10,8 +10,8 @@ const router = createRouter({
   routes: [
     {
       path: "/",
-      name: "home",
-      component: Home,
+      name: "login",
+      component: Login,
     },
     {
       path: "/:pathMatch(.*)",
@@ -19,9 +19,9 @@ const router = createRouter({
       component: ErrorPage,
     },
     {
-      path: "/login",
-      name: "login",
-      component: Login,
+      path: "/main",
+      name: "main",
+      component: Home,
     },
     // {
     //   path: "/adm/create",
