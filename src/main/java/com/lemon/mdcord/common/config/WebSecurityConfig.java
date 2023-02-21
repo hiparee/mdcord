@@ -6,10 +6,8 @@ import com.lemon.mdcord.common.security.jwt.JwtFilterConfigurer;
 import com.lemon.mdcord.common.security.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -57,11 +55,8 @@ public class WebSecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
                 .authorizeRequests()
-                    .antMatchers(HttpMethod.GET, "/assets/**", "/favicon.ico", "/", "/login").permitAll()
-                    .antMatchers(HttpMethod.GET, "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**").permitAll()
-                    .antMatchers(HttpMethod.POST, "/api/members/signin").permitAll()
-                    .anyRequest().authenticated()
-//                .antMatchers("/**").permitAll()
+                    .antMatchers("/api/members/signin").permitAll()
+                    .antMatchers("/api/members/**", "/api/channels/**").authenticated()
             .and()
                 .exceptionHandling()
                     .accessDeniedHandler(jwtAccessDeniedHandler)
