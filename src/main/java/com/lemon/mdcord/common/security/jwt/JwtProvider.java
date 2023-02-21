@@ -47,7 +47,7 @@ public class JwtProvider {
         this.header = header;
         this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
         this.validitySeconds = validitySeconds;
-        this.domain = profilesActive.equals("prod") ? domain : "localhost"; // TODO - yml 분리시키던가 해야할듯
+        this.domain = profilesActive.equals("dev") ? domain : "localhost"; // TODO - yml 분리시켜야함. 임시 땜빵 조건
         this.isProduct = profilesActive.equals("prod") ? true : false;
         this.userDetailsService = memberDetailsService;
         this.signatureAlgorithm = SignatureAlgorithm.HS256;
