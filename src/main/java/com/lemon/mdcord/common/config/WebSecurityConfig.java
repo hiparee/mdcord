@@ -33,13 +33,13 @@ public class WebSecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring()
-                .antMatchers(
-                        "/js/**", "/css/**", "/favicon.ico", "/img/**", "/fonts/**"
-                );
-    }
+//    @Bean
+//    public WebSecurityCustomizer webSecurityCustomizer() {
+//        return (web) -> web.ignoring()
+//                .antMatchers(
+//                        "/assets/**", "/favicon.ico"
+//                );
+//    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -57,8 +57,9 @@ public class WebSecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
                 .authorizeRequests()
+                    .antMatchers(HttpMethod.GET, "/assets/**", "/favicon.ico", "/", "/login").permitAll()
+                    .antMatchers(HttpMethod.GET, "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**").permitAll()
                     .antMatchers(HttpMethod.POST, "/api/members/signin").permitAll()
-                    .antMatchers(HttpMethod.GET, "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**", "/").permitAll()
                     .anyRequest().authenticated()
 //                .antMatchers("/**").permitAll()
             .and()
@@ -80,8 +81,9 @@ public class WebSecurityConfig {
 //        configuration.addAllowedHeader("*");
 //        configuration.addAllowedMethod("*");
 
-        configuration.setAllowedOrigins(List.of("http://localhost:8081", "http://127.0.0.1:5500"));
+        configuration.setAllowedOrigins(List.of("http://localhost:8080", "http://127.0.0.1:5500", "http://172.16.10.121:8080"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        configuration.setExposedHeaders(List.of("Set-Cookie"));
         configuration.setAllowedMethods(List.of("POST", "GET", "PUT"));
         configuration.setAllowCredentials(true);
 

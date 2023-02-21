@@ -5,7 +5,7 @@ import com.lemon.mdcord.dto.channel.ChannelListCreateRequest;
 import com.lemon.mdcord.dto.channel.MultipleChannelListResponse;
 
 public interface ChannelListService {
-    ChannelList createChannelList(ChannelListCreateRequest dto);
+    ChannelList createChannel(ChannelListCreateRequest dto);
 
-    MultipleChannelListResponse fetchChannelList();
+    MultipleChannelListResponse fetchChannels();
 }

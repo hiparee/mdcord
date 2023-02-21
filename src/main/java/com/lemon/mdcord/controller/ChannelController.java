@@ -20,15 +20,15 @@ public class ChannelController {
     private final ChannelListService channelListService;
 
     @Operation(summary = "채널 등록", description = "채널 등록 API")
-    @PostMapping("/channel-list")
+    @PostMapping("/channels")
     public ChannelListCreateResponse createChannelList(@RequestBody @Valid final ChannelListCreateRequest dto) {
-        return new ChannelListCreateResponse(channelListService.createChannelList(dto));
+        return new ChannelListCreateResponse(channelListService.createChannel(dto));
     }
 
     @Operation(summary = "채널 조회", description = "채널 조회 API")
-    @GetMapping("/channel-list")
+    @GetMapping("/channels")
     public MultipleChannelListResponse fetchChannelList() {
-        return channelListService.fetchChannelList();
+        return channelListService.fetchChannels();
     }
 
 }
