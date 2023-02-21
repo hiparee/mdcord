@@ -32,17 +32,23 @@ public class JwtProvider {
     private final String header;
     private final Key key;
     private final long validitySeconds;
+    private final String domain;
+    private final boolean isProduct;
     private final UserDetailsService userDetailsService;
     private final SignatureAlgorithm signatureAlgorithm;
 
     public JwtProvider(
             @Value("${jwt.secret}") String secret
             , @Value("${jwt.header}") String header
+            , @Value("${jwt.domain}") String domain
+            , @Value("${spring.profiles.active}") String profilesActive
             , @Value("${jwt.validity-in-seconds}") long validitySeconds
             , JpaMemberDetailsService memberDetailsService) {
         this.header = header;
         this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
         this.validitySeconds = validitySeconds;
+        this.domain = domain;
+        this.isProduct = profilesActive.equals("prod") ? true : false;
         this.userDetailsService = memberDetailsService;
         this.signatureAlgorithm = SignatureAlgorithm.HS256;
     }
@@ -55,7 +61,8 @@ public class JwtProvider {
      */
     public String createToken(String memberId, String MemberRole) {
         Date now = new Date();
-        Date expiration = new Date(now.getTime() + validitySeconds * 1000);
+        long validityMiliSeconds = validitySeconds * 1000;
+        Date expiration = new Date(now.getTime() + validityMiliSeconds);
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("member", memberId);
@@ -185,9 +192,10 @@ public class JwtProvider {
         ResponseCookie cookie = ResponseCookie.from(header, token)
                 .maxAge(validitySeconds)
                 .path("/")
-                .secure(true)
+                .domain(domain)
+                .secure(isProduct)
                 .httpOnly(true)
-                .sameSite("None")
+                .sameSite("Lax")
                 .build();
 
         response.setHeader("Set-Cookie", cookie.toString());

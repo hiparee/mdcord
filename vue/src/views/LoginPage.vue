@@ -12,24 +12,48 @@
               </pre>
 
               <div class="form-outline form-white mb-3">
-                <input type="text" ref="id" id="userId" class="form-control form-control-lg bg-dark text-white fs-6" placeholder="ID" />
+                <input
+                  type="text"
+                  ref="id"
+                  id="userId"
+                  class="form-control form-control-lg bg-dark text-white fs-6"
+                  placeholder="ID"
+                />
               </div>
 
               <div class="form-outline form-white mb-5">
-                <input type="password" id="password" class="form-control form-control-lg bg-dark text-white fs-6" placeholder="PASSWORD" />
+                <input
+                  type="password"
+                  id="password"
+                  class="form-control form-control-lg bg-dark text-white fs-6"
+                  placeholder="PASSWORD"
+                />
               </div>
 
-              <button class="btn btn-light btn-lg px-5 w-100" type="submit" @click="submit()">Login</button>
+              <button
+                class="btn btn-light btn-lg px-5 w-100"
+                type="submit"
+                @click="submit()"
+              >
+                Login
+              </button>
 
               <hr />
               <div class="d-flex justify-content-center text-center mt-4 pt-1">
-                <a href="#!" class="text-white"><i class="bi bi-google mx-2 fs-3"></i></a>
-                <a href="#!" class="text-white"><i class="bi bi-github mx-2 fs-3"></i></a>
+                <a href="#!" class="text-white"
+                  ><i class="bi bi-google mx-2 fs-3"></i
+                ></a>
+                <a href="#!" class="text-white"
+                  ><i class="bi bi-github mx-2 fs-3"></i
+                ></a>
               </div>
             </div>
 
             <div>
-              <p class="mb-0">Don't have an account? <a href="#!" class="text-white-50 fw-bold">Sign Up</a></p>
+              <p class="mb-0">
+                Don't have an account?
+                <a href="#!" class="text-white-50 fw-bold">Sign Up</a>
+              </p>
             </div>
           </div>
         </div>
@@ -39,19 +63,19 @@
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router/dist/vue-router';
-import { onMounted, ref } from 'vue';
+import { useRouter } from "vue-router/dist/vue-router";
+import { onMounted, ref } from "vue";
 
 const router = useRouter();
-const id = ref('');
+const id = ref("");
 
 const submit = () => {
-  router.push('/');
+  router.push("/");
 };
 
-onMounted(()=>{
+onMounted(() => {
   id.value.focus();
-})
+});
 </script>
 
 <style scoped>

@@ -5,12 +5,30 @@
       <div class="navbar-collapse" id="navbarNavDarkDropdown">
         <ul class="navbar-nav">
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              <img src="@/assets/images/icon.png" alt="" style="width: 30px; height: 30px; margin-right: 5px" />
+            <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              id="navbarDarkDropdownMenuLink"
+              role="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <img
+                src="@/assets/images/icon.png"
+                alt=""
+                style="width: 30px; height: 30px; margin-right: 5px"
+              />
               미션개발팀
             </a>
-            <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDarkDropdownMenuLink">
-              <li><a class="dropdown-item" href="#" @click="emitEvent()">서버추가</a></li>
+            <ul
+              class="dropdown-menu dropdown-menu-dark"
+              aria-labelledby="navbarDarkDropdownMenuLink"
+            >
+              <li>
+                <a class="dropdown-item" href="#" @click="emitEvent()"
+                  >서버추가</a
+                >
+              </li>
               <li><hr class="dropdown-divider bg-light" /></li>
               <li><a class="dropdown-item" href="#">의료컨텐츠사업부</a></li>
               <li><a class="dropdown-item" href="#">미션개발팀</a></li>
@@ -25,7 +43,14 @@
     <div class="list-group list-group-flush">
       <ul class="list-unstyled ps-0" id="sidebar">
         <li class="mb-2">
-          <button class="btn btn-toggle align-items-center rounded" data-bs-toggle="collapse" data-bs-target="#channel1" aria-expanded="true">Home</button>
+          <button
+            class="btn btn-toggle align-items-center rounded"
+            data-bs-toggle="collapse"
+            data-bs-target="#channel1"
+            aria-expanded="true"
+          >
+            Home
+          </button>
 
           <i class="bi bi-plus float-end plus-icon"></i>
 
@@ -37,7 +62,14 @@
           </div>
         </li>
         <li class="mb-2">
-          <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#channel2" aria-expanded="true">정부과제</button>
+          <button
+            class="btn btn-toggle align-items-center rounded collapsed"
+            data-bs-toggle="collapse"
+            data-bs-target="#channel2"
+            aria-expanded="true"
+          >
+            정부과제
+          </button>
           <i class="bi bi-plus float-end plus-icon"></i>
           <div class="collapse show" id="channel2" style="">
             <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
@@ -46,13 +78,24 @@
               <li><a href="#" class="rounded">비대면-비접촉</a></li>
               <li><a href="#" class="rounded">부천시 스마트경로당</a></li>
               <li><a href="#" class="rounded">세브란스 스마트 선도사업</a></li>
-              <li><a href="#" class="rounded">국립암센터 국민건강스마트관리연구개발사업</a></li>
+              <li>
+                <a href="#" class="rounded"
+                  >국립암센터 국민건강스마트관리연구개발사업</a
+                >
+              </li>
               <li><a href="#" class="rounded">감염병 빅데이터</a></li>
             </ul>
           </div>
         </li>
         <li class="mb-2">
-          <button class="btn btn-toggle align-items-center rounded" data-bs-toggle="collapse" data-bs-target="#channel3" aria-expanded="true">전자동의서</button>
+          <button
+            class="btn btn-toggle align-items-center rounded"
+            data-bs-toggle="collapse"
+            data-bs-target="#channel3"
+            aria-expanded="true"
+          >
+            전자동의서
+          </button>
           <i class="bi bi-plus float-end plus-icon"></i>
           <div class="collapse show" id="channel3" style="">
             <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
@@ -62,8 +105,15 @@
           </div>
         </li>
 
-        <li class="mb-2">
-          <button class="btn btn-toggle align-items-center rounded" data-bs-toggle="collapse" data-bs-target="#channel4" aria-expanded="true">전자동의서</button>
+        <!-- <li class="mb-2">
+          <button
+            class="btn btn-toggle align-items-center rounded"
+            data-bs-toggle="collapse"
+            data-bs-target="#channel4"
+            aria-expanded="true"
+          >
+            전자동의서
+          </button>
           <i class="bi bi-plus float-end plus-icon"></i>
           <div class="collapse show" id="channel4" style="">
             <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
@@ -71,19 +121,53 @@
               <li><a href="#" class="rounded">대구파티마병원</a></li>
             </ul>
           </div>
-        </li>
+        </li> -->
 
         <hr class="my-3" />
-
         <li class="mb-2">
-          <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#account-collapse" aria-expanded="true">바로가기</button>
+          <button
+            class="btn btn-toggle align-items-center rounded"
+            data-bs-toggle="collapse"
+            data-bs-target="#channel4"
+            aria-expanded="true"
+          >
+            바로가기
+          </button>
 
-          <div class="collapse show" id="account-collapse">
+          <div class="collapse show" id="channel4">
             <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-              <li><a href="https://office.hiworks.com/lemonhc.com" target="_blank" class="rounded">Hiworks</a></li>
-              <li><a href="https://auth.ncloud.com/nsa/cost" target="_blank" class="rounded">Naver Cloud</a></li>
-              <li><a href="https://jira.lemonhc.com/secure/Dashboard.jspa" target="_blank" class="rounded">Jira</a></li>
-              <li><a href="https://docs.lemonhc.com/login.action?os_destination=%2Findex.action&permissionViolation=true#all-updates" target="_blank" class="rounded">Confluence</a></li>
+              <li>
+                <a
+                  href="https://office.hiworks.com/lemonhc.com"
+                  target="_blank"
+                  class="rounded"
+                  >Hiworks</a
+                >
+              </li>
+              <li>
+                <a
+                  href="https://auth.ncloud.com/nsa/cost"
+                  target="_blank"
+                  class="rounded"
+                  >Naver Cloud</a
+                >
+              </li>
+              <li>
+                <a
+                  href="https://jira.lemonhc.com/secure/Dashboard.jspa"
+                  target="_blank"
+                  class="rounded"
+                  >Jira</a
+                >
+              </li>
+              <li>
+                <a
+                  href="https://docs.lemonhc.com/login.action?os_destination=%2Findex.action&permissionViolation=true#all-updates"
+                  target="_blank"
+                  class="rounded"
+                  >Confluence</a
+                >
+              </li>
               <li>
                 <a
                   href="https://m.search.naver.com/search.naver?sm=mtb_hty.top&where=m&oquery=%EB%A3%B0%EB%A0%9B&tqi=h33g5sp0iqdssfp0eEossssst1s-130140&query=%EB%A3%B0%EB%A0%9B"
@@ -91,6 +175,40 @@
                   class="rounded"
                   >룰렛돌리기</a
                 >
+              </li>
+            </ul>
+          </div>
+        </li>
+        <hr class="my-3" />
+        <li class="mb-2" v-if="pageType === 'A'">
+          <button
+            class="btn btn-toggle align-items-center rounded collapsed"
+            data-bs-toggle="collapse"
+            data-bs-target="#channel5"
+            aria-expanded="true"
+          >
+            관리자
+          </button>
+          <div class="collapse show" id="channel5">
+            <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+              <li>
+                <a
+                  href="javascript:;"
+                  @click="$router.push('/adm/user')"
+                  class="rounded"
+                  >사용자 관리</a
+                >
+              </li>
+              <!-- <li>
+                <a
+                  href="javascript:"
+                  class="rounded"
+                  @click="$router.push('/adm/create')"
+                  >사용자 등록</a
+                >
+              </li> -->
+              <li>
+                <a href="javascript:" class="rounded"></a>
               </li>
             </ul>
           </div>
@@ -117,12 +235,21 @@
                   <p class="small text-muted my-1 mx-1">글 <span>241</span></p>
                 </div>
                 <div class="flex:1">
-                  <p class="small text-muted my-1 mx-1">첨부파일 <span>41</span></p>
+                  <p class="small text-muted my-1 mx-1">
+                    첨부파일 <span>41</span>
+                  </p>
                 </div>
               </div>
               <div class="d-flex pt-1">
-                <button type="button" class="btn btn-outline-danger text-dark btn-sm me-1 flex-grow-1">Chat</button>
-                <button type="button" class="btn btn-danger btn-sm flex-grow-1">Logout</button>
+                <button
+                  type="button"
+                  class="btn btn-outline-danger text-dark btn-sm me-1 flex-grow-1"
+                >
+                  Chat
+                </button>
+                <button type="button" class="btn btn-danger btn-sm flex-grow-1">
+                  Logout
+                </button>
               </div>
             </div>
           </div>
@@ -133,11 +260,13 @@
 </template>
 
 <script setup>
-import { defineEmits } from 'vue';
-const emit = defineEmits(['pass', 'pass2']);
+import { defineEmits, ref } from "vue";
+const emit = defineEmits(["pass", "pass2"]);
 const emitEvent = () => {
-  emit('pass1');
+  emit("pass1");
 };
+
+const pageType = ref("A");
 </script>
 
 <style scoped>
