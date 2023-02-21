@@ -11,8 +11,9 @@ public class ApiCommonError implements ErrorPageRegistrar {
 
     @Override
     public void registerErrorPages(ErrorPageRegistry registry) {
-        ErrorPage errorPage = new ErrorPage(HttpStatus.NOT_FOUND, "/index.html");
-        registry.addErrorPages(errorPage);
+        ErrorPage errorPage404 = new ErrorPage(HttpStatus.NOT_FOUND, "/index.html");
+        ErrorPage errorPage401 = new ErrorPage(HttpStatus.UNAUTHORIZED, "/index.html");
+        registry.addErrorPages(errorPage404, errorPage401);
     }
 
 }
