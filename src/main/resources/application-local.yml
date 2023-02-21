@@ -1,0 +1,34 @@
+jwt:
+  header: Authorization
+  secret: QHp4Y3YoKTAxQCNAenhjdigpMDFAI0B6eGN2KCkwMUAj
+  validity-in-seconds: 86400
+  domain: localhost
+
+springdoc:
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  api-docs:
+    enabled: true # swagger 필요없어질 경우 false
+    path: /api-docs
+  packages-to-scan: com.lemon.mdcord.controller
+  swagger-ui:
+    operations-sorter: alpha # 알파벳 오름차순 : alpha, HTTP method순 : method
+    tags-sorter: alpha
+    disable-swagger-default-url: true # TODO - 다시 알아보기
+    display-request-duration: true
+
+spring:
+  datasource:
+    url: jdbc:mariadb://172.16.10.121:3306/mdcord
+    username: root
+    password: '#3wnffkdl#'
+    driver-class-name: org.mariadb.jdbc.Driver
+  jpa:
+    open-in-view: false
+    #    show-sql: true
+    hibernate:
+      ddl-auto: none # 운영은 무조건 none으로 설정할 것.
+    properties:
+      hibernate:
+        format_sql: true
+#        use_sql_comments: true
