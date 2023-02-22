@@ -27,12 +27,14 @@
                   type="password"
                   id="password"
                   v-model="password"
+                  @keyup.enter="submit()"
                   class="form-control form-control-lg bg-dark text-white fs-6"
                   placeholder="PASSWORD"
                 />
               </div>
 
               <button
+                id="submitBtn"
                 class="btn btn-light btn-lg px-5 w-100"
                 type="submit"
                 @click="submit()"
@@ -67,27 +69,63 @@
 <script setup>
 import { useRouter } from "vue-router/dist/vue-router";
 import { onMounted, ref, inject } from "vue";
-import axios from "axios";
 import { loginSubmit } from "../api/index.js";
+import { useToast } from "vue-toast-notification";
 
-// const router = useRouter();
+const router = useRouter();
+const $toast = useToast({
+  duration: 1000,
+});
 const id = ref("lemon");
 const password = ref("password1234");
+
 onMounted(() => {
   onFocus();
 });
 
 const submit = () => {
+  disToggle(true);
+
   loginSubmit({
     memberId: id.value,
     password: password.value,
-  });
+  })
+    .then((response) => {
+      console.log(response);
+      console.log(response.data.hasOwnProperty("httpStatus"));
+
+      if (response.data.hasOwnProperty("httpStatus")) {
+        $toast.error("Login Failed", {
+          onDismiss: () => {
+            disToggle(false);
+            onFocus();
+          },
+        });
+      } else {
+        $toast.success("Login Success", {
+          onDismiss: () => {
+            router.push("/main");
+            disToggle(false);
+          },
+        });
+      }
+    })
+    .catch(() => {
+      $toast.error("Server error");
+      disToggle(false);
+    });
 };
 
 const onFocus = () => {
   const elId = document.getElementById("userId");
   const elPw = document.getElementById("password");
-  return elId.value == "" ? elId.focus() : elPw.focus();
+  elId.value == "" ? elId.focus() : elPw.focus();
+};
+
+const disToggle = (disabled) => {
+  document.getElementById("userId").disabled = disabled;
+  document.getElementById("password").disabled = disabled;
+  document.getElementById("submitBtn").disabled = disabled;
 };
 </script>
 
@@ -96,9 +134,12 @@ const onFocus = () => {
 .v-leave-active {
   transition: opacity 2s ease;
 }
-
 .v-enter-from,
 .v-leave-to {
   opacity: 0;
+}
+input:disabled {
+  transition: 0.2s;
+  background: #000000 !important;
 }
 </style>
