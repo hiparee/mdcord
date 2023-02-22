@@ -8,7 +8,7 @@ public class PasswordNotMachedException extends AbstractException {
 
     @Override
     public HttpStatus getHttpStatus() {
-        return HttpStatus.BAD_REQUEST;
+        return HttpStatus.OK;
     }
 
     @Override
