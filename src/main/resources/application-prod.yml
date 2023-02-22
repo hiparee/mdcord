@@ -27,7 +27,7 @@ spring:
     open-in-view: false
     #    show-sql: true
     hibernate:
-      ddl-auto: none # 운영은 무조건 none으로 설정할 것.
+      ddl-auto: none # 운영은 무조건 none으로 설정할 것
     properties:
       hibernate:
         format_sql: true
