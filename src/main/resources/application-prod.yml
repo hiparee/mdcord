@@ -8,7 +8,7 @@ springdoc:
   default-consumes-media-type: application/json
   default-produces-media-type: application/json
   api-docs:
-    enabled: false # swagger 필요없어질 경우 false
+    enabled: false
     path: /api-docs
   packages-to-scan: com.lemon.mdcord.controller
   swagger-ui:
