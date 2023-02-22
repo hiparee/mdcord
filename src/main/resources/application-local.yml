@@ -2,7 +2,7 @@ jwt:
   header: Authorization
   secret: QHp4Y3YoKTAxQCNAenhjdigpMDFAI0B6eGN2KCkwMUAj
   validity-in-seconds: 86400
-  domain: localhost
+  domain: 172.16.10.121
 
 springdoc:
   default-consumes-media-type: application/json
