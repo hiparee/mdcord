@@ -1,16 +1,18 @@
 import { createApp } from "vue";
-// import axios from "axios";
+import { useToast } from "vue-toast-notification";
+// import ToastPlugin from "vue-toast-notification";
 import router from "./router/routes.js";
-// import "bootstrap/dist/css/bootstrap.css";
 
 import "@/assets/css/index.css";
 import "bootstrap/dist/js/bootstrap.js";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import "vue-toast-notification/dist/theme-sugar.css";
 import App from "./App.vue";
 
 const app = createApp(App);
-// app.config.globalProperties.$axios = axios;
 app.use(router);
-// app.provide(axios);
-// app.use(axios);
+// app.use(ToastPlugin);
 app.mount("#app");
+
+
+// let instance = $toast.success('You did it!');
