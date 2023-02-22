@@ -79,7 +79,7 @@ onMounted(() => {
 
 const submit = () => {
   loginSubmit({
-    memberId: id.value+'111',
+    memberId: id.value,
     password: password.value,
   });
 };
