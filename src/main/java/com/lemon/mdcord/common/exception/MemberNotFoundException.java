@@ -8,7 +8,7 @@ public class MemberNotFoundException extends AbstractException {
 
     @Override
     public HttpStatus getHttpStatus() {
-        return HttpStatus.NOT_FOUND;
+        return HttpStatus.OK;
     }
 
     @Override
