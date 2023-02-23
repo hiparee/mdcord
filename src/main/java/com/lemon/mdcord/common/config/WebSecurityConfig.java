@@ -69,8 +69,8 @@ public class WebSecurityConfig {
 //        configuration.addAllowedMethod("*");
 
         configuration.setAllowedOrigins(List.of("http://172.16.10.121:8080", "http://127.0.0.1:5173", "http://localhost:5173" ));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
-        configuration.setExposedHeaders(List.of("Set-Cookie"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Content-Security-Policy", "X-WebKit-CSP", "X-Content-Security-Policy"));
+        configuration.setExposedHeaders(List.of("Set-Cookie", "Content-Security-Policy", "X-WebKit-CSP", "X-Content-Security-Policy"));
         configuration.setAllowedMethods(List.of("POST", "GET", "PUT"));
         configuration.setAllowCredentials(true);
 
