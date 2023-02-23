@@ -40,8 +40,6 @@ public class WebSecurityConfig {
                 .cors()
             .and()
                 .headers()
-                    .contentSecurityPolicy("default-src 'self' 172.16.10.121:9000; img-src 'self' mdbcdn.b-cdn.net data:; font-src 'self' cdn.jsdelivr.net; style-src 'self' 172.16.10.121:9000; script-src 'self' 172.16.10.121:9000;")
-            .and()
                 .frameOptions()
                 .sameOrigin()
             .and()
