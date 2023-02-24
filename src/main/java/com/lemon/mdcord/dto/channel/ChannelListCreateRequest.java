@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Getter
@@ -16,15 +17,15 @@ public class ChannelListCreateRequest {
     @Schema(description = "채널명", example = "TEST", maxLength = 50)
     private String name;
 
-    @NotBlank
+    @NotNull
     @Schema(description = "상위채널 ID", example = "1")
     private Long parentId;
 
-    @NotBlank
+    @NotNull
     @Schema(description = "채널 레벨", example = "0")
     private Integer dept;
 
-    @NotBlank
+    @NotNull
     @Schema(description = "채널 순서", example = "0")
     private Integer channelOrder;
 
