@@ -42,7 +42,28 @@
 
     <div class="list-group list-group-flush">
       <ul class="list-unstyled ps-0" id="sidebar">
-        <li class="mb-2">
+        <li class="mb-2" v-for="channel in channelList" :key="index">
+          <button
+            class="btn btn-toggle align-items-center rounded"
+            data-bs-toggle="collapse"
+            data-bs-target="#channel1"
+            aria-expanded="true"
+          >
+            {{ channel.name }}
+          </button>
+
+          <i class="bi bi-plus float-end plus-icon"></i>
+
+          <div class="collapse show" id="channel1" style="">
+            <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+              <li v-for="sub in channel.subChannel">
+                <a href="#" class="rounded">{{ sub.name }}</a>
+              </li>
+            </ul>
+          </div>
+        </li>
+
+        <!-- <li class="mb-2">
           <button
             class="btn btn-toggle align-items-center rounded"
             data-bs-toggle="collapse"
@@ -103,27 +124,11 @@
               <li><a href="#" class="rounded">대구파티마병원</a></li>
             </ul>
           </div>
-        </li>
-
-        <!-- <li class="mb-2">
-          <button
-            class="btn btn-toggle align-items-center rounded"
-            data-bs-toggle="collapse"
-            data-bs-target="#channel4"
-            aria-expanded="true"
-          >
-            전자동의서
-          </button>
-          <i class="bi bi-plus float-end plus-icon"></i>
-          <div class="collapse show" id="channel4" style="">
-            <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-              <li><a href="#" class="rounded">영남대학교병원</a></li>
-              <li><a href="#" class="rounded">대구파티마병원</a></li>
-            </ul>
-          </div>
         </li> -->
 
         <hr class="my-3" />
+
+        <!-- 고정메뉴 -->
         <li class="mb-2">
           <button
             class="btn btn-toggle align-items-center rounded"
@@ -260,13 +265,58 @@
 </template>
 
 <script setup>
-import { defineEmits, ref } from "vue";
-const emit = defineEmits(["pass", "pass2"]);
-const emitEvent = () => {
-  emit("pass1");
+import { getChannelList } from "../../api/index.js";
+import { onMounted, defineEmits, ref } from "vue";
+
+const serverList = ref([]);
+const channelList = ref([]);
+// const emit = defineEmits(["pass", "pass2"]);
+// const emitEvent = () => {
+//   emit("pass1");
+// };
+
+// const pageType = ref("A");
+
+const processData = (data) => {
+  const result = [];
+
+  // 부모 메뉴를 순회하면서 channel 속성을 추가
+  data
+    .filter((item) => item.dept === 1) // dept가 1인 항목만 필터링
+    .sort((a, b) => a.channelOrder - b.channelOrder) // channelOrder를 기준으로 정렬
+    .forEach((parentMenu) => {
+      parentMenu.subChannel = []; // 빈 배열로 초기화
+
+      // 하위 메뉴를 찾아서 channel 속성에 추가
+      data
+        .filter((item) => item.parentId === parentMenu.id && item.dept === 2) // parentMenu의 하위 항목을 필터링
+        .sort((a, b) => a.channelOrder - b.channelOrder) // channelOrder를 기준으로 정렬
+        .forEach((channel) => parentMenu.subChannel.push(channel)); // parentMenu의 channel 속성에 추가
+
+      result.push(parentMenu); // 결과 배열에 추가
+    });
+
+  return result;
 };
 
-const pageType = ref("A");
+onMounted(async () => {
+  try {
+    const res = await getChannelList();
+    console.log(res);
+    const data = res.data.channelLists;
+    const serverData = [];
+    const channelData = [];
+
+    data.forEach((item) => {
+      item.dept == 0 ? serverData.push(item) : channelData.push(item);
+    });
+
+    const processedChannelData = processData(channelData);
+
+    serverList.value = serverData;
+    channelList.value = processedChannelData;
+  } catch (error) {}
+});
 </script>
 
 <style scoped>

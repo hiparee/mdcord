@@ -5,7 +5,7 @@ const instance = axios.create({
   baseURL: import.meta.env.VITE_APP_API_URL,
 });
 
-export const loginSubmit = async (params) => {
+const loginSubmit = async (params) => {
   try {
     const res = await instance.post('/api/members/signin', params);
     console.log(res);
@@ -15,3 +15,9 @@ export const loginSubmit = async (params) => {
     console.log(error);
   }
 };
+
+const getChannelList = async () => {
+  return instance.get('/api/channels');
+}
+
+export { loginSubmit, getChannelList };

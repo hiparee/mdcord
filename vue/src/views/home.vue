@@ -53,8 +53,6 @@
       </div>
     </nav>
 
-    교육훈련비 크릭 하고나서 세부내역 작성 결재라인 사내 결재 규정 교육훈련비 신
-
     <!-- Page content-->
     <div class="d-flex flex-column" style="">
       <div class="" style="background: none; border: 0">
