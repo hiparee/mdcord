@@ -13,10 +13,19 @@ public class ChannelListCreateRequest {
 
     @NotBlank
     @Size(max = 50)
-    @Schema(description = "채널명", example = "미션개발팀", maxLength = 50)
+    @Schema(description = "채널명", example = "TEST", maxLength = 50)
     private String name;
 
+    @NotBlank
     @Schema(description = "상위채널 ID", example = "1")
     private Long parentId;
+
+    @NotBlank
+    @Schema(description = "채널 레벨", example = "0")
+    private Integer dept;
+
+    @NotBlank
+    @Schema(description = "채널 순서", example = "0")
+    private Integer channelOrder;
 
 }
