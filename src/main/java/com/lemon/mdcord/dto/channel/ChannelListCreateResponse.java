@@ -12,6 +12,8 @@ public class ChannelListCreateResponse {
 
     private String name;
 
+    private Integer channelOrder;
+
     private LocalDateTime createDate;
 
     private String createBy;
@@ -19,6 +21,7 @@ public class ChannelListCreateResponse {
     public ChannelListCreateResponse(ChannelList dto) {
         this.id = dto.getId();
         this.name = dto.getName();
+        this.channelOrder = dto.getChannelOrder();
         this.createDate = dto.getCreateDate();
         this.createBy = dto.getCreateBy();
     }

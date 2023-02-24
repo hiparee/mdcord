@@ -38,6 +38,8 @@ public class JpaChannelListService implements ChannelListService {
         ChannelList channelList = ChannelList.builder()
                 .name(dto.getName())
                 .parentId(dto.getParentId())
+                .dept(dto.getDept())
+                .channelOrder(dto.getChannelOrder() == null ? 0 : dto.getChannelOrder())
                 .createBy(currentMemberId)
                 .build();
 
@@ -71,7 +73,9 @@ public class JpaChannelListService implements ChannelListService {
         return ChannelListResponse.builder()
                     .id(channelList.getId())
                     .name(channelList.getName())
+                    .dept(channelList.getDept())
                     .parentId(channelList.getParentId())
+                    .channelOrder(channelList.getChannelOrder())
                     .useYn(channelList.getUseYn())
                     .build();
     }

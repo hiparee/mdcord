@@ -51,6 +51,9 @@ public class ChannelList extends BaseEntity {
     @Column(name = "dept", length = 1)
     private Integer dept;
 
+    @Column(name = "channel_order", nullable = false, length = 1)
+    private Integer channelOrder;
+
     @OneToMany(mappedBy = "parentId")
     private List<ChannelList> child = new ArrayList<>();
 
@@ -61,12 +64,16 @@ public class ChannelList extends BaseEntity {
     private List<ChannelMember> channelMembers;
 
     @Builder
-    public ChannelList(String name, Long parentId, String createBy) {
+    public ChannelList(String name, Long parentId, Integer dept, Integer channelOrder, String createBy) {
         Assert.state(StringUtils.isNotBlank(name), "name may not be blank");
+        Assert.state(dept != null, "dept may not be blank");
+        Assert.state(channelOrder != null, "channelOrder may not be blank");
         Assert.state(StringUtils.isNotBlank(createBy), "createBy may not be blank");
 
         this.name = name;
         this.parentId = parentId;
+        this.dept = dept;
+        this.channelOrder = channelOrder;
         super.setCreateBy(createBy);
     }
 }
