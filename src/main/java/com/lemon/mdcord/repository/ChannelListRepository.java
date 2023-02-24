@@ -7,6 +7,6 @@ import java.util.Optional;
 
 public interface ChannelListRepository extends JpaRepository<ChannelList, Long> {
 
-    Optional<ChannelList> findByNameAndParentId(String name, Long parentId);
+    Optional<ChannelList> findByNameAndParentIdAndUseYn(String name, Long parentId, String useYn);
 
 }

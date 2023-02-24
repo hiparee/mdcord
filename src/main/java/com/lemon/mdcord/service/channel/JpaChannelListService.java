@@ -27,7 +27,7 @@ public class JpaChannelListService implements ChannelListService {
     @Override
     @Transactional
     public ChannelList createChannel(final ChannelListCreateRequest dto) {
-        Optional<ChannelList> checkDuplicated = channelListRepository.findByNameAndParentId(dto.getName(), dto.getParentId());
+        Optional<ChannelList> checkDuplicated = channelListRepository.findByNameAndParentIdAndUseYn(dto.getName(), dto.getParentId(), "Y");
 
         if(checkDuplicated.isPresent()) {
             throw new ChannelListDuplicatedException(dto.getName());
