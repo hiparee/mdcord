@@ -28,7 +28,7 @@ spring:
     #    show-sql: true
     hibernate:
       ddl-auto: none
-      # 개발은 create/update/validate/none 아무거나 상관없음
+      # 개발은 create/update/validate/none 아무거나 상관없음. 지금은 개발 DB가 아니므로 none
       # 하지만 create일 시 모든 테이블 drop 후 새로 create 이므로 주의
     properties:
       hibernate:
