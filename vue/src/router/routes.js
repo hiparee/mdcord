@@ -1,26 +1,28 @@
-import { createWebHistory, createRouter } from "vue-router";
-import ErrorPage from "@/views/error.vue";
-import Home from "@/views/home.vue";
-import Login from "@/views/LoginPage.vue";
+import { createWebHistory, createRouter } from 'vue-router';
+import ErrorPage from '@/views/error.vue';
+import Home from '@/views/home.vue';
+import Login from '@/views/LoginPage.vue';
 // import AdmUserCreate from "@/views/AdmUserCreate.vue";
 // import AdmUserList from "@/views/AdmUserList.vue";
+import { useChannelStore } from '@/store/store.js';
+import { useToast } from 'vue-toast-notification';
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
-      path: "/",
-      name: "login",
+      path: '/',
+      name: 'login',
       component: Login,
     },
     {
-      path: "/:pathMatch(.*)",
-      name: "not-found",
+      path: '/:pathMatch(.*)',
+      name: 'not-found',
       component: ErrorPage,
     },
     {
-      path: "/main",
-      name: "main",
+      path: '/main',
+      name: 'main',
       component: Home,
     },
     // {
@@ -36,14 +38,18 @@ const router = createRouter({
   ],
 });
 
-router.beforeEach((to, from, next)=>{
-  console.log( to );
-  console.log( from );
-  console.log( next );
-  if(to.name !== 'login') {
-    
+router.beforeEach(async (to, from, next) => {
+  console.log(to);
+  console.log(from);
+  if (to.name !== 'login') {
+    try {
+      await useChannelStore().SET_CHANNEL_LIST();
+    } catch (error) {
+      useToast().error('로그인정보 만료');
+      next({ name: 'login' });
+    }
   }
   next();
-})
+});
 
 export default router;
