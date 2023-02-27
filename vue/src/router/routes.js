@@ -1,7 +1,8 @@
 import { createWebHistory, createRouter } from 'vue-router';
-import ErrorPage from '@/views/error.vue';
-import Home from '@/views/home.vue';
-import Login from '@/views/LoginPage.vue';
+import ErrorView from '@/views/ErrorView.vue';
+import ContentsView from '@/views/ContentsView.vue';
+import MainView from '@/views/MainView.vue';
+import LoginView from '@/views/LoginView.vue';
 // import AdmUserCreate from "@/views/AdmUserCreate.vue";
 // import AdmUserList from "@/views/AdmUserList.vue";
 import { useChannelStore } from '@/store/store.js';
@@ -11,19 +12,28 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
-      path: '/',
-      name: 'login',
-      component: Login,
-    },
-    {
       path: '/:pathMatch(.*)',
       name: 'not-found',
-      component: ErrorPage,
+      meta: { requiresAuth: false },
+      component: ErrorView,
     },
     {
-      path: '/main',
-      name: 'main',
-      component: Home,
+      path: '/',
+      name: 'login',
+      meta: { requiresAuth: false },
+      component: LoginView,
+    },
+    {
+      path: '/channels',
+      name: 'channelsMain',
+      component: MainView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/channels/:id',
+      name: 'channels',
+      meta: { requiresAuth: true },
+      component: ContentsView,
     },
     // {
     //   path: "/adm/create",
@@ -41,7 +51,8 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   console.log(to);
   console.log(from);
-  if (to.name !== 'login') {
+
+  if (to.matched.some(record => record.meta.requiresAuth)) {
     try {
       await useChannelStore().SET_CHANNEL_LIST();
     } catch (error) {
@@ -49,6 +60,7 @@ router.beforeEach(async (to, from, next) => {
       next({ name: 'login' });
     }
   }
+
   next();
 });
 

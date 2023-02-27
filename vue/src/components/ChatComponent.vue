@@ -2,7 +2,6 @@
   <!-- Page content wrapper-->
   <div id="page-content-wrapper">
     <!-- Top navigation-->
-    <!-- 컴포넌트로뺴기 -->
     <nav class="navbar navbar-expand-lg navbar-light">
       <div class="container-fluid">
         <button
@@ -18,7 +17,7 @@
         </button>
         <p class="navbar-brand mb-0 p-0" href="#">
           <i class="bi bi-hash"></i>
-          <span class="text-white"> 세브란스 스마트 선도사업 </span>
+          <span class="text-white">세브란스 스마트 선도사업</span>
         </p>
         <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
@@ -148,22 +147,7 @@
     </div>
   </div>
 </template>
-
-<script setup>
-// import { reactive } from '@vue/reactivity';
-
-// const chatList = reactive([
-//   {
-//     name: '홍길동',
-//     time: '2022.10.12',
-//     msg: '가나다라마바사',
-//   },
-//   {
-//     name: '홍길동',
-//     time: '2022.10.11',
-//     msg: 'ㅇㅇ',
-//   },
-// ]);
+<script>
+export default {};
 </script>
-
-<style></style>
+<style lang=""></style>
