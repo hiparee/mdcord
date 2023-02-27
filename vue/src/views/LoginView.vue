@@ -107,7 +107,7 @@ const submit = () => {
       } else {
         $toast.success('Login Success', {
           onDismiss: () => {
-            router.push('/main');
+            router.push('/channels');
             disToggle(false);
           },
         });

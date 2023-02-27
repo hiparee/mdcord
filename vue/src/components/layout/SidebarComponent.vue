@@ -1,6 +1,7 @@
 <template>
   <!-- Sidebar-->
   <div id="sidebar-wrapper">
+    <!-- 상단 server 리스트 영역 -->
     <div class="sidebar-heading">
       <div class="navbar-collapse" id="navbarNavDarkDropdown">
         <ul class="navbar-nav">
@@ -42,11 +43,15 @@
 
     <div class="list-group list-group-flush">
       <ul class="list-unstyled ps-0" id="sidebar">
-        <li class="mb-2" v-for="channel in store.getChannelList" :key="index">
+        <li
+          class="mb-2"
+          v-for="channel in store.getChannelList"
+          :key="channel.id"
+        >
           <button
             class="btn btn-toggle align-items-center rounded"
             data-bs-toggle="collapse"
-            data-bs-target="#channel1"
+            :data-bs-target="`#channel${channel.id}`"
             aria-expanded="true"
           >
             {{ channel.name }}
@@ -54,9 +59,9 @@
 
           <i class="bi bi-plus float-end plus-icon"></i>
 
-          <div class="collapse show" id="channel1" style="">
+          <div class="collapse show" :id="`channel${channel.id}`" style="">
             <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-              <li v-for="sub in channel.subChannel">
+              <li v-for="sub in channel.subChannel" :key="sub.id">
                 <a href="#" class="rounded">{{ sub.name }}</a>
               </li>
             </ul>
