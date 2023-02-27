@@ -67,18 +67,18 @@
 </template>
 
 <script setup>
-import { useRouter } from "vue-router/dist/vue-router";
-import { onMounted, ref, inject } from "vue";
-import { loginSubmit } from "../api/index.js";
-import { useToast } from "vue-toast-notification";
+import { useRouter } from 'vue-router/dist/vue-router';
+import { onMounted, ref, inject } from 'vue';
+import { fetchLogin } from '../api/index.js';
+import { useToast } from 'vue-toast-notification';
 
 const router = useRouter();
 const $toast = useToast({
   duration: 1000,
 });
 
-const id = ref("lemon");
-const password = ref("password1234");
+const id = ref('lemon');
+const password = ref('password1234');
 
 onMounted(() => {
   onFocus();
@@ -87,46 +87,48 @@ onMounted(() => {
 const submit = () => {
   disToggle(true);
 
-  loginSubmit({
+  fetchLogin({
     memberId: id.value,
     password: password.value,
   })
-    .then((response) => {
+    .then(response => {
       console.log(response);
-      console.log(response.data.hasOwnProperty("httpStatus"));
+      console.log(
+        Object.prototype.hasOwnProperty.call(response.data, 'httpStatus'),
+      );
 
-      if (response.data.hasOwnProperty("httpStatus")) {
-        $toast.error("Login Failed", {
+      if (Object.prototype.hasOwnProperty.call(response.data, 'httpStatus')) {
+        $toast.error('Login Failed', {
           onDismiss: () => {
             disToggle(false);
             onFocus();
           },
         });
       } else {
-        $toast.success("Login Success", {
+        $toast.success('Login Success', {
           onDismiss: () => {
-            router.push("/main");
+            router.push('/main');
             disToggle(false);
           },
         });
       }
     })
     .catch(() => {
-      $toast.error("Server error");
+      $toast.error('Server error');
       disToggle(false);
     });
 };
 
 const onFocus = () => {
-  const elId = document.getElementById("userId");
-  const elPw = document.getElementById("password");
-  elId.value == "" ? elId.focus() : elPw.focus();
+  const elId = document.getElementById('userId');
+  const elPw = document.getElementById('password');
+  elId.value == '' ? elId.focus() : elPw.focus();
 };
 
-const disToggle = (disabled) => {
-  document.getElementById("userId").disabled = disabled;
-  document.getElementById("password").disabled = disabled;
-  document.getElementById("submitBtn").disabled = disabled;
+const disToggle = disabled => {
+  document.getElementById('userId').disabled = disabled;
+  document.getElementById('password').disabled = disabled;
+  document.getElementById('submitBtn').disabled = disabled;
 };
 </script>
 

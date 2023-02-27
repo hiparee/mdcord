@@ -42,7 +42,7 @@
 
     <div class="list-group list-group-flush">
       <ul class="list-unstyled ps-0" id="sidebar">
-        <li class="mb-2" v-for="channel in channelList" :key="index">
+        <li class="mb-2" v-for="channel in store.getChannelList" :key="index">
           <button
             class="btn btn-toggle align-items-center rounded"
             data-bs-toggle="collapse"
@@ -62,69 +62,6 @@
             </ul>
           </div>
         </li>
-
-        <!-- <li class="mb-2">
-          <button
-            class="btn btn-toggle align-items-center rounded"
-            data-bs-toggle="collapse"
-            data-bs-target="#channel1"
-            aria-expanded="true"
-          >
-            Home
-          </button>
-
-          <i class="bi bi-plus float-end plus-icon"></i>
-
-          <div class="collapse show" id="channel1" style="">
-            <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-              <li><a href="#" class="rounded">공지사항</a></li>
-              <li><a href="#" class="rounded">잡담</a></li>
-            </ul>
-          </div>
-        </li>
-        <li class="mb-2">
-          <button
-            class="btn btn-toggle align-items-center rounded collapsed"
-            data-bs-toggle="collapse"
-            data-bs-target="#channel2"
-            aria-expanded="true"
-          >
-            정부과제
-          </button>
-          <i class="bi bi-plus float-end plus-icon"></i>
-          <div class="collapse show" id="channel2" style="">
-            <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-              <li><a href="#" class="rounded">생활치료센터</a></li>
-              <li><a href="#" class="rounded">재택치료센터</a></li>
-              <li><a href="#" class="rounded">비대면-비접촉</a></li>
-              <li><a href="#" class="rounded">부천시 스마트경로당</a></li>
-              <li><a href="#" class="rounded">세브란스 스마트 선도사업</a></li>
-              <li>
-                <a href="#" class="rounded"
-                  >국립암센터 국민건강스마트관리연구개발사업</a
-                >
-              </li>
-              <li><a href="#" class="rounded">감염병 빅데이터</a></li>
-            </ul>
-          </div>
-        </li>
-        <li class="mb-2">
-          <button
-            class="btn btn-toggle align-items-center rounded"
-            data-bs-toggle="collapse"
-            data-bs-target="#channel3"
-            aria-expanded="true"
-          >
-            전자동의서
-          </button>
-          <i class="bi bi-plus float-end plus-icon"></i>
-          <div class="collapse show" id="channel3" style="">
-            <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-              <li><a href="#" class="rounded">영남대학교병원</a></li>
-              <li><a href="#" class="rounded">대구파티마병원</a></li>
-            </ul>
-          </div>
-        </li> -->
 
         <hr class="my-3" />
 
@@ -265,58 +202,8 @@
 </template>
 
 <script setup>
-import { getChannelList } from "../../api/index.js";
-import { onMounted, defineEmits, ref } from "vue";
-
-const serverList = ref([]);
-const channelList = ref([]);
-// const emit = defineEmits(["pass", "pass2"]);
-// const emitEvent = () => {
-//   emit("pass1");
-// };
-
-// const pageType = ref("A");
-
-const processData = (data) => {
-  const result = [];
-
-  // 부모 메뉴를 순회하면서 channel 속성을 추가
-  data
-    .filter((item) => item.dept === 1) // dept가 1인 항목만 필터링
-    .sort((a, b) => a.channelOrder - b.channelOrder) // channelOrder를 기준으로 정렬
-    .forEach((parentMenu) => {
-      parentMenu.subChannel = []; // 빈 배열로 초기화
-
-      // 하위 메뉴를 찾아서 channel 속성에 추가
-      data
-        .filter((item) => item.parentId === parentMenu.id && item.dept === 2) // parentMenu의 하위 항목을 필터링
-        .sort((a, b) => a.channelOrder - b.channelOrder) // channelOrder를 기준으로 정렬
-        .forEach((channel) => parentMenu.subChannel.push(channel)); // parentMenu의 channel 속성에 추가
-
-      result.push(parentMenu); // 결과 배열에 추가
-    });
-
-  return result;
-};
-
-onMounted(async () => {
-  try {
-    const res = await getChannelList();
-    console.log(res);
-    const data = res.data.channelLists;
-    const serverData = [];
-    const channelData = [];
-
-    data.forEach((item) => {
-      item.dept == 0 ? serverData.push(item) : channelData.push(item);
-    });
-
-    const processedChannelData = processData(channelData);
-
-    serverList.value = serverData;
-    channelList.value = processedChannelData;
-  } catch (error) {}
-});
+import { useChannelStore } from '@/store/store.js';
+const store = useChannelStore();
 </script>
 
 <style scoped>
