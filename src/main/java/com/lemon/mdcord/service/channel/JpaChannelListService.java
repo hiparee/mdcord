@@ -70,7 +70,7 @@ public class JpaChannelListService implements ChannelListService {
     @Transactional
     public void deleteChannel(Long id) {
         ChannelList channel = channelListRepository.findById(id).orElseThrow(() -> new ChannelNotFoundException(id));
-        if(channel.getUseYn().equals(USE_N)) throw new ChannelAlreadyDisabled();
+        if(channel.getUseYn().equals(USE_N)) throw new ChannelAlreadyDisabledException();
 
         List<ChannelList> childChannels = channelListRepository.findByParentIdAndUseYn(channel.getId(), USE_Y);
         if(!childChannels.isEmpty()) throw new ChannelCantDeleteException();

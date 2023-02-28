@@ -2,7 +2,7 @@ package com.lemon.mdcord.common.exception;
 
 import org.springframework.http.HttpStatus;
 
-public class ChannelAlreadyDisabled extends AbstractException {
+public class ChannelAlreadyDisabledException extends AbstractException {
     @Override
     public HttpStatus getHttpStatus() {
         return HttpStatus.OK;
@@ -13,7 +13,7 @@ public class ChannelAlreadyDisabled extends AbstractException {
         return ErrorCode.CHANNEL_ALREADY_DISABLED;
     }
 
-    public ChannelAlreadyDisabled() {
+    public ChannelAlreadyDisabledException() {
         super("This channel is already disabled.");
     }
 }
