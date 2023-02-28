@@ -8,4 +8,6 @@ public interface ChannelListService {
     ChannelList createChannel(ChannelListCreateRequest dto);
 
     MultipleChannelListResponse fetchChannels();
+
+    void deleteChannel(Long id);
 }
