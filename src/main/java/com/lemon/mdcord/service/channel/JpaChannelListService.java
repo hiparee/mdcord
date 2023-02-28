@@ -50,7 +50,7 @@ public class JpaChannelListService implements ChannelListService {
 
     @Override
     public MultipleChannelListResponse fetchChannels() {
-        List<ChannelList> channelLists = channelListRepository.findByUseYn(USE_Y);
+        List<ChannelList> channelLists = channelListRepository.findAll();
 
         if(channelLists.size() == 0) {
             return MultipleChannelListResponse.builder().channelCount(0).build();
