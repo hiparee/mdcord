@@ -1,6 +1,7 @@
-package com.lemon.mdcord.common.exception.common;
+package com.lemon.mdcord.common.utils;
 
 import com.lemon.mdcord.common.exception.AbstractException;
+import com.lemon.mdcord.common.exception.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
