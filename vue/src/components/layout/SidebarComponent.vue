@@ -59,10 +59,16 @@
 
           <i class="bi bi-plus float-end plus-icon"></i>
 
-          <div class="collapse show" :id="`channel${channel.id}`" style="">
+          <div class="collapse show" :id="`channel${channel.id}`">
             <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
               <li v-for="sub in channel.subChannel" :key="sub.id">
-                <a href="#" class="rounded">{{ sub.name }}</a>
+                <!-- <router-link :to="`/channels/${sub.id}`" class="rounded"> -->
+                <router-link
+                  :to="{ path: `/channels/${sub.id}` }"
+                  class="rounded"
+                >
+                  {{ sub.name }}
+                </router-link>
               </li>
             </ul>
           </div>
@@ -228,5 +234,12 @@ const store = useChannelStore();
   font-size: 18px;
   cursor: pointer;
   pointer-events: auto;
+}
+.router-link-active {
+  background-color: #3c3f45;
+  color: #ffffff !important;
+}
+.router-link-active::before {
+  color: #ffffff;
 }
 </style>

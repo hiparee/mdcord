@@ -8,6 +8,14 @@ export const useChannelStore = defineStore('channel', () => {
   const serverList = ref([]);
   const getChannelList = computed(() => channelList.value);
   const getServerList = computed(() => serverList.value);
+  const chatInfo = ref({
+    title: '',
+    chatList: [],
+  });
+
+  const SET_CHAT_TITLE = title => {
+    chatInfo.value.title = title;
+  };
 
   const SET_CHANNEL_LIST = async () => {
     const res = await fetchChannelList();
@@ -31,5 +39,7 @@ export const useChannelStore = defineStore('channel', () => {
     getChannelList,
     getServerList,
     SET_CHANNEL_LIST,
+    chatInfo,
+    SET_CHAT_TITLE,
   };
 });

@@ -17,7 +17,7 @@
         </button>
         <p class="navbar-brand mb-0 p-0" href="#">
           <i class="bi bi-hash"></i>
-          <span class="text-white">세브란스 스마트 선도사업</span>
+          <span class="text-white">{{ store.chatInfo.title }}</span>
         </p>
         <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
@@ -147,7 +147,8 @@
     </div>
   </div>
 </template>
-<script>
-export default {};
+<script setup>
+import { useChannelStore } from '../store/modules/channel';
+const store = useChannelStore();
 </script>
 <style lang=""></style>
