@@ -25,10 +25,20 @@ public class ChannelController {
         return new ChannelListCreateResponse(channelListService.createChannel(dto));
     }
 
-    @Operation(summary = "채널 조회", description = "채널 조회 API")
+    @Operation(summary = "활성 채널 목록 조회", description = "활성 채널 목록 조회 API. 사용 여부(use_yn) 'Y'인 목록")
     @GetMapping("/channels")
     public MultipleChannelListResponse fetchChannelList() {
+        // use_yn y만 보내주는게 맞을지?
+        //        n도 포함해서 보내주고, 프론트에서 필터링해서 보여주는게 맞을지?
         return channelListService.fetchChannels();
     }
 
+    @Operation(summary = "채널 삭제", description = "채널 삭제 API. 사용 여부(use_yn) Y -> N")
+    @DeleteMapping("/channels/{id}")
+    public void deleteChannelList(@RequestParam("id") Long id) {
+        channelListService.deleteChannel(id);
+    }
+
+    // 수정 기능 (order, 채널명, useYn) useyn n->y 때문에 필요
+    //  - 수정된 값 return
 }

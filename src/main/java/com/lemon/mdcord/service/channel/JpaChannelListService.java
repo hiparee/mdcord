@@ -1,6 +1,6 @@
 package com.lemon.mdcord.service.channel;
 
-import com.lemon.mdcord.common.exception.ChannelListDuplicatedException;
+import com.lemon.mdcord.common.exception.*;
 import com.lemon.mdcord.domain.channel.ChannelList;
 import com.lemon.mdcord.dto.channel.ChannelListCreateRequest;
 import com.lemon.mdcord.dto.channel.ChannelListResponse;
@@ -23,11 +23,13 @@ import java.util.stream.Collectors;
 public class JpaChannelListService implements ChannelListService {
 
     private final ChannelListRepository channelListRepository;
+    private final String USE_Y = "Y";
+    private final String USE_N = "N";
 
     @Override
     @Transactional
     public ChannelList createChannel(final ChannelListCreateRequest dto) {
-        Optional<ChannelList> checkDuplicated = channelListRepository.findByNameAndParentIdAndUseYn(dto.getName(), dto.getParentId(), "Y");
+        Optional<ChannelList> checkDuplicated = channelListRepository.findByNameAndParentIdAndUseYn(dto.getName(), dto.getParentId(), USE_Y);
 
         if(checkDuplicated.isPresent()) {
             throw new ChannelListDuplicatedException(dto.getName());
@@ -48,7 +50,7 @@ public class JpaChannelListService implements ChannelListService {
 
     @Override
     public MultipleChannelListResponse fetchChannels() {
-        List<ChannelList> channelLists = channelListRepository.findAll();
+        List<ChannelList> channelLists = channelListRepository.findByUseYn(USE_Y);
 
         if(channelLists.size() == 0) {
             return MultipleChannelListResponse.builder().channelCount(0).build();
@@ -62,6 +64,19 @@ public class JpaChannelListService implements ChannelListService {
                 .channelLists(channelListResponses)
                 .channelCount(channelListResponses.size())
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public void deleteChannel(Long id) {
+        ChannelList channel = channelListRepository.findById(id).orElseThrow(() -> new ChannelNotFoundException(id));
+        if(channel.getUseYn().equals(USE_N)) throw new ChannelAlreadyDisabled();
+
+        List<ChannelList> childChannels = channelListRepository.findByParentIdAndUseYn(channel.getId(), USE_Y);
+        if(!childChannels.isEmpty()) throw new ChannelCantDeleteException();
+
+        String updatedBy = getAuthentication().getName();
+        channel.disable(updatedBy);
     }
 
     private static Authentication getAuthentication() {
