@@ -49,9 +49,6 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-  console.log(to);
-  console.log(from);
-
   if (to.matched.some(record => record.meta.requiresAuth)) {
     try {
       await useChannelStore().SET_CHANNEL_LIST();
@@ -60,7 +57,6 @@ router.beforeEach(async (to, from, next) => {
       next({ name: 'login' });
     }
   }
-
   next();
 });
 
