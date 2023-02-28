@@ -1,4 +1,4 @@
-package com.lemon.mdcord.common.exception.common;
+package com.lemon.mdcord.common.exception;
 
 import lombok.Builder;
 import lombok.Getter;
