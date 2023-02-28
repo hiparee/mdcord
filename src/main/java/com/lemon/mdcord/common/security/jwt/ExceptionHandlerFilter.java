@@ -1,7 +1,7 @@
 package com.lemon.mdcord.common.security.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lemon.mdcord.common.exception.ErrorResponse;
+import com.lemon.mdcord.common.exception.common.ErrorResponse;
 import com.lemon.mdcord.common.exception.UserAuthenticationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
