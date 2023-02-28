@@ -1,6 +1,7 @@
-package com.lemon.mdcord.dto.member;
+package com.lemon.mdcord.common.utils;
 
 
+import com.lemon.mdcord.dto.member.MemberPasswordEncoder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
