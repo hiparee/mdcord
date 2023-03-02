@@ -26,8 +26,8 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
                 .body(
                         new ErrorResponse(
                                 e.getErrorCode().getStatus(),
-                                e.getMessage(),
-                                e.getErrorCode().getMessage()
+                                e.getErrorCode().getMessage(),
+                                e.getMessage()
                         )
                 );
     }
@@ -42,8 +42,8 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
                 .body(
                         new ErrorResponse(
                                 HttpStatus.BAD_REQUEST.value(),
-                                HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                                e.getBindingResult().getAllErrors().get(0).getDefaultMessage()
+                                e.getBindingResult().getAllErrors().get(0).getDefaultMessage(),
+                                HttpStatus.BAD_REQUEST.getReasonPhrase()
                         )
                 );
     }
