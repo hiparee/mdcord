@@ -43,7 +43,7 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
                         new ErrorResponse(
                                 HttpStatus.BAD_REQUEST.value(),
                                 e.getBindingResult().getAllErrors().get(0).getDefaultMessage(),
-                                HttpStatus.BAD_REQUEST.getReasonPhrase()
+                                e.getBindingResult().getFieldError().getField()
                         )
                 );
     }
