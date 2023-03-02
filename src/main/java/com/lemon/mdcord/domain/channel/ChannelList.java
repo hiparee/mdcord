@@ -76,4 +76,17 @@ public class ChannelList extends BaseEntity {
         this.channelOrder = channelOrder;
         super.setCreateBy(createBy);
     }
+
+    public void enable() {
+        if (this.useYn.equals("N")) this.useYn = "Y";
+    }
+
+    public void disable(String updatedBy) {
+        if (this.useYn.equals("Y")) {
+            Assert.state(StringUtils.isNotBlank(updatedBy), "updateBy may not be blank");
+            this.useYn = "N";
+            this.updateBy = updatedBy;
+            this.updateDate = LocalDateTime.now();
+        }
+    }
 }
