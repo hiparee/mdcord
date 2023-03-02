@@ -12,8 +12,8 @@ import javax.validation.constraints.Size;
 public class MemberCreateRequest {
 
     @NotBlank
-    @Size(max = 255)
-    @Schema(description = "사용자 ID", example = "lemon", maxLength = 255)
+    @Size(max = 20)
+    @Schema(description = "사용자 ID", example = "lemon", maxLength = 20)
     private String memberId;
 
     @NotBlank
