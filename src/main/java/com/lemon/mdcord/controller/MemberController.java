@@ -5,6 +5,8 @@ import com.lemon.mdcord.service.member.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -21,7 +23,6 @@ public class MemberController {
     @Operation(summary = "사용자 정보 등록", description = "사용자 정보 등록 API")
     @PostMapping("/members/signup")
     public MemberCreateResponse createMember(@RequestBody @Valid final MemberCreateRequest dto) {
-        // TODO - createBy 로직에서 추가
         return new MemberCreateResponse(memberService.createMember(dto));
     }
 
@@ -35,6 +36,12 @@ public class MemberController {
     @PutMapping("/members")
     public MemberUpdateResponse updateMember(@RequestBody final MemberUpdateRequest dto) {
         return new MemberUpdateResponse(memberService.updateUser(dto));
+    }
+
+    @Operation(summary = "사용자 목록 조회", description = "사용자 목록 조회 API")
+    @GetMapping("/members")
+    public Page<MemberListResponse> getMemberList(Pageable pageable) {
+        return memberService.getMemberList(pageable);
     }
 
 }
