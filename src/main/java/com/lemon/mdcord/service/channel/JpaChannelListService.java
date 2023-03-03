@@ -2,9 +2,7 @@ package com.lemon.mdcord.service.channel;
 
 import com.lemon.mdcord.common.exception.*;
 import com.lemon.mdcord.domain.channel.ChannelList;
-import com.lemon.mdcord.dto.channel.ChannelListCreateRequest;
-import com.lemon.mdcord.dto.channel.ChannelListResponse;
-import com.lemon.mdcord.dto.channel.MultipleChannelListResponse;
+import com.lemon.mdcord.dto.channel.*;
 import com.lemon.mdcord.repository.ChannelListRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -69,7 +67,7 @@ public class JpaChannelListService implements ChannelListService {
     @Override
     @Transactional
     public void deleteChannel(Long id) {
-        ChannelList channel = channelListRepository.findById(id).orElseThrow(() -> new ChannelNotFoundException(id));
+        ChannelList channel = getTargetChannel(id);
         if(channel.getUseYn().equals(USE_N)) throw new ChannelAlreadyDisabledException();
 
         List<ChannelList> childChannels = channelListRepository.findByParentIdAndUseYn(channel.getId(), USE_Y);
@@ -77,6 +75,21 @@ public class JpaChannelListService implements ChannelListService {
 
         String updatedBy = getAuthentication().getName();
         channel.disable(updatedBy);
+    }
+
+    @Override
+    public ChannelList updateChannel(ChannelListUpdateRequest dto) {
+        ChannelList channel = getTargetChannel(dto.getId());
+        channel.updateChannelInfo(
+                dto.getChannelName(), dto.getChannelOrder(),
+                dto.getUseYn(), getAuthentication().getName()
+        );
+
+        return channel;
+    }
+
+    private ChannelList getTargetChannel(Long id) {
+        return channelListRepository.findById(id).orElseThrow(() -> new ChannelNotFoundException(id));
     }
 
     private static Authentication getAuthentication() {

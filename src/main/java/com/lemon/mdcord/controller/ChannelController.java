@@ -1,8 +1,6 @@
 package com.lemon.mdcord.controller;
 
-import com.lemon.mdcord.dto.channel.ChannelListCreateRequest;
-import com.lemon.mdcord.dto.channel.ChannelListCreateResponse;
-import com.lemon.mdcord.dto.channel.MultipleChannelListResponse;
+import com.lemon.mdcord.dto.channel.*;
 import com.lemon.mdcord.service.channel.ChannelListService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,6 +35,10 @@ public class ChannelController {
         channelListService.deleteChannel(id);
     }
 
-    // 수정 기능 (order, 채널명, useYn) useyn n->y 때문에 필요
-    //  - 수정된 값 return
+    @Operation(summary = "채널 수정", description = "채널 수정 API")
+    @PutMapping("/channels")
+    public ChannelListUpdateResponse updateChannelList(@RequestBody @Valid ChannelListUpdateRequest dto) {
+        return new ChannelListUpdateResponse(channelListService.updateChannel(dto));
+    }
+
 }
