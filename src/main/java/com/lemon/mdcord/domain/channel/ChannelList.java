@@ -89,4 +89,12 @@ public class ChannelList extends BaseEntity {
             this.updateDate = LocalDateTime.now();
         }
     }
+
+    public void updateChannelInfo(String channelName, Integer channelOrder, String useYn, String updateBy) {
+        this.name = channelName;
+        this.channelOrder = channelOrder;
+        this.useYn = useYn;
+        this.updateBy = updateBy;
+        this.updateDate = LocalDateTime.now();
+    }
 }
