@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -28,19 +30,19 @@ public class MemberController {
 
     @Operation(summary = "로그인", description = "로그인 API")
     @PostMapping("/members/signin")
-    public MemberLoginResponse signin(@RequestBody final MemberLoginRequest dto, HttpServletResponse response) {
+    public MemberLoginResponse signin(@RequestBody @Valid final MemberLoginRequest dto, HttpServletResponse response) {
         return new MemberLoginResponse(memberService.memberLogin(dto, response));
     }
 
     @Operation(summary = "사용자 정보 수정", description = "사용자 정보 수정 API")
     @PutMapping("/members")
-    public MemberUpdateResponse updateMember(@RequestBody final MemberUpdateRequest dto) {
+    public MemberUpdateResponse updateMember(@RequestBody @Valid final MemberUpdateRequest dto) {
         return new MemberUpdateResponse(memberService.updateUser(dto));
     }
 
     @Operation(summary = "사용자 목록 조회", description = "사용자 목록 조회 API")
     @GetMapping("/members")
-    public Page<MemberListResponse> getMemberList(Pageable pageable) {
+    public Page<MemberListResponse> getMemberList(@PageableDefault(size = 20, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable) {
         return memberService.getMemberList(pageable);
     }
 

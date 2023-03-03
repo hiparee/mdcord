@@ -89,7 +89,7 @@ public class JpaMemberService implements MemberService {
                 dto.getUseYn(), currentMemberId
         );
 
-        return memberRepository.save(member);
+        return member;
     }
 
     @Override
