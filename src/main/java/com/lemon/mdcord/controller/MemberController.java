@@ -30,13 +30,13 @@ public class MemberController {
 
     @Operation(summary = "로그인", description = "로그인 API")
     @PostMapping("/members/signin")
-    public MemberLoginResponse signin(@RequestBody final MemberLoginRequest dto, HttpServletResponse response) {
+    public MemberLoginResponse signin(@RequestBody @Valid final MemberLoginRequest dto, HttpServletResponse response) {
         return new MemberLoginResponse(memberService.memberLogin(dto, response));
     }
 
     @Operation(summary = "사용자 정보 수정", description = "사용자 정보 수정 API")
     @PutMapping("/members")
-    public MemberUpdateResponse updateMember(@RequestBody final MemberUpdateRequest dto) {
+    public MemberUpdateResponse updateMember(@RequestBody @Valid final MemberUpdateRequest dto) {
         return new MemberUpdateResponse(memberService.updateUser(dto));
     }
 
