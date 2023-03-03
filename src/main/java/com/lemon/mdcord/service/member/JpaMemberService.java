@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Slf4j
 @Service
@@ -61,9 +62,12 @@ public class JpaMemberService implements MemberService {
 
         String currentMemberId = getAuthentication().getName();
 
+        int randomIconFileId = getRandomIconFileId();
+
         Member member = Member.builder()
                 .id(dto.getMemberId())
                 .name(dto.getName())
+                .iconFileId(randomIconFileId)
                 .password(dto.getPassword())
                 .passwordEncoder(memberPasswordEncoder)
                 .createBy(currentMemberId)
@@ -93,6 +97,14 @@ public class JpaMemberService implements MemberService {
 
         return memberRepository.findAll(pageable)
                 .map(MemberListResponse::new);
+    }
+
+    private static int getRandomIconFileId() {
+        ThreadLocalRandom tlr = ThreadLocalRandom.current();
+        int minValue = 1;
+        int maxValue = 50;
+        int randomIconFileId = tlr.nextInt(minValue, maxValue +1);
+        return randomIconFileId;
     }
 
     private static Authentication getAuthentication() {
