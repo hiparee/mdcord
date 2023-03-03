@@ -63,13 +63,14 @@ public class Member extends BaseEntity {
     private List<ChannelMember> channelMembers = new ArrayList<>();
 
     @Builder
-    public Member(String id, String name, String password, MemberPasswordEncoder passwordEncoder, String createBy) {
+    public Member(String id, String name, String password, Integer iconFileId, MemberPasswordEncoder passwordEncoder, String createBy) {
         Assert.state(StringUtils.isNotBlank(id), "id may not be blank");
         Assert.state(StringUtils.isNotBlank(password), "password may not be blank");
         Assert.state(passwordEncoder != null, "passwordEncoder may not be null");
 
         this.id = id;
         this.name = name;
+        this.iconFileId = iconFileId;
         this.password = this.encodePassword(password, passwordEncoder);
         this.memberRole = MemberRole.USER;
         super.setCreateBy(createBy);
