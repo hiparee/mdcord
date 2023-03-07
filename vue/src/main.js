@@ -1,6 +1,4 @@
 import { createApp } from 'vue';
-import { useToast } from 'vue-toast-notification';
-// import ToastPlugin from "vue-toast-notification";
 import router from './router/routes.js';
 
 import '@/assets/css/index.css';
