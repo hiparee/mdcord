@@ -38,12 +38,12 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException e, HttpHeaders headers, HttpStatus status, WebRequest request) {
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
+                .status(HttpStatus.OK)
                 .body(
                         new ErrorResponse(
                                 HttpStatus.BAD_REQUEST.value(),
-                                HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                                e.getBindingResult().getAllErrors().get(0).getDefaultMessage()
+                                e.getBindingResult().getAllErrors().get(0).getDefaultMessage(),
+                                e.getBindingResult().getFieldError().getField()
                         )
                 );
     }

@@ -10,8 +10,8 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 public class MemberUpdateRequest {
 
-    @Size(max = 255)
-    @Schema(description = "사용자 ID", example = "lemon", maxLength = 255)
+    @Size(max = 20)
+    @Schema(description = "사용자 ID", example = "lemon", maxLength = 20)
     private String memberId;
 
     @Size(max = 10)
@@ -22,6 +22,7 @@ public class MemberUpdateRequest {
     @Schema(description = "비밀번호", example = "password1234", minLength = 8, maxLength = 20)
     private String password;
 
+    @Schema(description = "사용자 아이콘 ID", example = "1")
     private Integer iconFileId;
 
     @Size(max = 1)
