@@ -1,8 +1,6 @@
 package com.lemon.mdcord.controller;
 
-import com.lemon.mdcord.dto.channel.ChannelListCreateRequest;
-import com.lemon.mdcord.dto.channel.ChannelListCreateResponse;
-import com.lemon.mdcord.dto.channel.MultipleChannelListResponse;
+import com.lemon.mdcord.dto.channel.*;
 import com.lemon.mdcord.service.channel.ChannelListService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,11 +23,9 @@ public class ChannelController {
         return new ChannelListCreateResponse(channelListService.createChannel(dto));
     }
 
-    @Operation(summary = "활성 채널 목록 조회", description = "활성 채널 목록 조회 API. 사용 여부(use_yn) 'Y'인 목록")
+    @Operation(summary = "채널 목록 조회", description = "채널 목록 조회 API")
     @GetMapping("/channels")
     public MultipleChannelListResponse fetchChannelList() {
-        // use_yn y만 보내주는게 맞을지?
-        //        n도 포함해서 보내주고, 프론트에서 필터링해서 보여주는게 맞을지?
         return channelListService.fetchChannels();
     }
 
@@ -39,6 +35,10 @@ public class ChannelController {
         channelListService.deleteChannel(id);
     }
 
-    // 수정 기능 (order, 채널명, useYn) useyn n->y 때문에 필요
-    //  - 수정된 값 return
+    @Operation(summary = "채널 수정", description = "채널 수정 API")
+    @PutMapping("/channels")
+    public ChannelListUpdateResponse updateChannelList(@RequestBody @Valid ChannelListUpdateRequest dto) {
+        return new ChannelListUpdateResponse(channelListService.updateChannel(dto));
+    }
+
 }

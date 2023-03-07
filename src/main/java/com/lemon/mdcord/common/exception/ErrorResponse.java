@@ -14,43 +14,11 @@ public class ErrorResponse {
 
     private String errorMessage;
 
-    private String detailMessage;
+    private String details;
 
-    private Errors errors;
-
-    @Getter
-    @NoArgsConstructor
-    public static class Errors {
-
-        private List<Body> body;
-
-        @Builder
-        public Errors(List<Body> body) {
-            this.body = body;
-        }
-
-        @Getter
-        @NoArgsConstructor
-        public static class Body {
-
-            private String message;
-
-            @Builder
-            public Body(String mesage) {
-                this.message = mesage;
-            }
-
-        }
-
-    }
-
-    public ErrorResponse(int httpStatus, String errorMessage, String detailMessage) {
+    public ErrorResponse(int httpStatus, String errorMessage, String details) {
         this.httpStatus = httpStatus;
         this.errorMessage = errorMessage;
-        this.detailMessage = detailMessage;
-
-        Errors.Body body = Errors.Body.builder().mesage(detailMessage).build();
-
-        this.errors = Errors.builder().body(List.of(body)).build();
+        this.details = details;
     }
 }

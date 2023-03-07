@@ -4,14 +4,12 @@ import com.lemon.mdcord.common.exception.MemberDuplicatedException;
 import com.lemon.mdcord.common.exception.MemberNotFoundException;
 import com.lemon.mdcord.common.security.jwt.JwtProvider;
 import com.lemon.mdcord.domain.member.Member;
-import com.lemon.mdcord.dto.member.MemberCreateRequest;
-import com.lemon.mdcord.dto.member.MemberLoginRequest;
-import com.lemon.mdcord.dto.member.MemberPasswordEncoder;
-import com.lemon.mdcord.dto.member.MemberUpdateRequest;
+import com.lemon.mdcord.dto.member.*;
 import com.lemon.mdcord.repository.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseCookie;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -19,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Slf4j
 @Service
@@ -63,9 +62,12 @@ public class JpaMemberService implements MemberService {
 
         String currentMemberId = getAuthentication().getName();
 
+        int randomIconFileId = getRandomIconFileId();
+
         Member member = Member.builder()
                 .id(dto.getMemberId())
                 .name(dto.getName())
+                .iconFileId(randomIconFileId)
                 .password(dto.getPassword())
                 .passwordEncoder(memberPasswordEncoder)
                 .createBy(currentMemberId)
@@ -87,7 +89,22 @@ public class JpaMemberService implements MemberService {
                 dto.getUseYn(), currentMemberId
         );
 
-        return memberRepository.save(member);
+        return member;
+    }
+
+    @Override
+    public Page<MemberListResponse> getMemberList(Pageable pageable) {
+
+        return memberRepository.findAll(pageable)
+                .map(MemberListResponse::new);
+    }
+
+    private static int getRandomIconFileId() {
+        ThreadLocalRandom tlr = ThreadLocalRandom.current();
+        int minValue = 1;
+        int maxValue = 50;
+        int randomIconFileId = tlr.nextInt(minValue, maxValue +1);
+        return randomIconFileId;
     }
 
     private static Authentication getAuthentication() {

@@ -10,6 +10,5 @@ public interface ChannelListRepository extends JpaRepository<ChannelList, Long> 
 
     Optional<ChannelList> findByNameAndParentIdAndUseYn(String name, Long parentId, String useYn);
     List<ChannelList> findByParentIdAndUseYn(Long parentId, String useYn);
-    List<ChannelList> findByUseYn(String useYn);
 
 }

@@ -1,22 +1,17 @@
 import axios from 'axios';
+import interceptors from '@/api/config/interceptors.js';
 
-const instance = axios.create({
-  withCredentials: true,
-  baseURL: import.meta.env.VITE_APP_API_URL,
-});
-
-const fetchLogin = async params => {
-  try {
-    const res = await instance.post('/api/members/signin', params);
-    console.log(res);
-    return res;
-  } catch (error) {
-    console.log(error);
-  }
+// create Axios Instance
+const create = () => {
+  // instance config
+  const instance = axios.create({
+    withCredentials: true,
+    baseURL: import.meta.env.VITE_APP_API_URL,
+  });
+  interceptors(instance);
+  return instance;
 };
 
-const fetchChannelList = () => {
-  return instance.get('/api/channels');
-};
-
-export { fetchLogin, fetchChannelList };
+// create api modules
+export const user = create();
+export const channel = create();
