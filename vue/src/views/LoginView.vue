@@ -69,7 +69,7 @@
 <script setup>
 import { useRouter } from 'vue-router/dist/vue-router';
 import { onMounted, ref, inject } from 'vue';
-import { fetchLogin } from '../api/index.js';
+import { fetchLogin } from '../api/user.js';
 import { useToast } from 'vue-toast-notification';
 
 const router = useRouter();
