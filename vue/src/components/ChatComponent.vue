@@ -115,7 +115,7 @@
 
               <template v-for="(chat, index) in chatList" :key="index">
                 <div
-                  class="d-flex mb-3"
+                  class="d-flex mt-2"
                   :class="
                     chat.memberId == userInfo.memberId
                       ? 'flex-row-reverse'
@@ -125,12 +125,12 @@
                   <div class="text-center">
                     <img
                       class="profile-img"
-                      :src="`/src/assets/images/profile/${chat.iconFileId}.png`"
+                      :src="getImageUrl(`profile/${chat.iconFileId}.png`)"
                     />
                     <div class="text-white mt-1">{{ chat.name }}</div>
                   </div>
                   <div>
-                    <p class="msg">{{ chat.message }}</p>
+                    <p class="msg">{{ chat.content }}</p>
                     <p
                       class="small m-3 mb-3 mt-0 text-muted"
                       :title="`${chat.commitTime}`"
@@ -179,7 +179,6 @@
             </div>
           </div>
           <!-- 첨부파일 리스트 영역 끝 -->
-          <button @click="test()">ddddd</button>
 
           <div class="d-flex" style="flex-direction: row; width: 100%">
             <textarea
@@ -215,6 +214,8 @@ import { useToast } from 'vue-toast-notification';
 import { fetchMultiFileUpload } from '../api/chat.js';
 import { useUserStore } from '../store/modules/user.js';
 import { timeAgo } from '../composables/chat.js';
+import { getImageUrl } from '../composables/common.js';
+
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
 dayjs.locale('ko');
@@ -244,10 +245,13 @@ const onInput = () => {
 const sendMessage = event => {
   if (!event.shiftKey) {
     // console.log('메세지 전송 :', message.value);
-    // console.log('useUserStore', userInfo);
+    console.log('useUserStore', userInfo);
 
     const data = {
-      message: message.value,
+      channelId: store.onChatInfo.channelId,
+      memberId: userInfo.memberId,
+      content: message.value,
+      fileYn: false,
       name: userInfo.name,
       sendTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
       commitTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
@@ -255,7 +259,6 @@ const sendMessage = event => {
         userInfo.iconFileId < 10
           ? '0' + userInfo.iconFileId
           : userInfo.iconFileId,
-      memberId: userInfo.memberId,
     };
 
     websocket.send(JSON.stringify(data));
@@ -375,13 +378,18 @@ onMounted(() => {
       console.log('메세지 수신 :', parseData);
 
       chatList.value.push({
-        message: parseData.message,
+        content: parseData.content,
+        memberId: parseData.memberId,
         name: parseData.name,
+        fileYn: parseData.fileYn,
         sendTime: parseData.sendTime,
         commitTime: parseData.commitTime,
         iconFileId: parseData.iconFileId,
-        memberId: parseData.memberId,
         timeText: dayjs(parseData.commitTime).format('YYYY. MM. DD A HH:mm'),
+      });
+
+      nextTick(() => {
+        chatScrollSetting();
       });
     };
   };
@@ -392,12 +400,12 @@ watch(
   (oldValue, newValue) => {
     console.log(`isLoading changed from ${oldValue} to ${newValue}`);
     nextTick(() => {
-      listBox.value.scrollTop = listBox.value.scrollHeight;
+      chatScrollSetting();
     });
   },
 );
 
-const test = () => {
+const chatScrollSetting = () => {
   listBox.value.scrollTop = listBox.value.scrollHeight;
 };
 
@@ -405,7 +413,6 @@ watch(chatList.value, () => {
   chatList.value.forEach(v => {
     v['timeAgo'] = timeAgo(v.commitTime);
   });
-  test();
 });
 </script>
 <style scoped lang="scss">
