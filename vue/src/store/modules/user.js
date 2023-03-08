@@ -4,7 +4,8 @@ import { ref } from 'vue';
 export const useUserStore = defineStore(
   'user',
   () => {
-    const userInfo = ref([]);
+    const userInfo = ref({});
+
     return {
       userInfo,
     };

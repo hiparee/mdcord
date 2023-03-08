@@ -30,7 +30,7 @@ function generateSkeletonBoxes() {
       height: getRandomNumberBetween(30, 200) + 'px',
     });
   }
-  console.log('boxes', boxes);
+  // console.log('boxes', boxes);
   return boxes;
 }
 
