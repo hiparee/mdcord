@@ -251,7 +251,7 @@ const sendMessage = event => {
       channelId: store.onChatInfo.channelId,
       memberId: userInfo.memberId,
       content: message.value,
-      fileYn: false,
+      fileYn: 'N',
       name: userInfo.name,
       sendTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
       commitTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
