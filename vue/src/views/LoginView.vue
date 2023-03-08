@@ -71,6 +71,7 @@ import { useRouter } from 'vue-router/dist/vue-router';
 import { onMounted, ref, inject } from 'vue';
 import { fetchLogin } from '../api/user.js';
 import { useToast } from 'vue-toast-notification';
+import { useUserStore } from '../store/modules/user';
 
 const router = useRouter();
 const $toast = useToast({
@@ -107,6 +108,10 @@ const submit = () => {
       } else {
         $toast.success('Login Success', {
           onDismiss: () => {
+            // sessionStorage.setItem('loginInfo', JSON.stringify(response.data));
+            useUserStore().$patch({
+              userInfo: JSON.stringify(response.data),
+            });
             router.push('/channels');
             disToggle(false);
           },
