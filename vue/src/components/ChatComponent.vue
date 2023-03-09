@@ -22,7 +22,7 @@
         </button>
         <p class="navbar-brand mb-0 p-0" href="#">
           <i class="bi bi-hash"></i>
-          <span class="text-white">{{ store.chatInfo.title }}</span>
+          <span class="text-white">{{ store.onChatInfo.title }}</span>
         </p>
         <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
@@ -90,42 +90,16 @@
 
             <!-- data list -->
             <template v-else>
-              <div class="d-flex flex-row justify-content-start mb-3">
+              <div class="d-flex flex-row-reverse">
                 <div class="text-center">
                   <img
                     class="profile-img"
-                    src="@/assets/images/profile/47.png"
+                    src="@/assets/images/profile/08.png"
                   />
-                  <div class="text-white mt-1">백성우</div>
+                  <div class="text-white mt-1">나</div>
                 </div>
                 <div>
-                  <p class="msg">223.130.130.222:8080</p>
-                  <p
-                    class="small m-3 mb-3 mt-0 text-muted"
-                    title="2023년 02월 22일 21시 08분"
-                  >
-                    23시간 전
-                  </p>
-                </div>
-              </div>
-
-              <div class="d-flex flex-row justify-content-start">
-                <div class="text-center">
-                  <img
-                    class="profile-img"
-                    src="@/assets/images/profile/47.png"
-                  />
-                  <div class="profile-name text-white mt-1">백성우</div>
-                </div>
-                <div>
-                  <p class="msg">
-                    select distinct (to_char(ep."timestamp", 'yyyy-MM-dd'))
-                    as<br />
-                    a, count(1) from es_payload ep group by<br />
-                    rollup((to_char(ep."timestamp", 'yyyy-MM-dd'))) order by
-                    a<br />
-                    asc ;
-                  </p>
+                  <p class="msg">Vuex</p>
                   <p
                     class="small m-3 mb-3 mt-0 text-muted"
                     title="2023년 02월 22일 23시 58분"
@@ -139,34 +113,33 @@
                 <p class="text-center mx-3 mb-0">Today</p>
               </div>
 
-              <div class="d-flex flex-row-reverse">
-                <div class="text-center">
-                  <img
-                    class="profile-img"
-                    src="@/assets/images/profile/08.png"
-                  />
-                  <div class="text-white mt-1">나</div>
+              <template v-for="(chat, index) in chatList" :key="index">
+                <div
+                  class="d-flex mt-2"
+                  :class="
+                    chat.memberId == userInfo.memberId
+                      ? 'flex-row-reverse'
+                      : 'flex-row justify-content-start'
+                  "
+                >
+                  <div class="text-center">
+                    <img
+                      class="profile-img"
+                      :src="getImageUrl(`profile/${chat.iconFileId}.png`)"
+                    />
+                    <div class="text-white mt-1">{{ chat.name }}</div>
+                  </div>
+                  <div>
+                    <p class="msg">{{ chat.content }}</p>
+                    <p
+                      class="small m-3 mb-3 mt-0 text-muted"
+                      :title="`${chat.commitTime}`"
+                    >
+                      {{ chat.timeAgo }}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p class="msg">
-                    Vuex와 비교 피니아는 Vuex 5에 대한 핵심 팀 토론의 많은<br />
-                    아이디어를 통합하여, Vuex의 다음 버전이 어떤 모습일지<br />
-                    탐구하는 것으로 시작했습니다. 마침내 우리는 Vuex 5에서<br />
-                    우리가 원하는 대부분을 피니아가 이미 구현하고 있다는 것을<br />
-                    깨달았고, 이것을 새로운 권장 사항으로 만들기로
-                    결정했습니다.<br />
-                    Vuex와 비교할 때, 피니아는 더 간단한 API를 제공하고,<br />
-                    컴포지션 API 스타일을 제공하며, 가장 중요한 것은<br />
-                    TypeScript와 함께 사용할 때 견고한 유형 추론을 지원합니다.
-                  </p>
-                  <p
-                    class="small m-3 mb-3 mt-0 text-muted"
-                    title="2023년 02월 22일 23시 58분"
-                  >
-                    23:58
-                  </p>
-                </div>
-              </div>
+              </template>
             </template>
           </div>
 
@@ -186,7 +159,17 @@
                 :key="index"
               >
                 <div class="file-img">
-                  <img class="img-thumbnail" :src="file.src" />
+                  <img
+                    v-if="file.isImage"
+                    class="img-thumbnail"
+                    :src="file.src"
+                  />
+                  <img
+                    v-else
+                    class="img-thumbnail"
+                    :src="`/src/assets/images/ext/${file.ext}.png`"
+                    style="width: 70px"
+                  />
                 </div>
                 <span class="file-name">{{ file.name }}</span>
                 <button class="file-delete">
@@ -201,11 +184,6 @@
             <textarea
               type="text"
               class="form-control shadow-none text-light form-control-lg bg-dark border-0"
-              style="
-                overflow: hidden;
-                height: 76px;
-                background-color: #383a40 !important;
-              "
               id="refMessage"
               ref="refMessage"
               @input="onInput"
@@ -229,15 +207,25 @@
   </div>
 </template>
 <script setup>
-import { ref, nextTick, watch, onMounted } from 'vue';
+import { ref, nextTick, watch, onMounted, watchEffect } from 'vue';
 import { useChannelStore } from '../store/modules/channel';
 import Skeleton from '../components/SkeletonComponent.vue';
 import { useToast } from 'vue-toast-notification';
+import { fetchMultiFileUpload } from '../api/chat.js';
+import { useUserStore } from '../store/modules/user.js';
+import { timeAgo } from '../composables/chat.js';
+import { getImageUrl } from '../composables/common.js';
+
+import dayjs from 'dayjs';
+import 'dayjs/locale/ko';
+dayjs.locale('ko');
 
 const store = useChannelStore();
+const userInfo = JSON.parse(useUserStore().userInfo);
 const listBox = ref(null);
 const refMessage = ref(null);
 const message = ref('');
+const fileList = ref([]);
 const fileDragOverStatus = ref(false);
 const props = defineProps({
   isLoading: {
@@ -245,6 +233,8 @@ const props = defineProps({
     default: true,
   },
 });
+
+const chatList = ref([]);
 
 const onInput = () => {
   const textarea = refMessage.value;
@@ -254,14 +244,66 @@ const onInput = () => {
 
 const sendMessage = event => {
   if (!event.shiftKey) {
-    console.log(message.value);
+    // console.log('메세지 전송 :', message.value);
+    console.log('useUserStore', userInfo);
+
+    const data = {
+      channelId: store.onChatInfo.channelId,
+      memberId: userInfo.memberId,
+      content: message.value,
+      fileYn: 'N',
+      name: userInfo.name,
+      sendTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+      commitTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+      iconFileId:
+        userInfo.iconFileId < 10
+          ? '0' + userInfo.iconFileId
+          : userInfo.iconFileId,
+    };
+
+    websocket.send(JSON.stringify(data));
+
     message.value = '';
     event.preventDefault();
     const textarea = refMessage.value;
     textarea.style.height = '76px';
     // refMessage.value.dispatchEvent(new Event('onInput'));
+    listBox.value.scrollTop = listBox.value.scrollHeight;
+    return;
+
+    // let formData = new FormData();
+
+    // for (let i = 0; i < fileList.value.length; i++) {
+    //   console.log('fileList.value[i] ->', fileList.value[i]);
+    //   formData.append('files', fileList.value[i]);
+    // }
+    // formData.append('channelId', store.onChatInfo.channelId);
+    // console.log(formData);
+    // const response = fetchMultiFileUpload(formData);
+    // console.log(response.data);
+
+    // // 업로드가 완료되면 fileList 배열 초기화
+    // fileList.value = [];
+
+    // alert('send message');
   }
 };
+
+// const uploadFiles = async () => {
+//   try {
+//     for (let i = 0; i < fileList.value.length; i++) {
+//       const formData = new FormData();
+//       console.log(fileList.value[i]);
+//       formData.append('file', fileList.value[i]);
+//       const response = await axios.post('/api/upload', formData);
+//       console.log(response.data);
+//     }
+//     // 업로드가 완료되면 fileList 배열 초기화
+//     // this.fileList = [];
+//   } catch (error) {
+//     // console.error(error);
+//   }
+// };
 
 const onDragOver = event => {
   if (fileDragOverStatus.value) return;
@@ -287,19 +329,29 @@ const onDrop = event => {
   event.preventDefault();
 
   const files = event.dataTransfer.files;
-  console.log(files);
   addFiles(files);
 };
 
-const fileList = ref([]);
+const getFileExt = fileName => {
+  const fileLen = fileName.length;
+  const lastDot = fileName.lastIndexOf('.');
+  const fileExt = fileName.substring(lastDot + 1, fileLen).toLowerCase();
+
+  return fileExt;
+};
 
 const addFiles = async files => {
   for (let i = 0; i < files.length; i++) {
     const src = await readFiles(files[i]);
+    const isImage = files[i].type.includes('image');
     files[i].src = src;
+    files[i].isImage = isImage;
+    files[i].ext = getFileExt(files[i].name);
 
     console.log(files[i]);
+
     fileList.value.push(files[i]);
+    console.log(fileList.value);
   }
 };
 
@@ -314,8 +366,33 @@ const readFiles = async files => {
   });
 };
 
+const websocket = new WebSocket('ws://localhost:9000/api/chat?memberId=lemon');
+
 onMounted(() => {
   refMessage.value.addEventListener('input', onInput);
+  websocket.onopen = () => {
+    console.log('connected');
+    websocket.onmessage = ({ data }) => {
+      // console.log('메세지 수신 :', data);
+      const parseData = JSON.parse(data);
+      console.log('메세지 수신 :', parseData);
+
+      chatList.value.push({
+        content: parseData.content,
+        memberId: parseData.memberId,
+        name: parseData.name,
+        fileYn: parseData.fileYn,
+        sendTime: parseData.sendTime,
+        commitTime: parseData.commitTime,
+        iconFileId: parseData.iconFileId,
+        timeText: dayjs(parseData.commitTime).format('YYYY. MM. DD A HH:mm'),
+      });
+
+      nextTick(() => {
+        chatScrollSetting();
+      });
+    };
+  };
 });
 
 watch(
@@ -323,16 +400,31 @@ watch(
   (oldValue, newValue) => {
     console.log(`isLoading changed from ${oldValue} to ${newValue}`);
     nextTick(() => {
-      listBox.value.scrollTop = listBox.value.scrollHeight;
+      chatScrollSetting();
     });
   },
 );
+
+const chatScrollSetting = () => {
+  listBox.value.scrollTop = listBox.value.scrollHeight;
+};
+
+watch(chatList.value, () => {
+  chatList.value.forEach(v => {
+    v['timeAgo'] = timeAgo(v.commitTime);
+  });
+});
 </script>
 <style scoped lang="scss">
+#refMessage {
+  overflow: hidden;
+  height: 76px;
+  background-color: #383a40 !important;
+}
 .profile-img {
   width: 50px;
   height: 50px;
-  border-radius: 50%;
+  border-radius: 10px;
 }
 .profile-name {
   white-space: nowrap;
@@ -393,14 +485,14 @@ watch(
     border-radius: 10px;
     margin-right: 10px;
     margin-bottom: 10px;
+    text-align: center;
     & .file-img {
-      width: 120px;
       height: 120px;
       overflow: hidden;
       & .img-thumbnail {
         margin-right: 10px;
         border-radius: 4px;
-        width: 100%;
+        max-width: 120px;
         border: 0;
         padding: 0;
         margin-bottom: 10px;
@@ -422,6 +514,11 @@ watch(
 
     & .file-name {
       color: #f1f1f1;
+      max-width: 200px;
+      display: inline-block;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
     }
   }
 }
