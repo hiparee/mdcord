@@ -1,4 +1,4 @@
-package com.lemon.mdcord.dto.channel;
+package com.lemon.mdcord.dto.channel.list;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
