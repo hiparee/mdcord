@@ -1,6 +1,6 @@
 package com.lemon.mdcord.controller;
 
-import com.lemon.mdcord.dto.channel.*;
+import com.lemon.mdcord.dto.channel.list.*;
 import com.lemon.mdcord.service.channel.ChannelListService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
