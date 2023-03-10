@@ -1,7 +1,9 @@
 package com.lemon.mdcord.dto.channel.list;
 
 import com.lemon.mdcord.domain.channel.ChannelList;
+import lombok.Getter;
 
+@Getter
 public class ChannelListUpdateResponse {
 
     private Long id;
