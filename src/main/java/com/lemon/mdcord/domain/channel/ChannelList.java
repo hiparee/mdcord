@@ -91,9 +91,25 @@ public class ChannelList extends BaseEntity {
     }
 
     public void updateChannelInfo(String channelName, Integer channelOrder, String useYn, String updateBy) {
+        Assert.state(StringUtils.isNotBlank(channelName), "channelName order may not be null.");
+        Assert.state(channelOrder != null, "channel order may not be null.");
+        Assert.state(StringUtils.isNotBlank(useYn), "useYn order may not be null.");
+        Assert.state(StringUtils.isNotBlank(updateBy), "channel order may not be null.");
+
         this.name = channelName;
         this.channelOrder = channelOrder;
         this.useYn = useYn;
+        this.updateBy = updateBy;
+        this.updateDate = LocalDateTime.now();
+    }
+
+    public void updateChannelOrder(Long parentId, Integer channelOrder, String updateBy) {
+        Assert.state(parentId != null, "parentId order may not be null.");
+        Assert.state(channelOrder != null, "channel order may not be null.");
+        Assert.state(StringUtils.isNotBlank(updateBy), "channel order may not be null.");
+
+        this.parentId = parentId;
+        this.channelOrder = channelOrder;
         this.updateBy = updateBy;
         this.updateDate = LocalDateTime.now();
     }
