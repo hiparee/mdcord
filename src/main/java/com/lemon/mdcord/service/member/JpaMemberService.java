@@ -54,7 +54,7 @@ public class JpaMemberService implements MemberService {
     @Override
     @Transactional
     public Member createMember(final MemberCreateRequest dto) {
-        Optional<Member> checkDuplicated = memberRepository.findMemberById(dto.getMemberId());
+        Optional<Member> checkDuplicated = memberRepository.findById(dto.getMemberId());
 
         if(checkDuplicated.isPresent()) {
             throw new MemberDuplicatedException(dto.getMemberId());
@@ -112,7 +112,7 @@ public class JpaMemberService implements MemberService {
     }
 
     private Member getMemberById(final String memberId) {
-        return memberRepository.findMemberById(memberId).orElseThrow(() -> new MemberNotFoundException(memberId));
+        return memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(memberId));
     }
 
     private void createToken(Member member, HttpServletResponse response) {

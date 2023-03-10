@@ -4,11 +4,14 @@ import com.lemon.mdcord.domain.BaseEntity;
 import com.lemon.mdcord.domain.channel.ChannelList;
 import com.lemon.mdcord.domain.member.Member;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.util.Assert;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -68,4 +71,17 @@ public class ChannelChat extends BaseEntity {
     @OneToMany(mappedBy = "channelChat")
     private List<AttachFile> attachFiles = new ArrayList<>();
 
+    @Builder
+    public ChannelChat(String content, String fileYn, ChannelList channelList, Member member, String createBy) {
+        Assert.state(StringUtils.isNotBlank(content), "content may not be blank");
+        Assert.state(member != null, "member may not be null");
+        Assert.state(channelList != null, "channelList may not be null");
+        Assert.state(createBy != null, "createBy may not be null");
+
+        this.content = content;
+        this.fileYn = fileYn;
+        this.channelList = channelList;
+        this.member = member;
+        super.setCreateBy(createBy);
+    }
 }
