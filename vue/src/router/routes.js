@@ -52,6 +52,7 @@ router.beforeEach(async (to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
     try {
       await useChannelStore().SET_CHANNEL_LIST();
+      console.log(from, to);
     } catch (error) {
       useToast().error('로그인정보 만료');
       next({ name: 'login' });
