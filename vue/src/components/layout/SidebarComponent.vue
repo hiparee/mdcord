@@ -16,10 +16,13 @@
             >
               <img
                 src="@/assets/images/icon.png"
-                alt=""
                 style="width: 30px; height: 30px; margin-right: 5px"
               />
-              미션개발팀
+              {{
+                store.getServerList.find(server => {
+                  return store.accessedChannelInfo.serverId == server.id;
+                }).name
+              }}
             </a>
             <ul
               class="dropdown-menu dropdown-menu-dark"
@@ -31,8 +34,12 @@
                 >
               </li>
               <li><hr class="dropdown-divider bg-light" /></li>
-              <li><a class="dropdown-item" href="#">의료컨텐츠사업부</a></li>
-              <li><a class="dropdown-item" href="#">미션개발팀</a></li>
+              <li v-for="server in store.getServerList" :key="server.id">
+                <!-- 서버명 -->
+                <span class="dropdown-item" @click="serverChange(server.id)"
+                  ><i class="bi bi-play-fill mr-1"></i> {{ server.name }}</span
+                >
+              </li>
             </ul>
           </li>
         </ul>
@@ -43,36 +50,37 @@
 
     <div class="list-group list-group-flush">
       <ul class="list-unstyled ps-0" id="sidebar">
-        <li
-          class="mb-2"
-          v-for="channel in store.getChannelList"
-          :key="channel.id"
-        >
-          <button
-            class="btn btn-toggle align-items-center rounded"
-            data-bs-toggle="collapse"
-            :data-bs-target="`#channel${channel.id}`"
-            aria-expanded="true"
+        <template v-for="channel in store.getChannelList" :key="channel.id">
+          <li
+            class="mb-2"
+            v-if="channel.parentId == store.accessedChannelInfo.serverId"
           >
-            {{ channel.name }}
-          </button>
+            <button
+              class="btn btn-toggle align-items-center rounded"
+              data-bs-toggle="collapse"
+              :data-bs-target="`#channel${channel.id}`"
+              aria-expanded="true"
+            >
+              {{ channel.name }}
+            </button>
 
-          <i class="bi bi-plus float-end plus-icon"></i>
+            <i class="bi bi-plus float-end plus-icon"></i>
 
-          <div class="collapse show" :id="`channel${channel.id}`">
-            <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-              <li v-for="sub in channel.subChannel" :key="sub.id">
-                <!-- <router-link :to="`/channels/${sub.id}`" class="rounded"> -->
-                <router-link
-                  :to="{ path: `/channels/${sub.id}` }"
-                  class="rounded"
-                >
-                  {{ sub.name }}
-                </router-link>
-              </li>
-            </ul>
-          </div>
-        </li>
+            <div class="collapse show" :id="`channel${channel.id}`">
+              <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                <li v-for="sub in channel.subChannel" :key="sub.id">
+                  <!-- <router-link :to="`/channels/${sub.id}`" class="rounded"> -->
+                  <router-link
+                    :to="{ path: `/channels/${sub.id}` }"
+                    class="rounded"
+                  >
+                    {{ sub.name }}
+                  </router-link>
+                </li>
+              </ul>
+            </div>
+          </li>
+        </template>
 
         <hr class="my-3" />
 
@@ -170,7 +178,7 @@
     </div>
 
     <div class="member-info">
-      <div class="card" style="display: block; --bs-card-bg: #232428">
+      <div class="card" style="display: none">
         <div class="card-body">
           <div class="d-flex text-light">
             <div class="flex-shrink-0">
@@ -181,9 +189,9 @@
                 style="width: 30px; border-radius: 10px"
               />
             </div>
-            <div class="flex-grow-1 ms-3 align-self-center">
-              <p class="m-0 p-0 text-white">홍길동</p>
-              <!--              <div class="d-flex flex-column" style="background-color: #efefef">
+            <div class="flex-grow-1 ms-3">
+              <p class="mb-1 p-0" style="color: #2b2a2a">홍길동</p>
+              <div class="d-flex flex-column" style="background-color: #efefef">
                 <div class="flex:1">
                   <p class="small text-muted my-1 mx-1">글 <span>241</span></p>
                 </div>
@@ -203,25 +211,7 @@
                 <button type="button" class="btn btn-danger btn-sm flex-grow-1">
                   Logout
                 </button>
-              </div>-->
-            </div>
-            <div>
-              <button
-                type="button"
-                class="btn btn-outline-secondary"
-                style="
-                  width: 33px;
-                  height: 33px;
-                  font-size: 23px;
-                  padding: 0;
-                  border: none;
-                  --bs-btn-hover-bg: #3a3b42;
-                  --bs-btn-active-bg: #3a3b42;
-                "
-                @click.stop="router.push('/settings')"
-              >
-                <span> <i class="bi-gear"></i></span>
-              </button>
+              </div>
             </div>
           </div>
         </div>
@@ -232,9 +222,13 @@
 
 <script setup>
 import { useChannelStore } from '@/store/store.js';
-import { useRouter } from 'vue-router';
-const router = useRouter();
+import { useRouter } from 'vue-router/dist/vue-router';
 const store = useChannelStore();
+const router = useRouter();
+const serverChange = serverId => {
+  router.push('/channels');
+  store.SET_ACCESSED_CHANNEL_INFO('serverId', serverId);
+};
 </script>
 
 <style scoped>
@@ -247,7 +241,7 @@ const store = useChannelStore();
   bottom: 0;
   left: 0;
   right: 0;
-  /*background: rgb(145, 145, 145);*/
+  background: rgb(145, 145, 145);
 }
 
 .plus-icon {
