@@ -55,10 +55,20 @@ public class SwaggerConfig {
 
     @Bean
     public GroupedOpenApi chatOpenApi() {
-        String[] paths = {"/api/chat/**"};
+        String[] paths = {"/api/chat/**", "/api/chat/file-upload"};
 
         return GroupedOpenApi.builder()
                 .group("채팅 관련 API")
+                .pathsToMatch(paths)
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi channelMemberOpenApi() {
+        String[] paths = {"/api/channel-member/**"};
+
+        return GroupedOpenApi.builder()
+                .group("채널 멤버 관련 API")
                 .pathsToMatch(paths)
                 .build();
     }
