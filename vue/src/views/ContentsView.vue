@@ -30,8 +30,8 @@ const setChatTitle = () => {
   channelList.forEach(item => {
     item.subChannel.forEach(sub => {
       if (sub.id == route.params.id) {
-        useChannelStore().SET_CHAT_TITLE(sub.name);
-        useChannelStore().SET_CHANNEL_ID(sub.id);
+        useChannelStore().SET_ACCESSED_CHANNEL_INFO('title', sub.name);
+        useChannelStore().SET_ACCESSED_CHANNEL_INFO('channelId', sub.id);
       }
     });
   });
