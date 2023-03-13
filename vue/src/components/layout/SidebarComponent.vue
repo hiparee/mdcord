@@ -178,7 +178,7 @@
     </div>
 
     <div class="member-info">
-      <div class="card" style="display: none">
+      <div class="card" style="display: block; --bs-card-bg: #232428">
         <div class="card-body">
           <div class="d-flex text-light">
             <div class="flex-shrink-0">
@@ -189,9 +189,9 @@
                 style="width: 30px; border-radius: 10px"
               />
             </div>
-            <div class="flex-grow-1 ms-3">
-              <p class="mb-1 p-0" style="color: #2b2a2a">홍길동</p>
-              <div class="d-flex flex-column" style="background-color: #efefef">
+            <div class="flex-grow-1 ms-3 align-self-center">
+              <p class="m-0 p-0 text-white">홍길동</p>
+              <!--              <div class="d-flex flex-column" style="background-color: #efefef">
                 <div class="flex:1">
                   <p class="small text-muted my-1 mx-1">글 <span>241</span></p>
                 </div>
@@ -211,7 +211,25 @@
                 <button type="button" class="btn btn-danger btn-sm flex-grow-1">
                   Logout
                 </button>
-              </div>
+              </div>-->
+            </div>
+            <div>
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                style="
+                  width: 33px;
+                  height: 33px;
+                  font-size: 23px;
+                  padding: 0;
+                  border: none;
+                  --bs-btn-hover-bg: #3a3b42;
+                  --bs-btn-active-bg: #3a3b42;
+                "
+                @click.stop="router.push('/settings')"
+              >
+                <span> <i class="bi-gear"></i></span>
+              </button>
             </div>
           </div>
         </div>
@@ -222,7 +240,7 @@
 
 <script setup>
 import { useChannelStore } from '@/store/store.js';
-import { useRouter } from 'vue-router/dist/vue-router';
+import { useRouter } from 'vue-router';
 const store = useChannelStore();
 const router = useRouter();
 const serverChange = serverId => {
@@ -241,7 +259,7 @@ const serverChange = serverId => {
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgb(145, 145, 145);
+  /*background: rgb(145, 145, 145);*/
 }
 
 .plus-icon {
