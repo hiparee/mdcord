@@ -2,6 +2,7 @@ package com.lemon.mdcord.domain.chat;
 
 import com.lemon.mdcord.domain.BaseEntity;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -33,10 +34,19 @@ public class AttachFile extends BaseEntity {
 
     @NotBlank
     @Column(name = "file_size", nullable = false)
-    private Integer fileSize;
+    private Long fileSize;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "channel_chat_id")
     private ChannelChat channelChat;
 
+    @Builder
+    public AttachFile(String originFileName, String realFileName, String fileExt, Long fileSize, ChannelChat channelChat, String createBy) {
+        this.originFileName = originFileName;
+        this.realFileName = realFileName;
+        this.fileExt = fileExt;
+        this.fileSize = fileSize;
+        this.channelChat = channelChat;
+        super.setCreateBy(createBy);
+    }
 }

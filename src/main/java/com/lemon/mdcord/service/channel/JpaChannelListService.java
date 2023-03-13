@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -32,20 +31,18 @@ public class JpaChannelListService implements ChannelListService {
     @Override
     @Transactional
     public ChannelList createChannel(final ChannelListCreateRequest dto) {
-        Optional<ChannelList> checkDuplicated = channelListRepository.findByNameAndParentIdAndUseYn(dto.getName(), dto.getParentId(), USE_Y);
+        ChannelList checkDuplicated = channelListRepository.findByNameAndParentIdAndUseYn(dto.getName(), dto.getParentId(), USE_Y);
+        if(checkDuplicated != null) throw new ChannelListDuplicatedException(dto.getName());
 
-        if(checkDuplicated.isPresent()) {
-            throw new ChannelListDuplicatedException(dto.getName());
-        }
-
-        String currentMemberId = getAuthentication().getName();
+        int channelOrder = dto.getChannelOrder() == null ? 1 : dto.getChannelOrder();
+        channelListRepository.increaseChannelOrderGreaterThanEqual(channelOrder);
 
         ChannelList channelList = ChannelList.builder()
                 .name(dto.getName())
                 .parentId(dto.getParentId())
                 .dept(dto.getDept())
-                .channelOrder(dto.getChannelOrder() == null ? 0 : dto.getChannelOrder())
-                .createBy(currentMemberId)
+                .channelOrder(channelOrder)
+                .createBy(getAuthentication().getName())
                 .build();
 
         return channelListRepository.save(channelList);
@@ -53,6 +50,12 @@ public class JpaChannelListService implements ChannelListService {
 
     @Override
     public MultipleChannelListResponse fetchChannels() {
+        // TODO - 관리자라면 모두 출력, 일반 사용자라면 필터링
+        /*
+            관리자 - useYn 상관없이 모두?
+            사용자 - useYn:Y, 자신이 속한 채널만?
+         */
+
         List<ChannelList> channelLists = channelListRepository.findAll();
 
         if(channelLists.size() == 0) {
@@ -112,6 +115,11 @@ public class JpaChannelListService implements ChannelListService {
                     , getAuthentication().getName()
             );
         }
+    }
+
+    @Override
+    public List<ChannelList> findByParentId(List<Long> channelIds) {
+        return channelListRepository.findByParentIdIn(channelIds);
     }
 
     private ChannelList getTargetChannel(Long id) {
