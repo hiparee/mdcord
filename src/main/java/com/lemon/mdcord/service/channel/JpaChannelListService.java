@@ -1,8 +1,11 @@
 package com.lemon.mdcord.service.channel;
 
-import com.lemon.mdcord.common.exception.*;
+import com.lemon.mdcord.common.exception.ChannelAlreadyDisabledException;
+import com.lemon.mdcord.common.exception.ChannelCantDeleteException;
+import com.lemon.mdcord.common.exception.ChannelListDuplicatedException;
+import com.lemon.mdcord.common.exception.ChannelNotFoundException;
 import com.lemon.mdcord.domain.channel.ChannelList;
-import com.lemon.mdcord.dto.channel.*;
+import com.lemon.mdcord.dto.channel.list.*;
 import com.lemon.mdcord.repository.ChannelListRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -27,20 +31,18 @@ public class JpaChannelListService implements ChannelListService {
     @Override
     @Transactional
     public ChannelList createChannel(final ChannelListCreateRequest dto) {
-        Optional<ChannelList> checkDuplicated = channelListRepository.findByNameAndParentIdAndUseYn(dto.getName(), dto.getParentId(), USE_Y);
+        ChannelList checkDuplicated = channelListRepository.findByNameAndParentIdAndUseYn(dto.getName(), dto.getParentId(), USE_Y);
+        if(checkDuplicated != null) throw new ChannelListDuplicatedException(dto.getName());
 
-        if(checkDuplicated.isPresent()) {
-            throw new ChannelListDuplicatedException(dto.getName());
-        }
-
-        String currentMemberId = getAuthentication().getName();
+        int channelOrder = dto.getChannelOrder() == null ? 1 : dto.getChannelOrder();
+        channelListRepository.increaseChannelOrderGreaterThanEqual(channelOrder);
 
         ChannelList channelList = ChannelList.builder()
                 .name(dto.getName())
                 .parentId(dto.getParentId())
                 .dept(dto.getDept())
-                .channelOrder(dto.getChannelOrder() == null ? 0 : dto.getChannelOrder())
-                .createBy(currentMemberId)
+                .channelOrder(channelOrder)
+                .createBy(getAuthentication().getName())
                 .build();
 
         return channelListRepository.save(channelList);
@@ -48,6 +50,12 @@ public class JpaChannelListService implements ChannelListService {
 
     @Override
     public MultipleChannelListResponse fetchChannels() {
+        // TODO - 관리자라면 모두 출력, 일반 사용자라면 필터링
+        /*
+            관리자 - useYn 상관없이 모두?
+            사용자 - useYn:Y, 자신이 속한 채널만?
+         */
+
         List<ChannelList> channelLists = channelListRepository.findAll();
 
         if(channelLists.size() == 0) {
@@ -73,12 +81,12 @@ public class JpaChannelListService implements ChannelListService {
         List<ChannelList> childChannels = channelListRepository.findByParentIdAndUseYn(channel.getId(), USE_Y);
         if(!childChannels.isEmpty()) throw new ChannelCantDeleteException();
 
-        String updatedBy = getAuthentication().getName();
-        channel.disable(updatedBy);
+        channel.disable(getAuthentication().getName());
     }
 
     @Override
-    public ChannelList updateChannel(ChannelListUpdateRequest dto) {
+    @Transactional
+    public ChannelList updateChannelInfo(ChannelListUpdateRequest dto) {
         ChannelList channel = getTargetChannel(dto.getId());
         channel.updateChannelInfo(
                 dto.getChannelName(), dto.getChannelOrder(),
@@ -86,6 +94,32 @@ public class JpaChannelListService implements ChannelListService {
         );
 
         return channel;
+    }
+
+    @Override
+    @Transactional
+    public void updateChannelOrder(List<ChannelListOrderUpdateRequest> list) {
+        Map<Long, ChannelListOrderUpdateRequest> dtoListToMap = list.stream()
+                .collect(Collectors.toMap(
+                        o1 -> o1.getId(),
+                        o2 -> o2
+        ));
+
+        Set<Long> channelIds = dtoListToMap.keySet();
+        List<ChannelList> targetChannelList = channelListRepository.findByIdIn(channelIds);
+
+        for(ChannelList cl : targetChannelList) {
+            cl.updateChannelOrder(
+                    dtoListToMap.get(cl.getId()).getParentId()
+                    , dtoListToMap.get(cl.getId()).getChannelOrder()
+                    , getAuthentication().getName()
+            );
+        }
+    }
+
+    @Override
+    public List<ChannelList> findByParentId(List<Long> channelIds) {
+        return channelListRepository.findByParentIdIn(channelIds);
     }
 
     private ChannelList getTargetChannel(Long id) {
