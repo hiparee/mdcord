@@ -8,15 +8,12 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'vue-toast-notification/dist/theme-sugar.css';
 import App from './App.vue';
 import store from '@/store/store.js';
-
-import dayjs from 'dayjs';
+import plugins from '@/plugins';
 
 const app = createApp(App);
 app.use(router);
 app.use(store);
+app.use(plugins);
 app.mount('#app');
 
-app.config.globalProperties.$dayjs = dayjs;
-app.provide('dayjs', dayjs);
-app.use(dayjs);
 // let instance = $toast.success('You did it!');
