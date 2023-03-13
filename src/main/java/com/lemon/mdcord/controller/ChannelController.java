@@ -33,7 +33,7 @@ public class ChannelController {
 
     @Operation(summary = "채널 삭제", description = "채널 삭제 API. 사용 여부(use_yn) Y -> N")
     @DeleteMapping("/channels/{id}")
-    public void deleteChannelList(@RequestParam("id") Long id) {
+    public void deleteChannelList(@PathVariable("id") Long id) {
         channelListService.deleteChannel(id);
     }
 
