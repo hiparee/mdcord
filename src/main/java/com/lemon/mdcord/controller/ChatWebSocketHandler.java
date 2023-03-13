@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
 import com.lemon.mdcord.domain.chat.ChannelChat;
 import com.lemon.mdcord.dto.chat.ChatCreateRequest;
+import com.lemon.mdcord.dto.chat.MessageType;
 import com.lemon.mdcord.service.channel.ChannelListService;
 import com.lemon.mdcord.service.channel.ChannelMemberService;
 import com.lemon.mdcord.service.chat.ChannelChatService;
@@ -69,7 +70,17 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             ChatCreateRequest request = payloadToChatCreateRequest(payload);
             log.debug("payload : " + payload);
 
-            ChannelChat channelChat = channelChatService.createChannelChat(request);
+            ChannelChat channelChat = null;
+            if(request.getMessageType().equals(MessageType.SEND)) {
+                channelChat = channelChatService.createChannelChat(request);
+            }
+            else if(request.getMessageType().equals(MessageType.EDIT)) {
+                channelChat = channelChatService.changeChannelChatInfo(request);
+            }
+            else {
+                // TODO - 제거 필요
+                log.info("message type : {}", request.getMessageType());
+            }
             TextMessage modifiedMessage = modifiedMessage(payload, channelChat);
 
             // 메시지 소켓 통신
@@ -134,8 +145,16 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
      * @return
      */
     private List<Long> getMemberChannelIds(String memberId) {
-        return channelMemberService.findByMemberId(memberId).stream()
+        List<Long> joinedDept0ChannelMemberId = channelMemberService.findByMemberId(memberId).stream()
                 .map(o -> o.getChannelList().getId())
+                .collect(Collectors.toList());
+
+        List<Long> joinedDept1ChannelMemberId = channelListService.findByParentId(joinedDept0ChannelMemberId).stream()
+                .map(o -> o.getId())
+                .collect(Collectors.toList());
+
+        return channelListService.findByParentId(joinedDept1ChannelMemberId).stream()
+                .map(o -> o.getId())
                 .collect(Collectors.toList());
     }
 

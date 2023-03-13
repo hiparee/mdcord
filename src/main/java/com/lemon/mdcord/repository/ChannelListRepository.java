@@ -18,4 +18,6 @@ public interface ChannelListRepository extends JpaRepository<ChannelList, Long> 
     @Modifying
     @Query("update ChannelList cl set cl.channelOrder = cl.channelOrder +1 where cl.channelOrder >= :order")
     void increaseChannelOrderGreaterThanEqual(@Param("order") Integer order);
+
+    List<ChannelList> findByParentIdIn(List<Long> channelIds);
 }

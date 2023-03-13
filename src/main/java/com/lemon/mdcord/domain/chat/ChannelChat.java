@@ -3,6 +3,7 @@ package com.lemon.mdcord.domain.chat;
 import com.lemon.mdcord.domain.BaseEntity;
 import com.lemon.mdcord.domain.channel.ChannelList;
 import com.lemon.mdcord.domain.member.Member;
+import com.lemon.mdcord.dto.chat.ChatCreateRequest;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -83,5 +84,13 @@ public class ChannelChat extends BaseEntity {
         this.channelList = channelList;
         this.member = member;
         super.setCreateBy(createBy);
+    }
+
+    public void changeChannelChatInfo(String content, String memberId) {
+        Assert.state(StringUtils.isNotBlank(content), "content may not be blank");
+
+        this.content = content;
+        this.updateBy = memberId;
+        this.updateDate = LocalDateTime.now();
     }
 }

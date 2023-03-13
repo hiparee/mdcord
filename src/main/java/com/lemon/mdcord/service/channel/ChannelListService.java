@@ -18,4 +18,6 @@ public interface ChannelListService {
     ChannelList updateChannelInfo(ChannelListUpdateRequest dto);
 
     void updateChannelOrder(List<ChannelListOrderUpdateRequest> list);
+
+    List<ChannelList> findByParentId(List<Long> channelIds);
 }
