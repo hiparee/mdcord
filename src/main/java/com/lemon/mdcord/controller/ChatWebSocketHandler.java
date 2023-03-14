@@ -133,14 +133,15 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     }
 
     private ChannelChat handleChannelChatByMessageType(ChatCreateRequest request, ChannelChat channelChat) {
-        if(request.getMessageType().equals(MessageType.SEND)) {
+        MessageType messageType = request.getMessageType();
+        if(messageType != null && messageType.equals(MessageType.SEND)) {
             channelChat = channelChatService.createChannelChat(request);
         }
-        else if(request.getMessageType().equals(MessageType.EDIT)) {
+        else if(messageType != null && messageType.equals(MessageType.EDIT)) {
             channelChat = channelChatService.changeChannelChatInfo(request);
         }
         else {
-            log.debug("message type : {}", request.getMessageType());
+            log.debug("message type : {}", messageType);
         }
         return channelChat;
     }

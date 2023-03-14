@@ -8,6 +8,7 @@ import com.lemon.mdcord.domain.channel.ChannelList;
 import com.lemon.mdcord.domain.chat.AttachFile;
 import com.lemon.mdcord.domain.chat.ChannelChat;
 import com.lemon.mdcord.domain.member.Member;
+import com.lemon.mdcord.dto.chat.ChannelChatListResponse;
 import com.lemon.mdcord.dto.chat.ChatCreateRequest;
 import com.lemon.mdcord.repository.AttachFileRepository;
 import com.lemon.mdcord.repository.ChannelChatRepository;
@@ -15,6 +16,8 @@ import com.lemon.mdcord.repository.ChannelListRepository;
 import com.lemon.mdcord.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -131,6 +134,12 @@ public class JpaChannelChatService implements ChannelChatService {
         ChannelChat channelChat = channelChatRepository.findById(chatId).orElseThrow(() -> new ChatNotFoundException(chatId));
         channelChat.changeChannelChatInfo(request.getContent(), request.getMemberId());
         return channelChat;
+    }
+
+    @Override
+    public Page<ChannelChatListResponse> getChannelChatList(Long channelId, Pageable pageable) {
+        return channelChatRepository.findAll(pageable)
+                .map(ChannelChatListResponse::new);
     }
 
     /**
