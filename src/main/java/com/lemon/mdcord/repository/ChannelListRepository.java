@@ -12,12 +12,16 @@ import java.util.Set;
 public interface ChannelListRepository extends JpaRepository<ChannelList, Long> {
 
     ChannelList findByNameAndParentIdAndUseYn(String name, Long parentId, String useYn);
+
     List<ChannelList> findByParentIdAndUseYn(Long parentId, String useYn);
+    List<ChannelList> findByParentIdIn(Set<Long> channelIds);
+    List<ChannelList> findByParentIdInAndUseYn(Set<Long> channelIds, String useYn);
+
     List<ChannelList> findByIdIn(Set<Long> channelIds);
+
+    List<ChannelList> findByIdInAndUseYn(Set<Long> channelIds, String useYn);
 
     @Modifying
     @Query("update ChannelList cl set cl.channelOrder = cl.channelOrder +1 where cl.channelOrder >= :order")
     void increaseChannelOrderGreaterThanEqual(@Param("order") Integer order);
-
-    List<ChannelList> findByParentIdIn(List<Long> channelIds);
 }

@@ -24,7 +24,7 @@ public class JpaMemberDetailsService implements UserDetailsService {
         return User.builder()
                 .username(member.getId())
                 .password(member.getPassword())
-                .roles(MemberRole.USER.getValue())
+                .roles(member.getMemberRole().getValue())
                 .build();
     }
 }
