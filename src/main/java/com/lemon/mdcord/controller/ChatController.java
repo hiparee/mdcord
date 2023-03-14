@@ -25,12 +25,12 @@ public class ChatController {
 
     private final ChannelChatService chatService;
 
-    // 채널별 채팅 목록 (50개?)
+    // TODO - 임시. offset 방식으로 변경 필요
     @Operation(summary = "채널별 채팅 목록 조회", description = "채널별 채팅 목록 조회 API (50개 묶)")
     @GetMapping("/channels/{channelId}/chat")
     public Page<ChannelChatListResponse> getChannelChatList(
             @PathVariable("channelId") Long channelId
-            , @PageableDefault(size = 50, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable) {
+            , @PageableDefault(size = 50, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
         return chatService.getChannelChatList(channelId, pageable);
     }
 
