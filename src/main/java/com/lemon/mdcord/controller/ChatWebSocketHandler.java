@@ -73,16 +73,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             log.debug("payload : " + payload);
 
             ChannelChat channelChat = null;
-            if(request.getMessageType().equals(MessageType.SEND)) {
-                channelChat = channelChatService.createChannelChat(request);
-            }
-            else if(request.getMessageType().equals(MessageType.EDIT)) {
-                channelChat = channelChatService.changeChannelChatInfo(request);
-            }
-            else {
-                // TODO - 제거 필요
-                log.info("message type : {}", request.getMessageType());
-            }
+            channelChat = handleChannelChatByMessageType(request, channelChat);
             TextMessage modifiedMessage = modifiedMessage(payload, channelChat);
 
             // 메시지 소켓 통신
@@ -139,6 +130,19 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             webSocketSessions.remove(session);
             log.debug(session + " 클라이언트 " + memberChannel + " 채널 접속 해제");
         }
+    }
+
+    private ChannelChat handleChannelChatByMessageType(ChatCreateRequest request, ChannelChat channelChat) {
+        if(request.getMessageType().equals(MessageType.SEND)) {
+            channelChat = channelChatService.createChannelChat(request);
+        }
+        else if(request.getMessageType().equals(MessageType.EDIT)) {
+            channelChat = channelChatService.changeChannelChatInfo(request);
+        }
+        else {
+            log.debug("message type : {}", request.getMessageType());
+        }
+        return channelChat;
     }
 
     /**
