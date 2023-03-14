@@ -7,45 +7,7 @@
     @drop="onDrop"
   >
     <!-- 상단 title 영역 -->
-    <nav class="navbar navbar-expand-lg navbar-light">
-      <div class="container-fluid">
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarTogglerDemo01"
-          aria-controls="navbarTogglerDemo01"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <p class="navbar-brand mb-0 p-0" href="#">
-          <i class="bi bi-hash"></i>
-          <span class="text-white">{{
-            channelStore.accessedChannelInfo.title
-          }}</span>
-        </p>
-        <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <i class="bi bi-person-fill-add fs-4"></i>
-            </li>
-          </ul>
-          <form class="d-flex">
-            <input
-              class="form-control me-2"
-              type="search"
-              placeholder="Search"
-              aria-label="Search"
-            />
-            <button class="btn btn-outline-success" type="submit">
-              Search
-            </button>
-          </form>
-        </div>
-      </div>
-    </nav>
+    <navbar-title-component></navbar-title-component>
 
     <!-- 첨부파일 drag & drop 영역 -->
     <transition name="drag">
@@ -80,25 +42,6 @@
 
             <!-- data list -->
             <template v-else>
-              <!-- <div class="d-flex flex-row-reverse">
-                <div class="text-center">
-                  <img
-                    class="profile-img"
-                    src="@/assets/images/profile/08.png"
-                  />
-                  <div class="text-white mt-1">나</div>
-                </div>
-                <div class="msg-wrap">
-                  <p class="msg">Vuex</p>
-                  <p
-                    class="small m-3 mb-3 mt-0 text-muted"
-                    title="2023년 02월 22일 23시 58분"
-                  >
-                    23:58
-                  </p>
-                </div>
-              </div> -->
-
               <!-- 날짜 구분선 -->
               <!-- <div class="divider mb-4">
                 <p class="text-center mx-3 mb-0">Today</p>
@@ -201,21 +144,20 @@
   </div>
 </template>
 <script setup>
-import { ref, nextTick, watch, onMounted, computed } from 'vue';
-import { useChannelStore } from '../store/modules/channel';
+import { ref, nextTick, watch, onMounted, computed, inject } from 'vue';
+import { useChannelStore, useUserStore } from '@/store/store';
 import Skeleton from '../components/SkeletonComponent.vue';
 import { useToast } from 'vue-toast-notification';
 import { fetchMultiFileUpload } from '../api/chat.js';
-import { useUserStore } from '../store/modules/user.js';
-import { timeAgo } from '../composables/chat.js';
-import { getImageUrl } from '../composables/common.js';
+import { timeAgo } from '../utils/chat.js';
+import { getImageUrl, userProfileIcon } from '../utils/common.js';
+import NavbarTitleComponent from '@/components/layout/NavbarTitleComponent.vue';
 
-import dayjs from 'dayjs';
-import 'dayjs/locale/ko';
-dayjs.locale('ko');
-
-const channelStore = useChannelStore();
 const userInfo = JSON.parse(useUserStore().userInfo);
+const websocket = new WebSocket(
+  `ws://localhost:9000/api/chat?memberId=${userInfo.memberId}`,
+);
+const channelStore = useChannelStore();
 const listBox = ref(null);
 const refMessage = ref(null);
 const message = ref('');
@@ -230,6 +172,9 @@ const props = defineProps({
 
 const chatList = ref([]);
 
+const dayjs = inject('dayjs');
+
+console.log('dayjs :::', dayjs);
 const onInput = () => {
   const textarea = refMessage.value;
   textarea.style.height = '';
@@ -242,21 +187,20 @@ const sendMessage = event => {
       event.preventDefault();
       return;
     }
+    console.log('message.value.length', message.value.length, message.value);
     // console.log('메세지 전송 :', message.value);
     // console.log('useUserStore', userInfo);
-
+    const fileYn = fileList.value.length > 0 ? 'Y' : 'N';
     const data = {
+      fileYn,
+      messageType: 'SEND',
       channelId: channelStore.accessedChannelInfo.channelId,
       memberId: userInfo.memberId,
       content: message.value,
-      fileYn: 'N',
       name: userInfo.name,
       sendTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
       commitTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-      iconFileId:
-        userInfo.iconFileId < 10
-          ? '0' + userInfo.iconFileId
-          : userInfo.iconFileId,
+      iconFileId: userProfileIcon(userInfo.iconFileId),
     };
 
     websocket.send(JSON.stringify(data));
@@ -266,41 +210,27 @@ const sendMessage = event => {
     const textarea = refMessage.value;
     textarea.style.height = '76px';
     // refMessage.value.dispatchEvent(new Event('onInput'));
-    return;
 
-    // let formData = new FormData();
+    if (fileYn === 'Y') {
+      let formData = new FormData();
 
-    // for (let i = 0; i < fileList.value.length; i++) {
-    //   console.log('fileList.value[i] ->', fileList.value[i]);
-    //   formData.append('files', fileList.value[i]);
-    // }
-    // formData.append('channelId', channelStore.accessedChannelInfo.channelId);
-    // console.log(formData);
-    // const response = fetchMultiFileUpload(formData);
-    // console.log(response.data);
+      for (let i = 0; i < fileList.value.length; i++) {
+        console.log('fileList.value[i] ->', fileList.value[i]);
+        formData.append('files', fileList.value[i]);
+      }
 
-    // // 업로드가 완료되면 fileList 배열 초기화
-    // fileList.value = [];
+      formData.append('channelId', channelStore.accessedChannelInfo.channelId);
+      console.log(formData);
+      const response = fetchMultiFileUpload(formData);
+      console.log(response.data);
 
-    // alert('send message');
+      // 업로드가 완료되면 fileList 배열 초기화
+      fileList.value = [];
+
+      // alert('send message');
+    }
   }
 };
-
-// const uploadFiles = async () => {
-//   try {
-//     for (let i = 0; i < fileList.value.length; i++) {
-//       const formData = new FormData();
-//       console.log(fileList.value[i]);
-//       formData.append('file', fileList.value[i]);
-//       const response = await axios.post('/api/upload', formData);
-//       console.log(response.data);
-//     }
-//     // 업로드가 완료되면 fileList 배열 초기화
-//     // this.fileList = [];
-//   } catch (error) {
-//     // console.error(error);
-//   }
-// };
 
 const onDragOver = event => {
   if (fileDragOverStatus.value) return;
@@ -382,8 +312,6 @@ const renderMsgHtml = text => {
   return makeHtml;
 };
 
-const websocket = new WebSocket('ws://localhost:9000/api/chat?memberId=lemon');
-
 onMounted(() => {
   refMessage.value.addEventListener('input', onInput);
 
@@ -394,18 +322,19 @@ onMounted(() => {
   websocket.onopen = () => {
     console.log('connected');
     websocket.onmessage = ({ data }) => {
-      // console.log('메세지 수신 :', data);
       const parseData = JSON.parse(data);
       console.log('메세지 수신 :', parseData);
       console.log(chatList.value.length);
       console.log(chatList.value[chatList.value.length - 1]);
       const prevData = chatList.value[chatList.value.length - 1];
-      if (prevData) {
-        console.log(
-          dayjs(prevData.commitTime).format('YYYY. MM. DD A HH:mm'),
-          dayjs(parseData.commitTime).format('YYYY. MM. DD A HH:mm'),
-        );
-      }
+
+      // const $toast = useToast({
+      //   duration: 3000,
+      //   position: 'bottom-right',
+      // });
+
+      // $toast.info(`<div>${parseData.channelId}</div>${parseData.content}`);
+
       if (
         prevData &&
         prevData.memberId == parseData.memberId &&
@@ -436,16 +365,6 @@ onMounted(() => {
     };
   };
 });
-
-watch(
-  () => props.isLoading,
-  (oldValue, newValue) => {
-    console.log(`isLoading changed from ${oldValue} to ${newValue}`);
-    nextTick(() => {
-      chatScrollSetting();
-    });
-  },
-);
 
 const chatScrollSetting = () => {
   if (listBox.value) {
@@ -481,7 +400,7 @@ watch(chatList.value, () => {
 .msg:hover {
   background: #444;
 }
-.msg::v-deep {
+.msg {
   transition: 0.2s;
   background-color: #535354;
   padding: 10px 15px;
