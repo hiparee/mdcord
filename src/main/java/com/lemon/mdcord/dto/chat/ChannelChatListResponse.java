@@ -13,6 +13,7 @@ public class ChannelChatListResponse {
     private String channelName;
     private String memberId;
     private String memberName;
+    private Integer memberIconId;
     private String content;
     private String fileYn;
     private String fixYn;
@@ -30,6 +31,7 @@ public class ChannelChatListResponse {
         this.channelName = cc.getChannelList().getName();
         this.memberId = cc.getMember().getId();
         this.memberName = cc.getMember().getName();
+        this.memberIconId = cc.getMember().getIconFileId();
         this.content = cc.getContent();
         this.fileYn = cc.getFileYn();
         this.fixYn = cc.getFixYn();
