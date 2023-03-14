@@ -7,6 +7,7 @@ import com.lemon.mdcord.dto.channel.list.ChannelListUpdateRequest;
 import com.lemon.mdcord.dto.channel.list.MultipleChannelListResponse;
 
 import java.util.List;
+import java.util.Set;
 
 public interface ChannelListService {
     ChannelList createChannel(ChannelListCreateRequest dto);
@@ -19,5 +20,5 @@ public interface ChannelListService {
 
     void updateChannelOrder(List<ChannelListOrderUpdateRequest> list);
 
-    List<ChannelList> findByParentId(List<Long> channelIds);
+    List<ChannelList> findByParentId(Set<Long> channelIds);
 }

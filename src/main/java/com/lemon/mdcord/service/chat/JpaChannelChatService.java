@@ -53,12 +53,13 @@ public class JpaChannelChatService implements ChannelChatService {
         ChannelList channelList = channelListRepository.findById(channelId).orElseThrow(() -> new ChannelNotFoundException(channelId));
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(memberId));
 
+        // TODO - getAuthentication() 왜 안꺼내지는지?
         ChannelChat channelChat = ChannelChat.builder()
                 .channelList(channelList)
                 .member(member)
                 .content(request.getContent())
                 .fileYn(request.getFileYn())
-                .createBy(getAuthentication().getName())
+                .createBy(request.getMemberId())
                 .build();
 
         return channelChatRepository.save(channelChat);
@@ -89,6 +90,7 @@ public class JpaChannelChatService implements ChannelChatService {
                 String msg = "디렉토리 생성 실패 - Exception";
                 log.error(msg);
                 log.error("Path : {}", targetDir);
+                log.error("getClass : {}", e.getClass());
                 log.error("getLocalizedMessage : {}", e.getLocalizedMessage());
                 log.error("getMessage : {}", e.getMessage());
                 throw new AttachFileException(msg, targetDir);
@@ -114,6 +116,7 @@ public class JpaChannelChatService implements ChannelChatService {
                 String msg = "파일 생성 실패 - Exception";
                 log.error(msg);
                 log.error("Path : {}", targetFile);
+                log.error("getClass : {}", e.getClass());
                 log.error("getLocalizedMessage : {}", e.getLocalizedMessage());
                 log.error("getMessage : {}", e.getMessage());
                 throw new AttachFileException(msg, targetDir);
