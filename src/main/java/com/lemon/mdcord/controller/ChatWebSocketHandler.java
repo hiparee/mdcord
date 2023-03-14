@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import com.lemon.mdcord.domain.chat.ChannelChat;
 import com.lemon.mdcord.dto.chat.ChatCreateRequest;
 import com.lemon.mdcord.dto.chat.MessageType;
+import com.lemon.mdcord.repository.ChannelListRepository;
 import com.lemon.mdcord.service.channel.ChannelListService;
 import com.lemon.mdcord.service.channel.ChannelMemberService;
 import com.lemon.mdcord.service.chat.ChannelChatService;
@@ -23,6 +24,7 @@ import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -34,6 +36,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     private final ChannelChatService channelChatService;
     private final ChannelMemberService channelMemberService;
     private final ChannelListService channelListService;
+    private final ChannelListRepository channelListRepository;
     private final ObjectMapper objectMapper;
 
     /**
@@ -44,8 +47,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     @PostConstruct
     private void init() {
         // 모든 채널의 ID 목록
-        List<Long> channelIds = channelListService.fetchChannels()
-                .getChannelLists().stream()
+        List<Long> channelIds = channelListRepository.findAll().stream()
                 .map(o -> o.getId())
                 .collect(Collectors.toList());
 
@@ -89,6 +91,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 webSocketSession.sendMessage(modifiedMessage);
             }
         } catch (Exception e) {
+            log.error("getClass : {}", e.getClass());
             log.error("getLocalizedMessage : {}", e.getLocalizedMessage());
             log.error("getMessage : {}", e.getMessage());
             log.error("getCause : {}", e.getCause());
@@ -145,13 +148,13 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
      * @return
      */
     private List<Long> getMemberChannelIds(String memberId) {
-        List<Long> joinedDept0ChannelMemberId = channelMemberService.findByMemberId(memberId).stream()
+        Set<Long> joinedDept0ChannelMemberId = channelMemberService.findByMemberId(memberId).stream()
                 .map(o -> o.getChannelList().getId())
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
 
-        List<Long> joinedDept1ChannelMemberId = channelListService.findByParentId(joinedDept0ChannelMemberId).stream()
+        Set<Long> joinedDept1ChannelMemberId = channelListService.findByParentId(joinedDept0ChannelMemberId).stream()
                 .map(o -> o.getId())
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
 
         return channelListService.findByParentId(joinedDept1ChannelMemberId).stream()
                 .map(o -> o.getId())
