@@ -8484,6 +8484,7 @@ html {
   #sidebar-wrapper .list-group {
     width: 15rem;
     padding: 10px;
+    margin-bottom: 40px;
     overflow-y: auto; }
     #sidebar-wrapper .list-group::-webkit-scrollbar {
       width: 3px;

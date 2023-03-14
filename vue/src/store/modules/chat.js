@@ -6,24 +6,21 @@ import { ref, computed } from 'vue';
 // store.chatList.value.A서버[1].채팅목록.push(chatData);
 
 export const useChatStore = defineStore('chat', () => {
-  const chatList = ref([
-    {
-      channelId: 1,
-      parentId: 9,
-      messages: [
-        // {
-        //   message: '안녕하세요',
-        //   name: '레몬',
-        //   sendTime: '2023-03-08 10:41:06',
-        //   commitTime: '2023-03-08 10:41:06',
-        //   iconFileId: '01',
-        //   memberId: 'lemon',
-        // },
-      ],
+  const chatList = ref({
+    channel: {
+      1: [],
+      2: [],
     },
-  ]);
+  });
+
+  const SET_CHAT_LIST = list => {
+    list.forEach(v => {
+      chatList.value.channel[v.channelId] = v;
+    });
+  };
 
   return {
     chatList,
+    SET_CHAT_LIST,
   };
 });
