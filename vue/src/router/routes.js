@@ -3,10 +3,12 @@ import ErrorView from '@/views/ErrorView.vue';
 import ContentsView from '@/views/ContentsView.vue';
 import MainView from '@/views/MainView.vue';
 import LoginView from '@/views/LoginView.vue';
-// import AdmUserCreate from "@/views/AdmUserCreate.vue";
-// import AdmUserList from "@/views/AdmUserList.vue";
 import { useChannelStore } from '@/store/store.js';
 import { useToast } from 'vue-toast-notification';
+import RegisterView from '@/views/RegisterView.vue';
+import SettingsView from '@/views/SettingsView.vue';
+import UserListView from '@/views/UserListView.vue';
+import ChannelView from '@/views/ChannelView.vue';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -35,16 +37,26 @@ const router = createRouter({
       meta: { requiresAuth: true },
       component: ContentsView,
     },
-    // {
-    //   path: "/adm/create",
-    //   name: "userCreate",
-    //   component: AdmUserCreate,
-    // },
-    // {
-    //   path: "/adm/user",
-    //   name: "userList",
-    //   component: AdmUserList,
-    // },
+    {
+      path: '/settings',
+      name: 'settings',
+      meta: { requiresAuth: true },
+      component: SettingsView,
+      children: [
+        {
+          path: 'adm/user',
+          component: UserListView,
+        },
+        {
+          path: 'adm/user/register',
+          component: RegisterView,
+        },
+        {
+          path: 'adm/channel',
+          component: ChannelView,
+        },
+      ],
+    },
   ],
 });
 
@@ -52,6 +64,7 @@ router.beforeEach(async (to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
     try {
       await useChannelStore().SET_CHANNEL_LIST();
+      console.log(from, to);
     } catch (error) {
       useToast().error('로그인정보 만료');
       next({ name: 'login' });

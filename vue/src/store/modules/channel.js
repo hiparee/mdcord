@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { fetchChannelList } from '@/api/channel.js';
-import { makeChannelTree } from '@/composables/channel.js';
+import { makeChannelTree } from '@/utils/channel.js';
 
 export const useChannelStore = defineStore(
   'channel',
@@ -11,18 +11,18 @@ export const useChannelStore = defineStore(
     const getChannelList = computed(() => channelList.value);
     const getServerList = computed(() => serverList.value);
 
-    // Sidebar에서 선택되어 접속된 chat 정보만 담음
-    const onChatInfo = ref({
+    // 현재 접속된 채널 정보
+    const accessedChannelInfo = ref({
       title: '',
       channelId: null,
+      serverId: null,
     });
 
-    const SET_CHAT_TITLE = title => {
-      onChatInfo.value.title = title;
-    };
-
-    const SET_CHANNEL_ID = id => {
-      onChatInfo.value.channelId = id;
+    const SET_ACCESSED_CHANNEL_INFO = (key, val) => {
+      console.log(key, val);
+      console.log(serverList.value[0].id);
+      console.log(accessedChannelInfo.value[key]);
+      accessedChannelInfo.value[key] = val;
     };
 
     const SET_CHANNEL_LIST = async () => {
@@ -39,6 +39,11 @@ export const useChannelStore = defineStore(
 
       serverList.value = serverData;
       channelList.value = channelTreeData;
+
+      // 접속시 Server list중 첫번째 server를 deafult 선택해주도록
+      if (accessedChannelInfo.value.serverId == null) {
+        accessedChannelInfo.value.serverId = serverList.value[0].id;
+      }
     };
 
     return {
@@ -46,10 +51,9 @@ export const useChannelStore = defineStore(
       serverList,
       getChannelList,
       getServerList,
+      accessedChannelInfo,
+      SET_ACCESSED_CHANNEL_INFO,
       SET_CHANNEL_LIST,
-      onChatInfo,
-      SET_CHAT_TITLE,
-      SET_CHANNEL_ID,
     };
   },
   {
