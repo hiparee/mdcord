@@ -199,6 +199,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         JsonNode jsonNode = objectMapper.readTree(payload);
 
         ((ObjectNode)jsonNode).put("chatId", channelChat.getId());
+        ((ObjectNode)jsonNode).put("channelName", channelChat.getChannelList().getName());
         ((ObjectNode)jsonNode).put("createDate", channelChat.getCreateDate().toString());
 
         return new TextMessage(objectMapper.writeValueAsString(jsonNode));
