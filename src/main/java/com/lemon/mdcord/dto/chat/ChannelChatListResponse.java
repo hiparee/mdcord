@@ -10,6 +10,7 @@ public class ChannelChatListResponse {
 
     private Long chatId;
     private Long channelId;
+    private String channelName;
     private String memberId;
     private String content;
     private String fileYn;
@@ -25,6 +26,7 @@ public class ChannelChatListResponse {
     public ChannelChatListResponse(ChannelChat cc) {
         this.chatId = cc.getId();
         this.channelId = cc.getChannelList().getId();
+        this.channelName = cc.getChannelList().getName();
         this.memberId = cc.getMember().getId();
         this.content = cc.getContent();
         this.fileYn = cc.getFileYn();
