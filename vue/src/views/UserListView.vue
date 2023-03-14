@@ -141,7 +141,7 @@
 <script setup>
 import { computed, onBeforeMount, onUpdated, ref } from 'vue';
 import { fetchMembers } from '@/api/user';
-import { userProfileIcon } from '@/composables/format';
+import { userProfileIcon } from '@/utils/common';
 import SearchBarComponent from '@/components/common/SearchBarComponent.vue';
 import UserRegisterModal from '@/components/UserRegisterModal.vue';
 
