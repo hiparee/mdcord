@@ -69,6 +69,7 @@
             <div class="collapse show" :id="`channel${channel.id}`">
               <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
                 <li v-for="sub in channel.subChannel" :key="sub.id">
+                  <div v-if="sub.useYn === 'Y'" >
                   <!-- <router-link :to="`/channels/${sub.id}`" class="rounded"> -->
                   <router-link
                     :to="{ path: `/channels/${sub.id}` }"
@@ -76,6 +77,7 @@
                   >
                     {{ sub.name }}
                   </router-link>
+                  </div>
                 </li>
               </ul>
             </div>
