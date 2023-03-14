@@ -1,0 +1,156 @@
+/* spinner 컴포넌트 - bootstrap spinner custom */
+.spinner-grow-sm {
+  margin-right: 0.3rem;
+  width: 0.7rem;
+  height: 0.7rem;
+}
+.spinner-grow:nth-of-type(2) {
+  -webkit-animation-delay: .2s;
+  animation-delay: .2s;
+}
+.spinner-grow:nth-of-type(3) {
+  -webkit-animation-delay: .4s;
+  animation-delay: .4s;
+ }
+
+/* 사용자 등록 페이지 */
+.register-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100vh;
+  overflow: auto;
+  background-image: url('../images/register.svg');
+}
+.register-form-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 580px;
+  align-items: center;
+  justify-content: center;
+}
+.register-form {
+  background-color: #313338;
+  border-radius: 5px;
+  width: 480px;
+  padding: 32px;
+}
+.register-input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 40px;
+  padding: 10px;
+  color: #f3f4f5;
+  background-color: #1e1f22;
+  border: none;
+  border-radius: 3px;
+  outline: 0;
+}
+.register-btn {
+  width: 100%;
+  height: 44px;
+  min-width: 130px;
+  min-height: 44px;
+  margin-top: 1rem;
+  font-size: 18px;
+  line-height: 14px;
+  color: #ffffff;
+  background-color: #5865f2;
+  transition: background-color 0.17s ease, color 0.17s ease;
+  outline: 0;
+  border: none;
+  border-radius: 3px;
+}
+.register-btn:hover {
+  background-color: #4752C4;
+  color: #ffffff;
+}
+ .register-btn.disabled {
+  background-color: #5865f2;
+}
+
+ /* 설정 관련 페이지 헤더 텍스트*/
+.header-text {
+  color: #f3f4f5;
+  font-size: 25px;
+  line-height: 25px;
+  font-weight: 600;
+}
+
+ /* 검색창 컴포넌트 */
+.search-bar-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  position: relative;
+  box-sizing: border-box;
+  padding: 1px;
+  min-width: 0;
+  align-items: center;
+  background: #1e1f22;
+  border-radius: 4px;
+  margin: 16px 0;
+}
+.search-bar-container > .search-input {
+  box-sizing: border-box;
+  height: 30px;
+  margin: 1px;
+  padding: 0 8px;
+  flex: 1;
+  background: #1e1f22;
+  font-size: 16px;
+  line-height: 32px;
+  border: none;
+  border-radius: 4px;
+  color: #d9d9d9;
+  outline: 0;
+}
+.search-bar-container > .icon-layout {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: text;
+}
+.search-bar-container > .icon-layout.pointer-x-icon {
+  cursor: pointer;
+}
+.search-bar-container > .icon-layout.point-search-icon {
+  pointer-events: none;
+}
+.search-bar-container > .icon-layout > .icon-container{
+  position: relative;
+  width: 20px;
+  height: 20px;
+}
+.icon-layout > .icon-container >.icon.icon-visible {
+  transform: rotate(0deg);
+  opacity: 1;
+}
+.icon-layout > .icon-container > .icon {
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  transition: opacity 0.1s ease-out, -webkit-transform 0.1s ease-out;
+  transition: transform 0.1s ease-out, opacity 0.1s ease-out;
+  transition: transform 0.1s ease-out, opacity 0.1s ease-out,
+  -webkit-transform 0.1s ease-out;
+  transform: rotate(90deg);
+  color: #b8b9bf;
+}
+
+/* modal 컴포넌트 - bootstap modal custom */
+.modal {
+  background-color: rgba(1, 1, 1, 0.5);
+}
+
+.modal-backdrop {
+  z-index: -1;
+}
