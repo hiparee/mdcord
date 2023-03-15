@@ -27,11 +27,12 @@ public class ChatController {
 
     // TODO - 임시. offset 방식으로 변경 필요
     @Operation(summary = "채널별 채팅 목록 조회", description = "채널별 채팅 목록 조회 API (50개 묶)")
-    @GetMapping("/channels/{channelId}/chat")
+    @GetMapping("/channels/{channelId}/chat/{chatId}")
     public Page<ChannelChatListResponse> getChannelChatList(
-            @PathVariable("channelId") Long channelId
+            @PathVariable("channelId") Long channelId,
+            @PathVariable(value = "chatId", required = false) Long chatId
             , @PageableDefault(size = 50, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
-        return chatService.getChannelChatList(channelId, pageable);
+        return chatService.getChannelChatList(channelId, chatId, pageable);
     }
 
     // 채팅 삭제(delete_yn : Y->N)

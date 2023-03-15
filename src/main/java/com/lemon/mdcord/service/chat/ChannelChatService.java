@@ -17,7 +17,7 @@ public interface ChannelChatService {
 
     ChannelChat changeChannelChatInfo(ChatCreateRequest request);
 
-    Page<ChannelChatListResponse> getChannelChatList(Long channelId, Pageable pageable);
+    Page<ChannelChatListResponse> getChannelChatList(Long channelId, Long chatId, Pageable pageable);
 
     ChannelChat deleteChannelChatInfo(ChatCreateRequest request);
 }
