@@ -1,30 +1,30 @@
 <template>
   <div class="row align-items-center justify-content-center">
     <div class="col-10 col-md-8">
-      <h1 class="m-0 header-text">사용자 목록</h1>
+      <h1 class="m-0 settings-header-text">사용자 목록</h1>
     </div>
     <div class="col-2 col-md-4" style="text-align: right">
       <button
-        class="add-user-btn"
+        class="add-member-btn"
         data-bs-toggle="modal"
-        data-bs-target="#exampleModal"
+        data-bs-target="#registerModal"
       >
-        <!--      data-bs-target="#exampleModal"-->
-        사용자 추가하기
+        사용자 계정 만들기
       </button>
     </div>
   </div>
   <!--  contents  -->
   <div class="contents">
-    <div class="people-column d-flex flex-column h-100">
-      <!--  사용자 검색  -->
+    <div class="people-column">
+      <!--  사용자 검색바 컴포넌트  -->
       <search-bar-component
         v-model="keyword"
         @clearKeywordEvent="clearKeywordEvent"
       />
+
       <div>
         <h2
-          class="title-x4dI75"
+          class="all-user-title"
           style="
             box-sizing: border-box;
             text-overflow: ellipsis;
@@ -37,137 +37,126 @@
             margin-top: 10px;
           "
         >
-          모든 사용자 — {{ searchedTotalCount }}명
+          모든 사용자 — {{ isLoading === true ? 0 : searchedTotalCount }}명
         </h2>
       </div>
-      <!--  사용자 목록  -->
-      <div class="overflow-auto">
-        <table class="table align-middle">
-          <colgroup>
-            <col />
-            <col />
-            <col />
-            <col />
-            <col />
-            <col />
-          </colgroup>
-          <thead>
-            <tr>
-              <th scope="col">#</th>
-              <th scope="col">이름</th>
-              <th scope="col">아이디</th>
-              <th scope="col">역할</th>
-              <th scope="col">등록일</th>
-              <th scope="col">상태</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(user, index) in searchedMember" :key="index">
-              <td>{{ index + 1 }}</td>
-              <td>
-                <span class="mr-2"
-                  ><img
-                    :src="imageUrl(userProfileIcon(user.iconFileId))"
-                    alt=""
-                    width="33"
-                    height="33"
-                /></span>
-                <span>{{ user.name }}</span>
-              </td>
-              <td>{{ user.memberId }}</td>
-              <td>{{ user.type === 'USER' ? '사용자' : '관리자' }}</td>
-              <td>{{ $dayjs(user.createDate).format('YYYY년 MM월 DD일') }}</td>
-
-              <td>{{ user.useYn }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- 리스트 형식 -->
-      <!--      <div class="people-list" role="list">
-        <div
-          v-for="(user, index) in searchedMember"
-          :key="index"
-          class="people-list-item"
-          role="listitem"
-        >
-          <div class="list-item-contents">
-            <div class="user-info d-flex flex-row">
-              &lt;!&ndash;              <img
-                :src="`/src/assets/images/profile/${userProfileIcon(
-                  user.iconFileId,
-                )}.png`"
-                alt=""
-                width="33"
-                height="33"
-              />&ndash;&gt;
-              <img
-                :src="imageUrl(userProfileIcon(user.iconFileId))"
-                alt=""
-                width="33"
-                height="33"
-              />
-              <div>{{ user.name }}</div>
-            </div>
+      <!--  사용자가 없는 경우  -->
+      <template v-if="searchedTotalCount === 0">
+        <div class="empty-container">
+          <div class="d-flex flex-column">
+            <div class="empty-image"></div>
+            <div class="empty-message">사용자가 없습니다.</div>
           </div>
         </div>
-      </div>-->
+      </template>
+      <!--  사용자가 있는 경우  -->
+      <template v-else>
+        <div class="overflow-auto position-relative" style="padding-top: 40px">
+          <div class="member-table-fixed-header"></div>
+          <div
+            class="member-table-wrapper table-custom-scrollbar"
+            style="
+              overflow-x: hidden;
+              overflow-y: auto;
+              height: 100%;
+              padding-right: 5px;
+            "
+          >
+            <table class="table align-middle member-table mb-0">
+              <colgroup>
+                <col style="width: 7%" />
+                <col style="width: 23%" />
+                <col style="width: 25%" />
+                <col style="width: 10%" />
+                <col style="width: 23%" />
+                <col style="width: 7%" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th><div class="th-text text-center">#</div></th>
+                  <th><div class="th-text text-center">이름</div></th>
+                  <th><div class="th-text text-center">아이디</div></th>
+                  <th><div class="th-text text-center">역할</div></th>
+                  <th><div class="th-text text-center">등록일</div></th>
+                  <th><div class="th-text text-center">상태</div></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-if="isLoading === true">
+                  <td colspan="6" class="text-center">
+                    <spinner-component></spinner-component>
+                  </td>
+                </tr>
+                <tr
+                  v-else
+                  v-for="(user, index) in searchedMember"
+                  :key="index"
+                  class="member-row"
+                >
+                  <td>{{ index + 1 }}</td>
+                  <td>
+                    <div class="img-section d-flex flex-row align-items-center">
+                      <span class="mr-2"
+                        ><img
+                          :src="imageUrl(userProfileIcon(user.iconFileId))"
+                          alt=""
+                          width="40"
+                          height="40"
+                      /></span>
+                      <span>{{ user.name }}</span>
+                    </div>
+                  </td>
+                  <td>{{ user.memberId }}</td>
+                  <td>{{ user.type === 'USER' ? '사용자' : '관리자' }}</td>
+                  <td>
+                    {{ $dayjs(user.createDate).format('YYYY/MM/DD HH:mm') }}
+                  </td>
+                  <td>{{ user.useYn === 'Y' ? '활성' : '비활성' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </template>
     </div>
   </div>
-  <!--  pagination section  -->
-  <!--    <nav aria-label="Page navigation example">
-      <ul class="pagination">
-        <li class="page-item">
-          <a class="page-link" href="#" aria-label="Previous">
-            <span aria-hidden="true">&laquo;</span>
-          </a>
-        </li>
-        <li class="page-item"><a class="page-link" href="#">1</a></li>
-        <li class="page-item"><a class="page-link" href="#">2</a></li>
-        <li class="page-item"><a class="page-link" href="#">3</a></li>
-        <li class="page-item">
-          <a class="page-link" href="#" aria-label="Next">
-            <span aria-hidden="true">&raquo;</span>
-          </a>
-        </li>
-      </ul>
-    </nav>-->
-
-  <!-- Modal -->
-  <user-register-modal />
+  <!-- 사용자 추가 Modal -->
+  <user-register-modal @reload-fetch-members="getMembers" />
 </template>
 
 <script setup>
-import { computed, onBeforeMount, onUpdated, ref } from 'vue';
+import { computed, onBeforeMount, ref } from 'vue';
 import { fetchMembers } from '@/api/user';
 import { userProfileIcon } from '@/composables/format';
 import SearchBarComponent from '@/components/common/SearchBarComponent.vue';
 import UserRegisterModal from '@/components/UserRegisterModal.vue';
+import SpinnerComponent from '@/components/common/SpinnerComponent.vue';
+import SkeletonComponent from '@/components/SkeletonComponent.vue';
 
 const members = ref([]);
 const totalCount = ref(0);
 
 const keyword = ref('');
-const openModal = ref(false);
+
+const isLoading = ref(false);
 
 onBeforeMount(async () => {
+  await getMembers();
+});
+
+// 사용자 목록 조회
+const getMembers = async () => {
+  isLoading.value = true;
   const params = {};
-  console.log('before mounted :::');
   try {
     const { data } = await fetchMembers();
-    console.log('members ::', members.value);
-    console.log(data);
     members.value = data.content;
     totalCount.value = data.totalElements;
   } catch (err) {
     console.log('error ::', err);
+  } finally {
+    isLoading.value = false;
   }
-});
-
-const openPeopleAddModal = () => {
-  console.log('사용자 추가 모달 띄울 예정');
-  openModal.value = true;
 };
 
 // 검색창 비우기
@@ -188,10 +177,6 @@ const searchedTotalCount = computed(() => {
   return keyword.value === '' ? totalCount : searchedMember.value.length;
 });
 
-onUpdated(() => {
-  console.log('update?');
-});
-
 // 추후 대리님이 추가하신 공통함수 적용
 const imageUrl = user => {
   return new URL(`../assets/images/profile/${user}.png`, import.meta.url).href;
@@ -199,7 +184,7 @@ const imageUrl = user => {
 </script>
 
 <style scoped>
-.add-user-btn {
+.add-member-btn {
   background-color: #248046;
   color: white;
   border-radius: 4px;
@@ -216,40 +201,62 @@ const imageUrl = user => {
   overflow: hidden;
 }
 .people-column {
-  flex: 1 1 auto;
-}
-.people-list {
-  overflow: hidden scroll;
-  padding-right: 0px;
-  margin-top: 8px;
-  position: relative;
-  box-sizing: border-box;
-  min-height: 0;
-  flex: 1 1 auto;
-}
-.people-list-item {
-  height: 62px;
   display: flex;
-  flex-direction: row;
-  margin-right: 20px;
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 20px;
-  overflow: hidden;
-}
-.list-item-contents {
-  display: flex;
-  flex-grow: 1;
-  align-items: center;
-  justify-content: space-between;
-  max-width: 100%;
+  flex-direction: column;
+  flex: 1 1 auto;
+  height: 100%;
 }
 
 /* 사용자 목록 table styling*/
-.table {
+.member-table-fixed-header {
+  border-top: 1px solid #3b3f2c;
+  border-bottom: 1px solid #3b3f2c;
+  text-align: center;
+  color: #666;
+  height: 40px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+}
+table.member-table {
+  width: 100%;
+  border-collapse: collapse;
+  --bs-table-border-color: #3f4147;
   color: #e0e1e5;
 }
-.table tr:last-child {
-  border-bottom: 0;
+table.member-table th {
+  padding: 0;
+}
+table.member-table th:first-child .th-text {
+  border-left: none;
+}
+table.member-table .th-text {
+  position: absolute;
+  top: 0;
+  width: inherit;
+  line-height: 40px; /* header-bg height값 */
+  border-color: #3b3f2c #c4c4c4;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 0 0.5rem;
+}
+table.member-table tbody tr:last-child td {
+  /*border-bottom: 1px solid #ffffff;*/
+}
+table.member-table .member-row:hover {
+  background-color: #3a3c42;
+  cursor: pointer;
+}
+/* 스크롤바 styling */
+.table-custom-scrollbar::-webkit-scrollbar {
+  width: 3px;
+}
+.table-custom-scrollbar:hover::-webkit-scrollbar-thumb {
+  background: #6c757d;
+  border-radius: 10px;
+}
+.table-custom-scrollbar::-webkit-scrollbar-track {
+  background: #2b2d31;
 }
 </style>
