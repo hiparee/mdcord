@@ -143,6 +143,14 @@ public class JpaChannelChatService implements ChannelChatService {
                 .map(ChannelChatListResponse::new);
     }
 
+    @Override
+    public ChannelChat deleteChannelChatInfo(ChatCreateRequest request) {
+        Long chatId = request.getChatId();
+        ChannelChat channelChat = channelChatRepository.findById(chatId).orElseThrow(() -> new ChatNotFoundException(chatId));
+        channelChat.deleteChannelChatInfo(request.getMemberId());
+        return channelChat;
+    }
+
     /**
      * 파일 정보 DB 저장 및 반환될 리스트에 추가
      * 
