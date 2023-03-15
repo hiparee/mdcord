@@ -9,4 +9,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface ChannelChatRepository extends JpaRepository<ChannelChat, Long> {
     Page<ChannelChat> findByChannelList(ChannelList channelId, Pageable pageable);
 
+    Page<ChannelChat> findByChannelListAndIdLessThan(ChannelList channelId, Long chatId, Pageable pageable);
 }

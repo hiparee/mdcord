@@ -137,10 +137,24 @@ public class JpaChannelChatService implements ChannelChatService {
     }
 
     @Override
-    public Page<ChannelChatListResponse> getChannelChatList(Long channelId, Pageable pageable) {
+    public Page<ChannelChatListResponse> getChannelChatList(Long channelId, Long chatId, Pageable pageable) {
         ChannelList channelList = channelListRepository.findById(channelId).orElseThrow(() -> new ChannelNotFoundException(channelId));
+
+        if(chatId != null) {
+            return channelChatRepository.findByChannelListAndIdLessThan(channelList, chatId, pageable)
+                    .map(ChannelChatListResponse::new);
+        }
+
         return channelChatRepository.findByChannelList(channelList, pageable)
                 .map(ChannelChatListResponse::new);
+    }
+
+    @Override
+    public ChannelChat deleteChannelChatInfo(ChatCreateRequest request) {
+        Long chatId = request.getChatId();
+        ChannelChat channelChat = channelChatRepository.findById(chatId).orElseThrow(() -> new ChatNotFoundException(chatId));
+        channelChat.deleteChannelChatInfo(request.getMemberId());
+        return channelChat;
     }
 
     /**
