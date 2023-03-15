@@ -5,7 +5,6 @@ import MainView from '@/views/MainView.vue';
 import LoginView from '@/views/LoginView.vue';
 import { useChannelStore } from '@/store/store.js';
 import { useToast } from 'vue-toast-notification';
-import RegisterView from '@/views/RegisterView.vue';
 import SettingsView from '@/views/SettingsView.vue';
 import UserListView from '@/views/UserListView.vue';
 import ChannelView from '@/views/ChannelView.vue';
@@ -42,15 +41,13 @@ const router = createRouter({
       name: 'settings',
       meta: { requiresAuth: true },
       component: SettingsView,
+      redirect: '/settings/member',
       children: [
         {
-          path: 'adm/user',
+          path: 'member',
           component: UserListView,
         },
-        {
-          path: 'adm/user/register',
-          component: RegisterView,
-        },
+        /* TODO :: adm/ 경로 빼주기 */
         {
           path: 'adm/channel',
           component: ChannelView,
