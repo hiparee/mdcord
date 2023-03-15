@@ -132,6 +132,13 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         }
     }
 
+    /**
+     * 메시지 타입에 따른 처리 핸들링
+     * 
+     * @param request
+     * @param channelChat
+     * @return
+     */
     private ChannelChat handleChannelChatByMessageType(ChatCreateRequest request, ChannelChat channelChat) {
         MessageType messageType = request.getMessageType();
         if(messageType != null && messageType.equals(MessageType.SEND)) {
@@ -140,8 +147,11 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         else if(messageType != null && messageType.equals(MessageType.EDIT)) {
             channelChat = channelChatService.changeChannelChatInfo(request);
         }
+        else if(messageType != null && messageType.equals(MessageType.DELETE)) {
+            channelChat = channelChatService.deleteChannelChatInfo(request);
+        }
         else {
-            log.debug("message type : {}", messageType);
+            log.error("message type : {}", messageType);
         }
         return channelChat;
     }
