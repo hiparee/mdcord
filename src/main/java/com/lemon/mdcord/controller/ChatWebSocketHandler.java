@@ -196,8 +196,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
      * @return
      */
     private ChatCreateRequest payloadToChatCreateRequest(String payload) {
-        Gson gson = new Gson();
-        return gson.fromJson(payload, ChatCreateRequest.class);
+        return new Gson().fromJson(payload, ChatCreateRequest.class);
     }
 
     /**
@@ -239,7 +238,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     private TextMessage modifiedMessage(String payload, List<ChatAttachFileResponse> fileList) throws JsonProcessingException {
         JsonNode jsonNode = objectMapper.readTree(payload);
 
-        ((ObjectNode)jsonNode).put("fileList", fileList.toString());
+        ((ObjectNode)jsonNode).put("fileList", new Gson().toJson(fileList));
 
         return new TextMessage(objectMapper.writeValueAsString(jsonNode));
     }
