@@ -12,6 +12,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lemon.mdcord.domain.BaseEntity;
 
 import lombok.AccessLevel;
@@ -46,6 +47,7 @@ public class AttachFile extends BaseEntity {
     @Column(name = "file_size", nullable = false)
     private Long fileSize;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "channel_chat_id")
     private ChannelChat channelChat;
