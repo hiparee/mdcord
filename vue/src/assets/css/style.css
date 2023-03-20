@@ -13,7 +13,7 @@
   animation-delay: .4s;
  }
 
-/* 사용자 등록 페이지 */
+/* 사용자 등록(사용자 계정 만들기) 모달 컴포넌트 */
 .register-container {
   display: flex;
   flex-direction: column;
@@ -34,7 +34,7 @@
 .register-form {
   background-color: #313338;
   border-radius: 5px;
-  width: 480px;
+  width: 100%;
   padding: 32px;
 }
 .register-input {
@@ -72,7 +72,7 @@
 }
 
  /* 설정 관련 페이지 헤더 텍스트*/
-.header-text {
+.settings-header-text {
   color: #f3f4f5;
   font-size: 25px;
   line-height: 25px;
@@ -148,9 +148,42 @@
 
 /* modal 컴포넌트 - bootstap modal custom */
 .modal {
-  background-color: rgba(1, 1, 1, 0.5);
+  --bs-modal-width: 440px;
+  background-color: rgba(1, 1, 1, 0.85);
 }
-
 .modal-backdrop {
   z-index: -1;
+}
+.btn-close {
+  color: #74767B;
+  padding: calc(var(--bs-modal-header-padding-y) * 0.5)
+  calc(var(--bs-modal-header-padding-x) * 0.5);
+  margin: calc(-0.5 * var(--bs-modal-header-padding-y))
+  calc(-0.5 * var(--bs-modal-header-padding-x))
+  calc(-0.5 * var(--bs-modal-header-padding-y)) auto;
+  background: transparent url('../images/x.svg') center/1.3em auto no-repeat;
+}
+
+/* 컨텐츠가 없을 경우의 container */
+.empty-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+.empty-image {
+  background: no-repeat;
+  background-image: url('../images/nonUser.svg');
+  flex: 1 1 auto;
+  width: 425px;
+  background-size: 100% 100%;
+  height: 220px;
+  margin-bottom: 40px;
+}
+.empty-message {
+  font-size: 17px;
+  line-height: 20px;
+  text-align: center;
+  margin-top: 5px;
 }
