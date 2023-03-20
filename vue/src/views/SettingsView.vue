@@ -1,9 +1,9 @@
 <template>
   <settings-sidebar-component />
-  <div class="settings-content overflow-auto background-color">
+  <div class="settings-content overflow-auto settings-bg">
     <router-view></router-view>
   </div>
-  <div class="exit-button background-color">
+  <div class="exit-button settings-bg">
     <div
       class="close-button"
       aria-label="닫기"
