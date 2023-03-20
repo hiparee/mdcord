@@ -1,9 +1,9 @@
 <template>
   <settings-sidebar-component />
-  <div class="settings-content custom-scrollbar overflow-auto">
+  <div class="settings-content overflow-auto background-color">
     <router-view></router-view>
   </div>
-  <div class="exit-button">
+  <div class="exit-button background-color">
     <div
       class="close-button"
       aria-label="닫기"
@@ -48,27 +48,7 @@ const router = useRouter();
   font-weight: 500;
   font-size: 14px;
 }
-/* 스크롤바 커스텀*/
-.custom-scrollbar::-webkit-scrollbar {
-  width: 8px;
+.settings-bg {
+  background-color: #313338;
 }
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: #2B2D31FF;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #1A1B1EFF;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
-
-.custom-scrollbar {
-  /* 전체 스크롤바의 너비를 7px로 변경 */
-  scrollbar-width: thin;
-  scrollbar-color: #1A1B1EFF #2B2D31FF;
-}
-
 </style>
