@@ -1,6 +1,5 @@
 package com.lemon.mdcord.dto.chat;
 
-import com.lemon.mdcord.domain.chat.AttachFile;
 import lombok.Getter;
 
 import java.util.List;
@@ -14,6 +13,6 @@ public class ChatCreateRequest {
     private String content;
     private String fileYn;
     private MessageType messageType;
-    private List<AttachFile> fileList;
+    private List<ChatAttachFileResponse> fileList;
 
 }
