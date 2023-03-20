@@ -61,4 +61,15 @@ public class AttachFile extends BaseEntity {
         this.channelChat = channelChat;
         super.setCreateBy(createBy);
     }
+
+    @Override
+    public String toString() {
+        return "AttachFile{" +
+                "id=" + id +
+                ", originFileName='" + originFileName + '\'' +
+                ", realFileName='" + realFileName + '\'' +
+                ", fileExt='" + fileExt + '\'' +
+                ", fileSize=" + fileSize +
+                '}';
+    }
 }
