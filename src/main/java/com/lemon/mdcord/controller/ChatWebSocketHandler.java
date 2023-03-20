@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
-import com.lemon.mdcord.domain.chat.AttachFile;
 import com.lemon.mdcord.domain.chat.ChannelChat;
+import com.lemon.mdcord.dto.chat.ChatAttachFileResponse;
 import com.lemon.mdcord.dto.chat.ChatCreateRequest;
 import com.lemon.mdcord.dto.chat.MessageType;
 import com.lemon.mdcord.repository.ChannelListRepository;
@@ -236,7 +236,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
      * @return
      * @throws JsonProcessingException
      */
-    private TextMessage modifiedMessage(String payload, List<AttachFile> fileList) throws JsonProcessingException {
+    private TextMessage modifiedMessage(String payload, List<ChatAttachFileResponse> fileList) throws JsonProcessingException {
         JsonNode jsonNode = objectMapper.readTree(payload);
 
         ((ObjectNode)jsonNode).put("fileList", fileList.toString());
