@@ -76,4 +76,23 @@ const fetchMembers = payload => {
   return user.get(`${URL_PREFIX}`, payload);
 };
 
-export { fetchLogin, signupUser, fetchMembers };
+/**
+ * 사용자 정보 수정
+ * @param {string} memberId 아이디,
+ * @param {string} name 이름,
+ * @param {string} password 비밀번호,
+ * @param {string} useYn 활성여부,
+ * @param {int} iconFileId 활성여부,
+ *
+ * @returns {
+ *   "name": "사용자",
+ *   "iconFileId": 1,
+ *   "useYn": "Y"
+ * }
+ * */
+const fetchUpdateMember = payload => {
+  console.log('payload --> ', JSON.stringify(payload));
+  console.log('{ ...payload } --> ', JSON.stringify({ ...payload }));
+  return user.put(`${URL_PREFIX}`, payload);
+};
+export { fetchLogin, signupUser, fetchMembers, fetchUpdateMember };
