@@ -12,7 +12,7 @@ public class ChatAttachFileResponse {
     private String realFileName;
     private String fileExt;
     private Long fileSize;
-    private LocalDateTime createDate;
+    private String createDate;
     private String createBy;
 
 }
