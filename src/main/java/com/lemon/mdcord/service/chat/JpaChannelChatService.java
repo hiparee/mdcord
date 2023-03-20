@@ -85,7 +85,7 @@ public class JpaChannelChatService implements ChannelChatService {
             log.debug("Content type : {}", file.getContentType());
             log.debug("-------------------");
 
-            Path targetDir = Paths.get(UPPER_DIRECTORY, String.valueOf(targetChat.getId()));
+            Path targetDir = Paths.get(UPPER_DIRECTORY, String.valueOf(targetChat.getChannelList().getId()));
 
             try {
                 Files.createDirectories(targetDir); // 경로가 없으면 생성해준다
