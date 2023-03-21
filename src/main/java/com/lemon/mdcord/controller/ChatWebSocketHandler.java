@@ -6,8 +6,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
 import com.lemon.mdcord.domain.chat.ChannelChat;
+import com.lemon.mdcord.dto.chat.ChatAttachFileResponse;
 import com.lemon.mdcord.dto.chat.ChatCreateRequest;
 import com.lemon.mdcord.dto.chat.MessageType;
+import com.lemon.mdcord.repository.ChannelListRepository;
 import com.lemon.mdcord.service.channel.ChannelListService;
 import com.lemon.mdcord.service.channel.ChannelMemberService;
 import com.lemon.mdcord.service.chat.ChannelChatService;
@@ -23,6 +25,7 @@ import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -34,6 +37,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     private final ChannelChatService channelChatService;
     private final ChannelMemberService channelMemberService;
     private final ChannelListService channelListService;
+    private final ChannelListRepository channelListRepository;
     private final ObjectMapper objectMapper;
 
     /**
@@ -44,8 +48,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     @PostConstruct
     private void init() {
         // 모든 채널의 ID 목록
-        List<Long> channelIds = channelListService.fetchChannels()
-                .getChannelLists().stream()
+        List<Long> channelIds = channelListRepository.findAll().stream()
                 .map(o -> o.getId())
                 .collect(Collectors.toList());
 
@@ -66,22 +69,11 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) {
         try {
-            String payload = message.getPayload();
-            ChatCreateRequest request = payloadToChatCreateRequest(payload);
-            log.debug("payload : " + payload);
+            // DTO로 변환
+            ChatCreateRequest request = payloadToChatCreateRequest(message.getPayload());
 
-            ChannelChat channelChat = null;
-            if(request.getMessageType().equals(MessageType.SEND)) {
-                channelChat = channelChatService.createChannelChat(request);
-            }
-            else if(request.getMessageType().equals(MessageType.EDIT)) {
-                channelChat = channelChatService.changeChannelChatInfo(request);
-            }
-            else {
-                // TODO - 제거 필요
-                log.info("message type : {}", request.getMessageType());
-            }
-            TextMessage modifiedMessage = modifiedMessage(payload, channelChat);
+            // 메시지 타입에 따른 처리 핸들링
+            TextMessage modifiedMessage = handleChannelChatByMessageType(request, message);
 
             // 메시지 소켓 통신
             List<WebSocketSession> webSocketSessions = channelMap.get(request.getChannelId());
@@ -89,6 +81,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 webSocketSession.sendMessage(modifiedMessage);
             }
         } catch (Exception e) {
+            log.error("getClass : {}", e.getClass());
             log.error("getLocalizedMessage : {}", e.getLocalizedMessage());
             log.error("getMessage : {}", e.getMessage());
             log.error("getCause : {}", e.getCause());
@@ -139,19 +132,57 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     }
 
     /**
+     * 메시지 타입에 따른 처리 핸들링
+     * 
+     * @param request
+     * @return
+     * @throws JsonProcessingException
+     */
+    private TextMessage handleChannelChatByMessageType(ChatCreateRequest request, TextMessage message) throws JsonProcessingException {
+        String payload = message.getPayload();
+        log.debug("payload : " + payload);
+        MessageType messageType = request.getMessageType();
+
+        if(messageType == null) {
+            log.error("message type : {}", messageType);
+            return message;
+        }
+
+        if(messageType.equals(MessageType.SEND)) {
+            ChannelChat channelChat = channelChatService.createChannelChat(request);
+            return modifiedMessage(payload, channelChat);
+        }
+        else if(messageType.equals(MessageType.EDIT)) {
+            ChannelChat channelChat = channelChatService.changeChannelChatInfo(request);
+            return modifiedMessage(payload, channelChat);
+        }
+        else if(messageType.equals(MessageType.DELETE)) {
+            ChannelChat channelChat = channelChatService.deleteChannelChatInfo(request);
+            return modifiedMessage(payload, channelChat);
+        }
+        else if(messageType.equals(MessageType.FILE)) {
+            return modifiedMessage(payload, request.getFileList());
+        }
+        else {
+            log.error("message type : {}", messageType);
+            return message;
+        }
+    }
+
+    /**
      * 사용자가 소속된 채널 ID 목록
      * 
      * @param memberId
      * @return
      */
     private List<Long> getMemberChannelIds(String memberId) {
-        List<Long> joinedDept0ChannelMemberId = channelMemberService.findByMemberId(memberId).stream()
+        Set<Long> joinedDept0ChannelMemberId = channelMemberService.findByMemberId(memberId).stream()
                 .map(o -> o.getChannelList().getId())
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
 
-        List<Long> joinedDept1ChannelMemberId = channelListService.findByParentId(joinedDept0ChannelMemberId).stream()
+        Set<Long> joinedDept1ChannelMemberId = channelListService.findByParentId(joinedDept0ChannelMemberId).stream()
                 .map(o -> o.getId())
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
 
         return channelListService.findByParentId(joinedDept1ChannelMemberId).stream()
                 .map(o -> o.getId())
@@ -165,8 +196,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
      * @return
      */
     private ChatCreateRequest payloadToChatCreateRequest(String payload) {
-        Gson gson = new Gson();
-        return gson.fromJson(payload, ChatCreateRequest.class);
+        return new Gson().fromJson(payload, ChatCreateRequest.class);
     }
 
     /**
@@ -191,7 +221,24 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         JsonNode jsonNode = objectMapper.readTree(payload);
 
         ((ObjectNode)jsonNode).put("chatId", channelChat.getId());
+        ((ObjectNode)jsonNode).put("channelName", channelChat.getChannelList().getName());
         ((ObjectNode)jsonNode).put("createDate", channelChat.getCreateDate().toString());
+
+        return new TextMessage(objectMapper.writeValueAsString(jsonNode));
+    }
+
+    /**
+     * message 정보에 첨부 파일 목록 추가
+     * 
+     * @param payload
+     * @param fileList
+     * @return
+     * @throws JsonProcessingException
+     */
+    private TextMessage modifiedMessage(String payload, List<ChatAttachFileResponse> fileList) throws JsonProcessingException {
+        JsonNode jsonNode = objectMapper.readTree(payload);
+
+        ((ObjectNode)jsonNode).put("fileList", new Gson().toJson(fileList));
 
         return new TextMessage(objectMapper.writeValueAsString(jsonNode));
     }

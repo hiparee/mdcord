@@ -1,3 +1,7 @@
+// 사용법
+// vue/src/assets/scss 경로에서 명령어 사용
+// node-sass --watch index.scss ../css/index.css
+
 $primary: #0d6efd;
 $secondary: #6c757d;
 $success: #198754;
@@ -143,6 +147,7 @@ html {
   & .list-group {
     width: 15rem;
     padding: 10px;
+    margin-bottom: 40px;
     overflow-y: auto;
 
     &::-webkit-scrollbar {

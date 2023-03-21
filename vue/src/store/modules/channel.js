@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { fetchChannelList } from '@/api/channel.js';
-import { makeChannelTree } from '@/composables/channel.js';
+import { makeChannelTree } from '@/utils/channel.js';
 
 export const useChannelStore = defineStore(
   'channel',

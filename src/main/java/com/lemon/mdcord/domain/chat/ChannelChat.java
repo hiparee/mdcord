@@ -93,4 +93,10 @@ public class ChannelChat extends BaseEntity {
         this.updateBy = memberId;
         this.updateDate = LocalDateTime.now();
     }
+
+    public void deleteChannelChatInfo(String memberId) {
+        this.deleteBy = memberId;
+        this.deleteYn = "Y";
+        // TODO - 언제 지워졌는지는 필요없는지
+    }
 }
