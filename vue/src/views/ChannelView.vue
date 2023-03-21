@@ -51,7 +51,7 @@
           <a
             :class="{ 'border-active': active === '채널목록' }"
             aria-current="page"
-            class="nav-link custom-tabBarItem"
+            class="nav-link custom-tabBarItem cursor-pointer"
             style="color: #c5c5c5"
             @click="active = '채널목록'"
             >채널목록</a
@@ -73,23 +73,23 @@
     <div style="display: inline-flex; width: 100%">
       <div
         v-if="active === '채널목록'"
-        class="list-group list-group-flush"
-        style="width: 50%"
+        class="list-group list-group-flush channel-list"
       >
         <ul id="sidebar" class="list-unstyled ps-0">
           <template v-for="channel in store.getChannelList" :key="channel.id">
             <li
               v-if="channel.parentId == store.accessedChannelInfo.serverId"
               class="mb-2"
+              style="display: grid"
             >
               <button
                 :class="{ 'custom-button': channel.id === channelNumber }"
                 :data-bs-target="`#channel${channel.id}`"
                 aria-expanded="true"
-                class="btn align-items-center rounded"
+                class="btn border-0"
                 data-bs-toggle="collapse"
-                style="color: #ffffff"
-                @click="channelListNumber(channel.id)"
+                style="color: #cfcfcf; text-align: left"
+                @click="channelListNumber(channel)"
               >
                 {{ channel.name }}
               </button>
@@ -102,27 +102,52 @@
       <div style="width: 100%">
         <div>
           <div>
+            <!--            <vue-draggable-->
+            <!--              @dragstart="onDragStart"-->
+            <!--              :list="channelList"-->
+            <!--              @choose="changeBackgroundColor"-->
+            <!--              @unchoose="revertBackgroundColor"-->
+            <!--              class="draggable-list"-->
+            <!--              group="my-group"-->
+            <!--            >-->
             <vue-draggable
+              @dragstart="onDragStart"
               :list="channelList"
+              @choose="changeBackgroundColor"
+              @unchoose="revertBackgroundColor"
               class="draggable-list"
               group="my-group"
             >
               <div
-                v-for="element in channelList"
+                v-for="(element, index) in channelList"
                 :key="element.name"
                 class="list-item"
+                @mousedown="onDragStart(element)"
+                @mouseup="onDragStart(element)"
                 style="margin-bottom: 8px; background-color: #2b2d31"
               >
-                <div style="display: flex; padding: 10px">
-                  <span> {{ element.name }} </span>
+                <div
+                  class="discord-element"
+                  style="display: flex; padding: 10px"
+                  :class="{
+                    'list-clicked': listClickd && index === listId,
+                  }"
+                >
+                  <span style="flex: 1 0; color: #f2f3f5">
+                    {{ element.name }}
+                  </span>
                   <div class="custom-checkbox bi-check">
                     <input
+                      v-model="inputChecked"
+                      :value="element.id"
+                      @click="changeChannelStatus(element)"
                       style="
                         position: absolute;
                         z-index: 5;
                         width: 65%;
                         height: 100%;
                         opacity: 0;
+                        right: 15px;
                       "
                       type="checkbox"
                     />
@@ -147,28 +172,65 @@
 <script setup>
 import { useChannelStore } from '@/store/modules/channel';
 import { computed, onBeforeMount, ref } from 'vue';
+import { fetchEditChannelName } from '@/api/channel';
 
 const store = useChannelStore();
-const list2 = ref([{ name: 'Drag Me Too!' }, { name: 'dada' }]);
 const serverListValue = ref([]);
 const channelListValue = ref([]);
 const channelList = ref([]);
 const channelName = ref([]);
 const active = ref('채널목록');
+const inputChecked = ref([]);
+const listClickd = ref(false);
+const listId = ref(null);
 const channelNumber = ref(null);
-const channelListNumber = number => {
-  channelNumber.value = number;
 
+const channelListNumber = channel => {
+  inputChecked.value = [];
+  console.log(channel);
+  channelNumber.value = channel.id;
   channelList.value = channelListValue.value.filter(
     i => i.dept !== 1 && i.parentId === channelNumber.value,
   );
-  // console.log(channelListValue)
+  for (const sub of channel.subChannel) {
+    if (sub.useYn === 'Y') {
+      console.log(sub.id);
+      inputChecked.value.push(sub.id);
+    }
+  }
 };
-
-const getchannelListValue = computed(() => {
-  return channelListValue.value;
-});
+const changeChannelStatus = async channel => {
+  if (inputChecked.value.includes(channel.id)) {
+    console.log('del');
+    inputChecked.value = inputChecked.value.filter(i => i !== channel.id);
+    console.log('now', inputChecked.value);
+  } else {
+    inputChecked.value.push(channel.id);
+  }
+  /**
+   * {
+   *   "id": 0,
+   *   "useYn": "string",
+   *   "channelName": "",
+   *   "channelOrder": 1
+   * }
+   **/
+  const params = {
+    id: channel.id,
+    useYn: inputChecked.value.includes(channel.id) ? 'Y' : 'N',
+    channelName: channel.name,
+    channelOrder: channel.channelOrder,
+  };
+  await fetchEditChannelName(params)
+    .then(() => {
+      store.SET_CHANNEL_LIST();
+    })
+    .catch(e => {
+      console.log(e);
+    });
+};
 onBeforeMount(() => {
+  console.log(inputChecked.value);
   for (const server of store.getServerList) {
     serverListValue.value.push(server);
   }
@@ -178,9 +240,18 @@ onBeforeMount(() => {
     for (const sub of channel.subChannel) {
       channelListValue.value.push(sub);
     }
-    console.log(channelListValue.value);
   }
 });
+const changeBackgroundColor = event => {
+  listId.value = event.oldIndex;
+  listClickd.value = true;
+};
+const revertBackgroundColor = event => {
+  listId.value = null;
+  listClickd.value = false;
+};
+
+const onDragStart = event => {};
 </script>
 
 <style lang="scss" scoped>
@@ -244,10 +315,14 @@ onBeforeMount(() => {
   padding-top: 6px;
   margin-top: 0px;
   margin-bottom: 16px;
+  border-bottom: 1px solid;
+  border-bottom-color: #3f4046;
 }
 
 .border-active {
+  color: #ffffff !important;
   border-bottom: 2px solid;
+  border-bottom-color: #939bf5;
 }
 
 button.edit-button {
@@ -345,11 +420,13 @@ button.edit-button:active {
 
 .custom-button {
   background-color: #5561f4ff;
+  color: #ffffff !important;
 }
 
-button:hover {
-  background-color: #5561f4ff;
+.mb-2:hover {
+  background-color: #393c41;
   color: white;
+  border-radius: 3px;
 }
 
 .custom-checkbox {
@@ -413,5 +490,28 @@ button:hover {
 
 .custom-checkbox input:checked + label:after {
   left: 25px;
+}
+.hover-class {
+  color: #ffffff; /* 텍스트 색상 변경 */
+  background-color: #fdfdfd; /* 배경색 변경 */
+  cursor: pointer; /* 커서 모양 변경 */
+}
+
+.list-clicked {
+  background-color: #42434a !important;
+}
+/* 마우스가 호버될 요소를 선택 */
+.discord-element:hover {
+  /* hover-class 스타일 적용 */
+  color: #fff;
+  background-color: #393c41;
+  cursor: pointer;
+}
+.channel-list {
+  width: 25%;
+  max-width: 15%;
+  background-color: #2b2d31;
+  margin-right: 5px;
+  padding: 10px;
 }
 </style>
