@@ -1,6 +1,7 @@
 package com.lemon.mdcord.controller;
 
-import com.lemon.mdcord.dto.channel.*;
+import com.lemon.mdcord.dto.channel.list.ChannelListOrderUpdateRequest;
+import com.lemon.mdcord.dto.channel.list.*;
 import com.lemon.mdcord.service.channel.ChannelListService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -8,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Tag(name = "Channel Controller")
 @RestController
@@ -31,14 +33,20 @@ public class ChannelController {
 
     @Operation(summary = "채널 삭제", description = "채널 삭제 API. 사용 여부(use_yn) Y -> N")
     @DeleteMapping("/channels/{id}")
-    public void deleteChannelList(@RequestParam("id") Long id) {
+    public void deleteChannelList(@PathVariable("id") Long id) {
         channelListService.deleteChannel(id);
     }
 
     @Operation(summary = "채널 수정", description = "채널 수정 API")
     @PutMapping("/channels")
     public ChannelListUpdateResponse updateChannelList(@RequestBody @Valid ChannelListUpdateRequest dto) {
-        return new ChannelListUpdateResponse(channelListService.updateChannel(dto));
+        return new ChannelListUpdateResponse(channelListService.updateChannelInfo(dto));
+    }
+
+    @Operation(summary = "채널 순서 변경", description = "채널 순서 변경 API")
+    @PutMapping("/channels/order")
+    public void updateChannelOrder(@RequestBody List<ChannelListOrderUpdateRequest> list) {
+        channelListService.updateChannelOrder(list);
     }
 
 }

@@ -19,12 +19,12 @@ public class JpaMemberDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String memberId) throws UsernameNotFoundException {
-        Member member = memberRepository.findMemberById(memberId).orElseThrow(() -> new MemberNotFoundException(memberId));
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(memberId));
 
         return User.builder()
                 .username(member.getId())
                 .password(member.getPassword())
-                .roles(MemberRole.USER.getValue())
+                .roles(member.getMemberRole().getValue())
                 .build();
     }
 }

@@ -86,13 +86,16 @@ public class Member extends BaseEntity {
         }
     }
 
-    public void updateMemberInfo(String name, String password, MemberPasswordEncoder passwordEncoder, Integer iconFileId, String useYn, String updateBy) {
+    public void updateMemberInfo(String name, String password, MemberPasswordEncoder passwordEncoder, Integer iconFileId, MemberRole role, String useYn, String updateBy) {
         this.name = name;
         if(StringUtils.isNotBlank(password)) {
             this.password = this.encodePassword(password, passwordEncoder);
         }
-        this.iconFileId = iconFileId;
+        if(iconFileId != null) {
+            this.iconFileId = iconFileId;
+        }
         this.useYn = useYn;
+        this.memberRole = role;
         this.updateBy = updateBy;
         this.updateDate = LocalDateTime.now();
     }

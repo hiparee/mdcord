@@ -2,13 +2,11 @@ package com.lemon.mdcord.service.member;
 
 import com.lemon.mdcord.domain.member.Member;
 import com.lemon.mdcord.dto.member.MemberCreateRequest;
-import com.lemon.mdcord.dto.member.MemberListResponse;
 import com.lemon.mdcord.dto.member.MemberLoginRequest;
 import com.lemon.mdcord.dto.member.MemberUpdateRequest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 public interface MemberService {
 
@@ -18,5 +16,5 @@ public interface MemberService {
 
     Member updateUser(MemberUpdateRequest dto);
 
-    Page<MemberListResponse> getMemberList(Pageable pageable);
+    List<Member> getMemberList();
 }
