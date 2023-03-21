@@ -9,5 +9,7 @@ public interface ChannelMemberService {
 
     ChannelMember createChannelMember(ChannelMemberCreateRequest request);
     List<ChannelMember> findByMemberId(String memberId);
-
+    List<ChannelMember> getJoinedChannelsMemberList();
+    void changeAllStateOFF();
+    void changeMemberState(String memberId, String state);
 }
