@@ -32,26 +32,61 @@
     <!-- Contents 영역 -->
     <div class="page-content">
       <div class="content-chat-area">
+        <!-- 채팅 영역 -->
         <div class="chat-list">
-          <!-- 채팅 리스트 영역 -->
-          <div class="list-box" ref="listBox">
-            <!-- skeleton -->
+          <!-- 채팅 리스트 -->
+          <div class="list-box" ref="listBox" @scroll="handleScroll">
+            <!-- 더보기 로딩 -->
+            <div class="more-loading text-center text-light" v-if="moreLoading">
+              <div class="spinner-grow spinner-grow-sm" role="status"></div>
+              <div class="spinner-grow spinner-grow-sm" role="status"></div>
+              <div class="spinner-grow spinner-grow-sm" role="status"></div>
+            </div>
+
+            <!-- 스켈레톤 -->
             <template v-if="isLoading">
               <Skeleton />
             </template>
 
             <!-- data list -->
             <template v-else>
-              <!-- 날짜 구분선 -->
-              <!-- <div class="divider mb-4">
-                <p class="text-center mx-3 mb-0">Today</p>
-              </div> -->
+              <template
+                v-if="
+                  (accessedChannelData && accessedChannelData.length == 0) ||
+                  (accessedChannelData &&
+                    accessedChannelData[0] &&
+                    accessedChannelData[0][0] &&
+                    accessedChannelData[0][0].dataLast)
+                "
+              >
+                <div class="text-center text-white">
+                  <h1># {{ channelStore.accessedChannelInfo.title }}에</h1>
+                  <h1>오신 것을 환영합니다</h1>
+                  <p>
+                    # {{ channelStore.accessedChannelInfo.title }} 채널의
+                    시작이에요.
+                  </p>
 
-              <template v-for="(chat, index) in chatList" :key="index">
+                  <p v-if="accessedChannelData.length == 0">
+                    채널의 첫 메세지를 전송해보세요.
+                  </p>
+                </div>
+              </template>
+
+              <template
+                v-for="(chatAry, index) in accessedChannelData"
+                :key="index"
+              >
+                <!-- 날짜 구분선 -->
+                <div class="divider mb-4" v-if="getDateDiff(index) > 0">
+                  <p class="text-center mx-3 mb-0">
+                    {{ getDividerText(index, chatAry[0].createDate) }}
+                  </p>
+                </div>
                 <div
                   class="d-flex mt-2"
                   :class="
-                    chat.memberId == userInfo.memberId
+                    chatAry[0].memberId == userInfo.memberId
                       ? 'flex-row-reverse'
                       : 'flex-row justify-content-start'
                   "
@@ -59,20 +94,31 @@
                   <div class="text-center">
                     <img
                       class="profile-img"
-                      :src="getImageUrl(`profile/${chat.iconFileId}.png`)"
+                      :src="getImageUrl(`profile/${chatAry[0].iconFileId}.png`)"
                     />
-                    <div class="text-white mt-1">{{ chat.name }}</div>
+                    <div class="text-white mt-1">{{ chatAry[0].name }}</div>
                   </div>
                   <div class="msg-wrap">
-                    <template v-for="(msg, index) in chat.content" :key="index">
-                      <p class="msg" v-html="renderMsgHtml(msg)"></p>
+                    <!-- {{ chat.content }} -->
+                    <template v-for="(chat, index) in chatAry" :key="index">
+                      <p
+                        class="msg"
+                        v-html="renderMsgHtml(chat.content)"
+                        :title="JSON.stringify(chat)"
+                        :data-chat-id="chat.chatId"
+                      ></p>
+                      <!-- @mousedown.right="mousedown"
+                        @contextmenu.prevent -->
                     </template>
+                    <!-- <template v-for="(msg, index) in chat.content" :key="index">
+                        <p class="msg" v-html="renderMsgHtml(msg)"></p>
+                      </template> -->
 
                     <p
                       class="small m-3 mb-3 mt-0 text-muted"
-                      :title="`${chat.timeText}`"
+                      :title="`${chatAry[0].timeText}`"
                     >
-                      {{ chat.timeAgo }}
+                      {{ chatAry[0].timeAgo }}
                     </p>
                   </div>
                 </div>
@@ -116,7 +162,6 @@
             </div>
           </div>
           <!-- 첨부파일 리스트 영역 끝 -->
-
           <div class="d-flex" style="flex-direction: row; width: 100%">
             <textarea
               type="text"
@@ -128,15 +173,25 @@
               @keydown.enter="sendMessage"
               placeholder="메세지 보내기"
             ></textarea>
-            <a class="ms-1 text-muted" href="#!"
+            <!-- <a class="ms-1 text-muted" href="#!"
               ><i class="bi bi-paperclip fs-3 text-light"></i
             ></a>
             <a class="ms-3 text-muted" href="#!"
               ><i class="bi bi-emoji-smile fs-4 text-light"></i
-            ></a>
-            <a class="ms-3" href="#!"
+            ></a> -->
+            <span class="ms-3" href="#!" @click="sendMessage()"
               ><i class="bi bi-send-fill fs-4 text-light"></i
-            ></a>
+            ></span>
+          </div>
+        </div>
+      </div>
+      <div class="channel-member-list">
+        <div>
+          <div>
+            <h5 class="text-primary">{{ accessedServerName }} 참여자</h5>
+          </div>
+          <div>
+            <div v-for="i in 10" :key="i">홍길동</div>
           </div>
         </div>
       </div>
@@ -144,37 +199,81 @@
   </div>
 </template>
 <script setup>
-import { ref, nextTick, watch, onMounted, computed, inject } from 'vue';
-import { useChannelStore, useUserStore } from '@/store/store';
+import {
+  ref,
+  nextTick,
+  watch,
+  onMounted,
+  computed,
+  inject,
+  onBeforeMount,
+} from 'vue';
+import {
+  useChannelStore,
+  useUserStore,
+  useChatStore,
+  webSocketStore,
+} from '@/store/store';
 import Skeleton from '../components/SkeletonComponent.vue';
 import { useToast } from 'vue-toast-notification';
 import { fetchMultiFileUpload } from '../api/chat.js';
 import { timeAgo } from '../utils/chat.js';
 import { getImageUrl, userProfileIcon } from '../utils/common.js';
 import NavbarTitleComponent from '@/components/layout/NavbarTitleComponent.vue';
-
+import { useRoute } from 'vue-router';
+const route = useRoute();
+const dayjs = inject('dayjs');
 const userInfo = JSON.parse(useUserStore().userInfo);
-const websocket = new WebSocket(
-  `ws://localhost:9000/api/chat?memberId=${userInfo.memberId}`,
-);
 const channelStore = useChannelStore();
+const chatStore = useChatStore();
+const socketStore = webSocketStore();
 const listBox = ref(null);
 const refMessage = ref(null);
+const refContextMenu = ref(null);
 const message = ref('');
 const fileList = ref([]);
 const fileDragOverStatus = ref(false);
-const props = defineProps({
-  isLoading: {
-    type: Boolean,
-    default: true,
-  },
+// const props = defineProps({
+//   isLoading: {
+//     type: Boolean,
+//     default: true,
+//   },
+// });
+const isLoading = ref(true);
+const moreLoading = ref(false);
+const accessedChannelId = computed(
+  () => channelStore.accessedChannelInfo.channelId,
+);
+const accessedChannelData = computed(() => {
+  return chatStore.chatList.channels[accessedChannelId.value];
 });
+const accessedServerName = computed(() => {
+  const serverId = channelStore.accessedChannelInfo.serverId;
+  const obj = channelStore.serverList.find(item => item.id === serverId);
+  const name = obj.name;
+  return name;
+});
+const getDividerText = (index, createDate) => {
+  const nowDate = dayjs().format('YYYYMMDD');
+  const divDate = dayjs(createDate).format('YYYYMMDD');
 
-const chatList = ref([]);
+  if (nowDate == divDate) {
+    return 'Today';
+  } else {
+    return dayjs(createDate).format('YYYY년 M월 D일');
+  }
+};
 
-const dayjs = inject('dayjs');
+const mousedown = e => {
+  const context = refContextMenu.value;
+  console.log(e);
+  console.log(e.target.getAttribute('data-chat-id'));
+  console.log(e.clientX, e.clientY);
+  console.log(context.style.top);
+  context.style.top = e.clientY + 'px';
+  context.style.left = e.clientX + 'px';
+};
 
-console.log('dayjs :::', dayjs);
 const onInput = () => {
   const textarea = refMessage.value;
   textarea.style.height = '';
@@ -187,14 +286,11 @@ const sendMessage = event => {
       event.preventDefault();
       return;
     }
-    console.log('message.value.length', message.value.length, message.value);
-    // console.log('메세지 전송 :', message.value);
-    // console.log('useUserStore', userInfo);
     const fileYn = fileList.value.length > 0 ? 'Y' : 'N';
     const data = {
       fileYn,
       messageType: 'SEND',
-      channelId: channelStore.accessedChannelInfo.channelId,
+      channelId: accessedChannelId.value,
       memberId: userInfo.memberId,
       content: message.value,
       name: userInfo.name,
@@ -203,32 +299,17 @@ const sendMessage = event => {
       iconFileId: userProfileIcon(userInfo.iconFileId),
     };
 
-    websocket.send(JSON.stringify(data));
+    console.log('전송데이터', JSON.stringify(data));
+
+    // 서버로 채팅 data를 전송한다.
+    socketStore.websocket.send(JSON.stringify(data));
+    console.log(socketStore.websocket.readyState);
 
     message.value = '';
-    event.preventDefault();
     const textarea = refMessage.value;
     textarea.style.height = '76px';
-    // refMessage.value.dispatchEvent(new Event('onInput'));
 
-    if (fileYn === 'Y') {
-      let formData = new FormData();
-
-      for (let i = 0; i < fileList.value.length; i++) {
-        console.log('fileList.value[i] ->', fileList.value[i]);
-        formData.append('files', fileList.value[i]);
-      }
-
-      formData.append('channelId', channelStore.accessedChannelInfo.channelId);
-      console.log(formData);
-      const response = fetchMultiFileUpload(formData);
-      console.log(response.data);
-
-      // 업로드가 완료되면 fileList 배열 초기화
-      fileList.value = [];
-
-      // alert('send message');
-    }
+    event.preventDefault();
   }
 };
 
@@ -282,12 +363,32 @@ const addFiles = async files => {
   }
 };
 
+const readAndCompressImage = async (file, quality) => {
+  const image = await createImageBitmap(file);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = image.width;
+  canvas.height = image.height;
+
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(image, 0, 0);
+
+  const compressedDataURL = canvas.toDataURL('image/jpeg', quality);
+
+  return compressedDataURL;
+};
+
 // FileReader를 통해 파일을 읽어 thumbnail 영역의 src 값으로 셋팅
 const readFiles = async files => {
+  const compressedDataURL = await readAndCompressImage(files, 0.01); // 이미지 품질을 50%로 줄임
+
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
+    // reader.onload = async e => {
+    //   resolve(e.target.result);
+    // };
     reader.onload = async e => {
-      resolve(e.target.result);
+      resolve(compressedDataURL);
     };
     reader.readAsDataURL(files);
   });
@@ -307,80 +408,152 @@ const renderMsgHtml = text => {
     '<a href="$&" target="_blank">$&</a>',
   );
 
-  let makeHtml = `<div class='msg-inner'>${replaceUrlText}</div>`;
+  let makeHtml = `${replaceUrlText}`;
+  // let makeHtml = `<div class='msg-inner'>${replaceUrlText}</div>`;
   // makeHtml += '<div class="more-btn"><span>더보기</span></div>';
   return makeHtml;
 };
 
 onMounted(() => {
   refMessage.value.addEventListener('input', onInput);
-
   setInterval(() => {
-    updateChatListTimeAgo(chatList.value);
-  }, 1000);
-
-  websocket.onopen = () => {
-    console.log('connected');
-    websocket.onmessage = ({ data }) => {
-      const parseData = JSON.parse(data);
-      console.log('메세지 수신 :', parseData);
-      console.log(chatList.value.length);
-      console.log(chatList.value[chatList.value.length - 1]);
-      const prevData = chatList.value[chatList.value.length - 1];
-
-      // const $toast = useToast({
-      //   duration: 3000,
-      //   position: 'bottom-right',
-      // });
-
-      // $toast.info(`<div>${parseData.channelId}</div>${parseData.content}`);
-
-      if (
-        prevData &&
-        prevData.memberId == parseData.memberId &&
-        dayjs(prevData.commitTime).format('YYYY. MM. DD A HH:mm') ==
-          dayjs(parseData.commitTime).format('YYYY. MM. DD A HH:mm')
-      ) {
-        // console.log('이전채팅사용자');
-        chatList.value[chatList.value.length - 1].content.push(
-          parseData.content,
-        );
-      } else {
-        // console.log('이전채팅사용자아님');
-        chatList.value.push({
-          content: [parseData.content],
-          memberId: parseData.memberId,
-          name: parseData.name,
-          fileYn: parseData.fileYn,
-          sendTime: parseData.sendTime,
-          commitTime: parseData.commitTime,
-          iconFileId: parseData.iconFileId,
-          timeText: dayjs(parseData.commitTime).format('YYYY. MM. DD A HH:mm'),
-        });
-      }
-
-      nextTick(() => {
-        chatScrollSetting();
-      });
-    };
-  };
+    updateChatListTimeAgo();
+  }, 5000);
 });
 
 const chatScrollSetting = () => {
   if (listBox.value) {
     listBox.value.scrollTop = listBox.value.scrollHeight;
+    console.log(listBox.value.scrollTop, listBox.value.scrollHeight);
   }
 };
 
-const updateChatListTimeAgo = ref => {
-  ref.map(v => {
-    v['timeAgo'] = timeAgo(v.commitTime);
+const getDateDiff = index => {
+  const channels = chatStore.chatList.channels;
+  const accessedChannel = channels[accessedChannelId.value];
+
+  if (accessedChannel[index - 1]) {
+    const date1 = dayjs(accessedChannel[index][0].createDate).format(
+      'YYYY-MM-DD',
+    );
+    const date2 = dayjs(accessedChannel[index - 1][0].createDate).format(
+      'YYYY-MM-DD',
+    );
+    const date3 = dayjs(date1, 'YYYY-MM-DD');
+    const date4 = dayjs(date2, 'YYYY-MM-DD');
+    // console.log(date3, date4);
+    return date3.diff(date4, 'd');
+  }
+};
+
+/**
+ * 채팅리스트 Box 의 스크롤이벤트 처리함.
+ * scrollTop 값이 0이되는경우 이전 채팅 내역을 불러온다.
+ * 늘어난 scrollHeight 만큼 scrollTop을 변경한다.
+ */
+const handleScroll = async () => {
+  const channels = chatStore.chatList.channels[accessedChannelId.value];
+  if (listBox.value.scrollTop === 0 && channels && channels.length > 0) {
+    const scrollHeight = listBox.value.scrollHeight;
+    console.log('scoll', scrollHeight);
+    moreLoading.value = true;
+
+    await chatStore.MORE_CHAT_LIST(accessedChannelId.value);
+    moreLoading.value = false;
+
+    listBox.value.scrollTop = listBox.value.scrollHeight - scrollHeight;
+    console.log('로딩 종료');
+  }
+};
+
+const updateChatListTimeAgo = () => {
+  for (let i = 0; i < accessedChannelData.value.length; i++) {
+    accessedChannelData.value[i] = accessedChannelData.value[i].map(chat => {
+      chat.timeAgo = timeAgo(chat.createDate);
+      return chat;
+    });
+  }
+};
+
+const setChatList = async () => {
+  isLoading.value = true;
+
+  // 현재 접속한 채널의 채팅메세지 50개를 가지고와서 chat store에 저장한다.
+  chatStore.SET_CHAT_LIST(accessedChannelId.value).then(() => {
+    isLoading.value = false;
+    nextTick(() => {
+      chatScrollSetting();
+    });
   });
 };
 
-watch(chatList.value, () => {
-  updateChatListTimeAgo(chatList.value);
+const setChatTitle = () => {
+  // Channel Title 설정
+  const channelList = channelStore.getChannelList;
+  channelList.forEach(item => {
+    item.subChannel.forEach(sub => {
+      if (sub.id == route.params.id) {
+        channelStore.SET_ACCESSED_CHANNEL_INFO('title', sub.name);
+        channelStore.SET_ACCESSED_CHANNEL_INFO('channelId', sub.id);
+      }
+    });
+  });
+};
+
+onBeforeMount(() => {
+  setChatTitle();
+  setChatList();
 });
+
+watch(
+  () => route.params,
+  () => {
+    setChatTitle();
+    setChatList();
+  },
+);
+
+watch(
+  () => chatStore.lastChat[accessedChannelId.value],
+  async newValue => {
+    console.log('watch !!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+    console.log(newValue);
+
+    if (newValue && newValue.fileYn == 'Y') {
+      console.log('upload 할 파일', fileList);
+      const chatId = newValue.chatId;
+      let formData = new FormData();
+
+      for (let i = 0; i < fileList.value.length; i++) {
+        console.log('fileList.value[i] ->', fileList.value[i]);
+        formData.append('files', fileList.value[i]);
+      }
+      formData.append('chatId', newValue.chatId);
+
+      formData.append('channelId', accessedChannelId.value);
+      console.log(formData);
+      const response = await fetchMultiFileUpload(formData);
+      console.log('파일업로드 완료', response.data);
+
+      //소켓 send
+      const data = {
+        messageType: 'FILE',
+        fileList: response.data,
+        channelId: accessedChannelId.value,
+        chatId: chatId,
+      };
+
+      socketStore.websocket.send(JSON.stringify(data));
+
+      // 업로드가 완료되면 fileList 배열 초기화
+      fileList.value = [];
+    }
+
+    nextTick(() => {
+      chatScrollSetting();
+    });
+  },
+);
 </script>
 <style scoped lang="scss">
 #refMessage {

@@ -9,3 +9,4 @@ export default store;
 export * from './modules/channel';
 export * from './modules/chat';
 export * from './modules/user';
+export * from './modules/socket';

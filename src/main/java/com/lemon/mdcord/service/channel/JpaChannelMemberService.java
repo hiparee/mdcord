@@ -14,8 +14,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -28,7 +30,8 @@ public class JpaChannelMemberService implements ChannelMemberService {
 
     @Override
     public ChannelMember createChannelMember(ChannelMemberCreateRequest request) {
-        // TODO - 기존에 등록되어있는지 체크하기
+        // TODO - 1.기존에 등록되어있는지 체크하기
+        //        2.이전과 달라짐. 루트 채널 초대 성공 시 insert인데, 하위 채널 찾아서 모두 넣어줘야 함.
 
         String memberId = request.getMemberId();
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(memberId));
@@ -49,6 +52,29 @@ public class JpaChannelMemberService implements ChannelMemberService {
     @Override
     public List<ChannelMember> findByMemberId(String memberId) {
         return channelMemberRepository.findByMemberId(memberId);
+    }
+
+    @Override
+    public List<ChannelMember> getJoinedChannelsMemberList() {
+        String currentMemberId = getAuthentication().getName();
+        List<ChannelMember> joinedChannels = channelMemberRepository.findByMemberId(currentMemberId);
+        List<Long> joinedChannelIds = joinedChannels.stream()
+                .map(o -> o.getChannelList().getId())
+                .collect(Collectors.toList());
+
+        return channelMemberRepository.findByChannelListIdIn(joinedChannelIds);
+    }
+
+    @Override
+    @Transactional
+    public void changeAllStateOFF() {
+        channelMemberRepository.changeAllStateOff();
+    }
+
+    @Override
+    @Transactional
+    public void changeMemberState(String memberId, String state) {
+        channelMemberRepository.changeMemberState(memberId, state);
     }
 
     private static Authentication getAuthentication() {
