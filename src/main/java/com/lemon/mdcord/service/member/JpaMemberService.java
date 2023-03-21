@@ -88,7 +88,8 @@ public class JpaMemberService implements MemberService {
         member.updateMemberInfo(
                 dto.getName(), dto.getPassword(),
                 memberPasswordEncoder, dto.getIconFileId(),
-                dto.getUseYn(), currentMemberId
+                dto.getRole(), dto.getUseYn(),
+                currentMemberId
         );
 
         return member;
