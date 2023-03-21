@@ -2,6 +2,7 @@ package com.lemon.mdcord.controller;
 
 import com.lemon.mdcord.dto.channel.member.ChannelMemberCreateRequest;
 import com.lemon.mdcord.dto.channel.member.ChannelMemberCreateReseponse;
+import com.lemon.mdcord.dto.channel.member.ChannelMemberReseponse;
 import com.lemon.mdcord.service.channel.ChannelMemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -9,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Tag(name = "ChannelMember Controller")
 @RestController
@@ -32,10 +35,14 @@ public class ChannelMemberController {
         return new ChannelMemberCreateReseponse(channelMemberService.createChannelMember(dto));
     }
 
-//    @Operation(summary = "멤버 소속 채널 조회", description = "멤버 소속 채널 조회 API")
-//    @GetMapping("/channel-member")
-//    public ChannelMemberCreateReseponse getMemberChannelList(@RequestBody @Valid final ChannelMemberCreateRequest dto) {
-//        return new ChannelMemberCreateReseponse(channelMemberService.createChannelMember(dto));
-//    }
+    @Operation(summary = "소속 채널의 인원 목록 조회", description = "소속 채널의 인원 목록 조회 API")
+    @GetMapping("/channel-member")
+    public List<ChannelMemberReseponse> getJoinedChannelsMemberList() {
+        List<ChannelMemberReseponse> result = channelMemberService.getJoinedChannelsMemberList().stream()
+                .map(ChannelMemberReseponse::new)
+                .collect(Collectors.toList());
+
+        return result;
+    }
 
 }
