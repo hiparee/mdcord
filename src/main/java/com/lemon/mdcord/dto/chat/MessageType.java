@@ -4,5 +4,6 @@ public enum MessageType {
     SEND,
     EDIT,
     DELETE,
-    FILE
+    FILE,
+    ACCESS;
 }
