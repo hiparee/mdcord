@@ -41,6 +41,15 @@ const skeletonBoxes = generateSkeletonBoxes();
 .chat-skeleton {
   display: flex;
   flex-direction: column;
+  position: absolute;
+  bottom: 0;
+  overflow: hidden;
+  top: 0;
+  right: 0;
+  left: 0;
+  padding: 20px;
+  z-index: 800;
+  background-color: #32353b;
 }
 
 .skeleton-wrap {

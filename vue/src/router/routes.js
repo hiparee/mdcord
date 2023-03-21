@@ -9,6 +9,7 @@ import RegisterView from '@/views/RegisterView.vue';
 import SettingsView from '@/views/SettingsView.vue';
 import UserListView from '@/views/UserListView.vue';
 import ChannelView from '@/views/ChannelView.vue';
+import { webSocketStore } from '@/store/store';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -63,6 +64,18 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
     try {
+      const socket = webSocketStore().websocket;
+      if (socket.readyState != 0 && socket.readyState != 1) {
+        webSocketStore().WEB_SOCKET_CONNECT();
+      }
+
+      console.log(
+        'websocket ********',
+        webSocketStore().websocket,
+        webSocketStore().websocket.readyState,
+        typeof webSocketStore().websocket,
+      );
+
       await useChannelStore().SET_CHANNEL_LIST();
       console.log(from, to);
     } catch (error) {

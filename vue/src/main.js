@@ -15,5 +15,3 @@ app.use(router);
 app.use(store);
 app.use(plugins);
 app.mount('#app');
-
-// let instance = $toast.success('You did it!');

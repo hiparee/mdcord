@@ -8507,11 +8507,12 @@ html {
   flex-direction: column; }
   #page-content-wrapper .page-content {
     flex: 1;
-    flex-direction: column !important;
+    flex-direction: row;
     display: flex !important; }
     #page-content-wrapper .page-content .content-chat-area {
       height: 100%;
       display: flex;
+      flex: 1;
       flex-direction: column; }
       #page-content-wrapper .page-content .content-chat-area .chat-list {
         flex: 1;
@@ -8524,6 +8525,11 @@ html {
           left: 0;
           overflow-y: auto;
           padding: 20px; }
+          #page-content-wrapper .page-content .content-chat-area .chat-list .list-box .more-loading {
+            position: absolute;
+            top: 20px;
+            right: 0;
+            left: 0; }
           #page-content-wrapper .page-content .content-chat-area .chat-list .list-box::-webkit-scrollbar {
             width: 3px;
             /* 스크롤바의 너비 */ }
@@ -8536,6 +8542,10 @@ html {
             /*스크롤바 뒷 배경 색상*/ }
       #page-content-wrapper .page-content .content-chat-area .chat-footer {
         border-top: 1px solid #3c3f45; }
+    #page-content-wrapper .page-content .channel-member-list {
+      width: 250px;
+      background: #2b2d31;
+      padding: 20px; }
   #page-content-wrapper > nav.navbar {
     border-bottom: 1px solid #54565a; }
     #page-content-wrapper > nav.navbar * {
