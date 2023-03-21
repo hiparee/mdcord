@@ -8,6 +8,7 @@ import com.lemon.mdcord.domain.channel.ChannelList;
 import com.lemon.mdcord.domain.chat.AttachFile;
 import com.lemon.mdcord.domain.chat.ChannelChat;
 import com.lemon.mdcord.domain.member.Member;
+import com.lemon.mdcord.dto.chat.ChannelChatListResponse;
 import com.lemon.mdcord.dto.chat.ChatCreateRequest;
 import com.lemon.mdcord.repository.AttachFileRepository;
 import com.lemon.mdcord.repository.ChannelChatRepository;
@@ -15,6 +16,8 @@ import com.lemon.mdcord.repository.ChannelListRepository;
 import com.lemon.mdcord.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -53,12 +56,13 @@ public class JpaChannelChatService implements ChannelChatService {
         ChannelList channelList = channelListRepository.findById(channelId).orElseThrow(() -> new ChannelNotFoundException(channelId));
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(memberId));
 
+        // TODO - getAuthentication() 왜 안꺼내지는지?
         ChannelChat channelChat = ChannelChat.builder()
                 .channelList(channelList)
                 .member(member)
                 .content(request.getContent())
                 .fileYn(request.getFileYn())
-                .createBy(getAuthentication().getName())
+                .createBy(request.getMemberId())
                 .build();
 
         return channelChatRepository.save(channelChat);
@@ -81,7 +85,7 @@ public class JpaChannelChatService implements ChannelChatService {
             log.debug("Content type : {}", file.getContentType());
             log.debug("-------------------");
 
-            Path targetDir = Paths.get(UPPER_DIRECTORY, String.valueOf(targetChat.getId()));
+            Path targetDir = Paths.get(UPPER_DIRECTORY, String.valueOf(targetChat.getChannelList().getId()));
 
             try {
                 Files.createDirectories(targetDir); // 경로가 없으면 생성해준다
@@ -89,6 +93,7 @@ public class JpaChannelChatService implements ChannelChatService {
                 String msg = "디렉토리 생성 실패 - Exception";
                 log.error(msg);
                 log.error("Path : {}", targetDir);
+                log.error("getClass : {}", e.getClass());
                 log.error("getLocalizedMessage : {}", e.getLocalizedMessage());
                 log.error("getMessage : {}", e.getMessage());
                 throw new AttachFileException(msg, targetDir);
@@ -114,6 +119,7 @@ public class JpaChannelChatService implements ChannelChatService {
                 String msg = "파일 생성 실패 - Exception";
                 log.error(msg);
                 log.error("Path : {}", targetFile);
+                log.error("getClass : {}", e.getClass());
                 log.error("getLocalizedMessage : {}", e.getLocalizedMessage());
                 log.error("getMessage : {}", e.getMessage());
                 throw new AttachFileException(msg, targetDir);
@@ -127,6 +133,27 @@ public class JpaChannelChatService implements ChannelChatService {
         Long chatId = request.getChatId();
         ChannelChat channelChat = channelChatRepository.findById(chatId).orElseThrow(() -> new ChatNotFoundException(chatId));
         channelChat.changeChannelChatInfo(request.getContent(), request.getMemberId());
+        return channelChat;
+    }
+
+    @Override
+    public Page<ChannelChatListResponse> getChannelChatList(Long channelId, Long chatId, Pageable pageable) {
+        ChannelList channelList = channelListRepository.findById(channelId).orElseThrow(() -> new ChannelNotFoundException(channelId));
+
+        if(chatId != null) {
+            return channelChatRepository.findByChannelListAndIdLessThan(channelList, chatId, pageable)
+                    .map(ChannelChatListResponse::new);
+        }
+
+        return channelChatRepository.findByChannelList(channelList, pageable)
+                .map(ChannelChatListResponse::new);
+    }
+
+    @Override
+    public ChannelChat deleteChannelChatInfo(ChatCreateRequest request) {
+        Long chatId = request.getChatId();
+        ChannelChat channelChat = channelChatRepository.findById(chatId).orElseThrow(() -> new ChatNotFoundException(chatId));
+        channelChat.deleteChannelChatInfo(request.getMemberId());
         return channelChat;
     }
 
