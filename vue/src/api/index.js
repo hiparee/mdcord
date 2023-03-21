@@ -15,3 +15,4 @@ const create = () => {
 // create api modules
 export const user = create();
 export const channel = create();
+export const chat = create();

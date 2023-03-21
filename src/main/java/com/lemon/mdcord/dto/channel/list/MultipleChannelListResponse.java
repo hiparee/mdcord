@@ -1,5 +1,6 @@
-package com.lemon.mdcord.dto.channel;
+package com.lemon.mdcord.dto.channel.list;
 
+import com.lemon.mdcord.dto.channel.list.ChannelListResponse;
 import lombok.Builder;
 import lombok.Getter;
 

@@ -3,6 +3,7 @@ package com.lemon.mdcord.domain.channel;
 import com.lemon.mdcord.domain.BaseEntity;
 import com.lemon.mdcord.domain.member.Member;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -27,4 +28,10 @@ public class ChannelMember extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @Builder
+    public ChannelMember(ChannelList channelList, Member member, String createBy) {
+        this.channelList = channelList;
+        this.member = member;
+        super.setCreateBy(createBy);
+    }
 }

@@ -1,4 +1,4 @@
-package com.lemon.mdcord.dto.channel;
+package com.lemon.mdcord.dto.channel.list;
 
 import lombok.Builder;
 import lombok.Getter;

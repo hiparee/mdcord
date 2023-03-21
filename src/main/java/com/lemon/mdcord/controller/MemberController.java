@@ -5,14 +5,12 @@ import com.lemon.mdcord.service.member.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Tag(name = "Member Controller")
 @RestController
@@ -42,8 +40,11 @@ public class MemberController {
 
     @Operation(summary = "사용자 목록 조회", description = "사용자 목록 조회 API")
     @GetMapping("/members")
-    public Page<MemberListResponse> getMemberList(@PageableDefault(size = 20, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable) {
-        return memberService.getMemberList(pageable);
+    public List<MemberListResponse> getMemberList() {
+        List<MemberListResponse> result = memberService.getMemberList().stream()
+                .map(MemberListResponse::new)
+                .collect(Collectors.toList());
+        return result;
     }
 
 }

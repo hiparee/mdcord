@@ -4,18 +4,20 @@ import com.lemon.mdcord.common.exception.MemberDuplicatedException;
 import com.lemon.mdcord.common.exception.MemberNotFoundException;
 import com.lemon.mdcord.common.security.jwt.JwtProvider;
 import com.lemon.mdcord.domain.member.Member;
-import com.lemon.mdcord.dto.member.*;
+import com.lemon.mdcord.dto.member.MemberCreateRequest;
+import com.lemon.mdcord.dto.member.MemberLoginRequest;
+import com.lemon.mdcord.dto.member.MemberPasswordEncoder;
+import com.lemon.mdcord.dto.member.MemberUpdateRequest;
 import com.lemon.mdcord.repository.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -54,7 +56,7 @@ public class JpaMemberService implements MemberService {
     @Override
     @Transactional
     public Member createMember(final MemberCreateRequest dto) {
-        Optional<Member> checkDuplicated = memberRepository.findMemberById(dto.getMemberId());
+        Optional<Member> checkDuplicated = memberRepository.findById(dto.getMemberId());
 
         if(checkDuplicated.isPresent()) {
             throw new MemberDuplicatedException(dto.getMemberId());
@@ -86,17 +88,16 @@ public class JpaMemberService implements MemberService {
         member.updateMemberInfo(
                 dto.getName(), dto.getPassword(),
                 memberPasswordEncoder, dto.getIconFileId(),
-                dto.getUseYn(), currentMemberId
+                dto.getRole(), dto.getUseYn(),
+                currentMemberId
         );
 
         return member;
     }
 
     @Override
-    public Page<MemberListResponse> getMemberList(Pageable pageable) {
-
-        return memberRepository.findAll(pageable)
-                .map(MemberListResponse::new);
+    public List<Member> getMemberList() {
+        return memberRepository.findAll();
     }
 
     private static int getRandomIconFileId() {
@@ -112,7 +113,7 @@ public class JpaMemberService implements MemberService {
     }
 
     private Member getMemberById(final String memberId) {
-        return memberRepository.findMemberById(memberId).orElseThrow(() -> new MemberNotFoundException(memberId));
+        return memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(memberId));
     }
 
     private void createToken(Member member, HttpServletResponse response) {
