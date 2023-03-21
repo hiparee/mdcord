@@ -162,9 +162,6 @@
             </div>
           </div>
           <!-- 첨부파일 리스트 영역 끝 -->
-          <button type="button" @click="socketStore.websocket.close()">
-            close !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-          </button>
           <div class="d-flex" style="flex-direction: row; width: 100%">
             <textarea
               type="text"
