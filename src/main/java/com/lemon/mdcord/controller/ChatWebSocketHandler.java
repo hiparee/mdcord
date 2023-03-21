@@ -150,7 +150,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
      */
     private void sendMemberAccessInfo(String memberId, List<Long> memberChannels, String state) {
         if(memberChannels.size() > 0) {
-            Map<String, String> memberAccessMap = new HashMap<>();
+            Map<String, Object> memberAccessMap = new HashMap<>();
+            memberAccessMap.put("messageType", MessageType.ACCESS);
             memberAccessMap.put(memberId, state);
 
             // 사용자 + 접속 정보 TextMessage화
