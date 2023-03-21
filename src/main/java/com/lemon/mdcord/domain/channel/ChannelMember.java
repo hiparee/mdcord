@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 
@@ -27,6 +28,10 @@ public class ChannelMember extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    @Column(name = "state", nullable = false, length = 3)
+    @ColumnDefault("'OFF'")
+    private String state;
 
     @Builder
     public ChannelMember(ChannelList channelList, Member member, String createBy) {

@@ -22,10 +22,7 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -33,7 +30,10 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class ChatWebSocketHandler extends TextWebSocketHandler {
+    // 채널별 접속 세션 Map 
     private static Map<Long, List<WebSocketSession>> channelMap = new ConcurrentHashMap<>();
+    // 모든 세션 접속자 상태
+    private static List<WebSocketSession> memberStateList = new ArrayList<>();
     private final ChannelChatService channelChatService;
     private final ChannelMemberService channelMemberService;
     private final ChannelListService channelListService;
@@ -43,7 +43,6 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     /**
      * application이 실행될 때 단 한번만,
      * 의존성 주입이 끝난 이후 실행
-     *
      */
     @PostConstruct
     private void init() {
@@ -51,6 +50,9 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         List<Long> channelIds = channelListRepository.findAll().stream()
                 .map(o -> o.getId())
                 .collect(Collectors.toList());
+
+        // 모든 접속자 상태 OFF
+        channelMemberService.changeAllStateOFF();
 
         // 채널 ID별 Map
         for(Long channelId : channelIds) {
@@ -99,14 +101,19 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         // 사용자 ID를 파라미터로 받음
         String memberId = getMemberId(session);
         // 사용자가 속한 채널 ID 목록
-        List<Long> MemberChannels = getMemberChannelIds(memberId);
+        List<Long> memberChannels = getMemberChannelIds(memberId);
+        // 현재 접속 사용자 목록
+        memberStateList.add(session);
 
         // 소속 채널에 webSocket 추가
-        for(Long memberChannel : MemberChannels) {
+        for(Long memberChannel : memberChannels) {
             List<WebSocketSession> webSocketSessions = channelMap.get(memberChannel);
             webSocketSessions.add(session);
             log.debug(session + " 클라이언트 " + memberChannel + " 채널 접속");
         }
+
+        // 세션 접속 시 사용자 접속 정보 전송
+        sendMemberAccessInfo(memberId, memberChannels, "ON");
     }
 
     /**
@@ -121,14 +128,58 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         // 사용자 ID를 파라미터로 받음
         String memberId = getMemberId(session);
         // 사용자가 속한 채널 목록
-        List<Long> MemberChannels = getMemberChannelIds(memberId);
+        List<Long> memberChannels = getMemberChannelIds(memberId);
 
         // 소속 채널에 webSocket 제거
-        for(Long memberChannel : MemberChannels) {
+        for(Long memberChannel : memberChannels) {
             List<WebSocketSession> webSocketSessions = channelMap.get(memberChannel);
             webSocketSessions.remove(session);
             log.debug(session + " 클라이언트 " + memberChannel + " 채널 접속 해제");
         }
+
+        // 세션 해제 시 사용자 접속 정보 전송 
+        sendMemberAccessInfo(memberId, memberChannels, "OFF");
+    }
+
+    /**
+     * 세션 접속 / 해제 시 사용자 접속 정보 전송 
+     * 
+     * @param memberId
+     * @param memberChannels
+     * @param state
+     */
+    private void sendMemberAccessInfo(String memberId, List<Long> memberChannels, String state) {
+        if(memberChannels.size() > 0) {
+            Map<String, String> memberAccessMap = new HashMap<>();
+            memberAccessMap.put(memberId, state);
+
+            // 사용자 + 접속 정보 TextMessage화
+            TextMessage message = null;
+            try {
+                message = new TextMessage(objectMapper.writeValueAsString(new Gson().toJson(memberAccessMap)));
+            } catch(Exception e) {
+                log.error("getClass : {}", e.getClass());
+                log.error("getLocalizedMessage : {}", e.getLocalizedMessage());
+                log.error("getMessage : {}", e.getMessage());
+                log.error("getCause : {}", e.getCause());
+            }
+
+            // TODO - 부적절함. 수정 필요
+            // TextMessage가 null이 아닐 경우, 현재 세션 접속자들에게 알림
+            if(message != null) {
+                for(WebSocketSession webSocketSession : memberStateList) {
+                    try {
+                        webSocketSession.sendMessage(message);
+                    } catch(Exception e) {
+                        log.error("getClass : {}", e.getClass());
+                        log.error("getLocalizedMessage : {}", e.getLocalizedMessage());
+                        log.error("getMessage : {}", e.getMessage());
+                        log.error("getCause : {}", e.getCause());
+                    }
+                }
+            }
+        }
+        channelMemberService.changeMemberState(memberId, state);
     }
 
     /**

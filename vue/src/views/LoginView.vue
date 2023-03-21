@@ -72,6 +72,7 @@ import { onMounted, ref, inject } from 'vue';
 import { fetchLogin } from '../api/user.js';
 import { useToast } from 'vue-toast-notification';
 import { useUserStore } from '../store/modules/user';
+import { webSocketStore } from '@/store/store';
 
 const router = useRouter();
 const $toast = useToast({
@@ -109,9 +110,12 @@ const submit = () => {
         $toast.success('Login Success', {
           onDismiss: () => {
             // sessionStorage.setItem('loginInfo', JSON.stringify(response.data));
+            // webSocketStore().WEB_SOCKET_CONNECT();
+
             useUserStore().$patch({
               userInfo: JSON.stringify(response.data),
             });
+            // webSocketStore().WEB_SOCKET_CONNECT();
             router.push('/channels');
             disToggle(false);
           },
