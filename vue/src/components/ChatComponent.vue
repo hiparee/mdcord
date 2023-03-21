@@ -350,8 +350,8 @@ const getFileExt = fileName => {
 
 const addFiles = async files => {
   for (let i = 0; i < files.length; i++) {
-    const src = await readFiles(files[i]);
     const isImage = files[i].type.includes('image');
+    const src = await readFiles(files[i], isImage);
     files[i].src = src;
     files[i].isImage = isImage;
     files[i].ext = getFileExt(files[i].name);
@@ -379,17 +379,19 @@ const readAndCompressImage = async (file, quality) => {
 };
 
 // FileReader를 통해 파일을 읽어 thumbnail 영역의 src 값으로 셋팅
-const readFiles = async files => {
-  const compressedDataURL = await readAndCompressImage(files, 0.01); // 이미지 품질을 50%로 줄임
-
+const readFiles = (files, isImage) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    // reader.onload = async e => {
-    //   resolve(e.target.result);
-    // };
-    reader.onload = async e => {
-      resolve(compressedDataURL);
-    };
+    if (isImage) {
+      const compressedDataURL = readAndCompressImage(files, 0.01); // 이미지 품질을 50%로 줄임
+      reader.onload = async e => {
+        resolve(compressedDataURL);
+      };
+    } else {
+      reader.onload = async e => {
+        resolve(e.target.result);
+      };
+    }
     reader.readAsDataURL(files);
   });
 };
