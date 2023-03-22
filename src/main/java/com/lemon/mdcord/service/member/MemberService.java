@@ -5,6 +5,7 @@ import com.lemon.mdcord.dto.member.MemberCreateRequest;
 import com.lemon.mdcord.dto.member.MemberLoginRequest;
 import com.lemon.mdcord.dto.member.MemberUpdateRequest;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
@@ -17,4 +18,6 @@ public interface MemberService {
     Member updateUser(MemberUpdateRequest dto);
 
     List<Member> getMemberList();
+
+    void memberLogout(HttpServletRequest request, HttpServletResponse response);
 }
