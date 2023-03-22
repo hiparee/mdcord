@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class JpaChannelMemberService implements ChannelMemberService {
 
@@ -56,7 +57,6 @@ public class JpaChannelMemberService implements ChannelMemberService {
     }
 
     @Override
-    @Transactional
     public List<ChannelMemberResponse> getJoinedChannelsMemberList() {
         String currentMemberId = getAuthentication().getName();
         List<ChannelMember> joinedChannels = channelMemberRepository.findByMemberId(currentMemberId);
@@ -70,13 +70,11 @@ public class JpaChannelMemberService implements ChannelMemberService {
     }
 
     @Override
-    @Transactional
     public void changeAllStateOFF() {
         channelMemberRepository.changeAllStateOff();
     }
 
     @Override
-    @Transactional
     public void changeMemberState(String memberId, String state) {
         channelMemberRepository.changeMemberState(memberId, state);
     }
