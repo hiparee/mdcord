@@ -25,7 +25,6 @@ public class ChatController {
 
     private final ChannelChatService chatService;
 
-    // TODO - 임시. offset 방식으로 변경 필요
     @Operation(summary = "채널별 채팅 목록 조회", description = "채널별 채팅 목록 조회 API (50개 묶)")
     @GetMapping("/channels/{channelId}/chat")
     public Page<ChannelChatListResponse> getChannelChatList(
@@ -34,8 +33,6 @@ public class ChatController {
             , @PageableDefault(size = 50, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
         return chatService.getChannelChatList(channelId, chatId, pageable);
     }
-
-    // 채팅 삭제(delete_yn : Y->N)
 
     // 채팅 상단 고정
 
