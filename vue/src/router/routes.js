@@ -5,10 +5,10 @@ import MainView from '@/views/MainView.vue';
 import LoginView from '@/views/LoginView.vue';
 import { useChannelStore } from '@/store/store.js';
 import { useToast } from 'vue-toast-notification';
-import RegisterView from '@/views/RegisterView.vue';
 import SettingsView from '@/views/SettingsView.vue';
 import UserListView from '@/views/UserListView.vue';
 import ChannelView from '@/views/ChannelView.vue';
+import { webSocketStore } from '@/store/store';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -42,15 +42,13 @@ const router = createRouter({
       name: 'settings',
       meta: { requiresAuth: true },
       component: SettingsView,
+      redirect: '/settings/member',
       children: [
         {
-          path: 'adm/user',
+          path: 'member',
           component: UserListView,
         },
-        {
-          path: 'adm/user/register',
-          component: RegisterView,
-        },
+        /* TODO :: adm/ 경로 빼주기 */
         {
           path: 'adm/channel',
           component: ChannelView,
@@ -63,9 +61,15 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
     try {
+      const socket = webSocketStore().websocket;
+      if (socket.readyState != 0 && socket.readyState != 1) {
+        webSocketStore().WEB_SOCKET_CONNECT();
+      }
+
       await useChannelStore().SET_CHANNEL_LIST();
-      console.log(from, to);
+      // console.log(from, to);
     } catch (error) {
+      console.log(error);
       useToast().error('로그인정보 만료');
       next({ name: 'login' });
     }

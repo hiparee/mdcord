@@ -7,7 +7,7 @@
         <ul class="navbar-nav">
           <li class="nav-item dropdown">
             <a
-              class="nav-link dropdown-toggle"
+              class="nav-link dropdown-toggle text-warning"
               href="#"
               id="navbarDarkDropdownMenuLink"
               role="button"
@@ -18,27 +18,27 @@
                 src="@/assets/images/icon.png"
                 style="width: 30px; height: 30px; margin-right: 5px"
               />
-              {{
-                store.getServerList.find(server => {
-                  return store.accessedChannelInfo.serverId == server.id;
-                }).name
-              }}
+              {{ getServername }}
             </a>
             <ul
               class="dropdown-menu dropdown-menu-dark"
               aria-labelledby="navbarDarkDropdownMenuLink"
             >
-              <li>
+              <!-- <li>
                 <a class="dropdown-item" href="#" @click="emitEvent()"
                   >서버추가</a
                 >
-              </li>
-              <li><hr class="dropdown-divider bg-light" /></li>
-              <li v-for="server in store.getServerList" :key="server.id">
+              </li> -->
+              <!-- <li><hr class="dropdown-divider bg-light" /></li> -->
+              <li
+                v-for="server in store.getServerList"
+                :key="server.id"
+                style="cursor: pointer"
+              >
                 <!-- 서버명 -->
-                <span class="dropdown-item" @click="serverChange(server.id)"
-                  ><i class="bi bi-play-fill mr-1"></i> {{ server.name }}</span
-                >
+                <span class="dropdown-item" @click="serverChange(server.id)">
+                  <span class="text-light"> {{ server.name }}</span>
+                </span>
               </li>
             </ul>
           </li>
@@ -69,13 +69,15 @@
             <div class="collapse show" :id="`channel${channel.id}`">
               <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
                 <li v-for="sub in channel.subChannel" :key="sub.id">
-                  <!-- <router-link :to="`/channels/${sub.id}`" class="rounded"> -->
-                  <router-link
-                    :to="{ path: `/channels/${sub.id}` }"
-                    class="rounded"
-                  >
-                    {{ sub.name }}
-                  </router-link>
+                  <div v-if="sub.useYn === 'Y'">
+                    <!-- <router-link :to="`/channels/${sub.id}`" class="rounded"> -->
+                    <router-link
+                      :to="{ path: `/channels/${sub.id}` }"
+                      class="rounded"
+                    >
+                      {{ sub.name }}
+                    </router-link>
+                  </div>
                 </li>
               </ul>
             </div>
@@ -239,6 +241,7 @@
 </template>
 
 <script setup>
+import { computed } from 'vue';
 import { useChannelStore } from '@/store/store.js';
 import { useRouter } from 'vue-router';
 const store = useChannelStore();
@@ -246,7 +249,14 @@ const router = useRouter();
 const serverChange = serverId => {
   router.push('/channels');
   store.SET_ACCESSED_CHANNEL_INFO('serverId', serverId);
+  store.SET_ACCESSED_CHANNEL_INFO('channelId', null);
 };
+
+const getServername = computed(() => {
+  return store.getServerList.find(server => {
+    return store.accessedChannelInfo.serverId == server.id;
+  }).name;
+});
 </script>
 
 <style scoped>
