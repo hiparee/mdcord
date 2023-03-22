@@ -23,6 +23,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @Slf4j
 @Service
+@Transactional
 public class JpaMemberService implements MemberService {
     private final MemberRepository memberRepository;
     private final MemberPasswordEncoder memberPasswordEncoder;
@@ -44,7 +45,6 @@ public class JpaMemberService implements MemberService {
     }
 
     @Override
-    @Transactional
     public Member memberLogin(final MemberLoginRequest dto, HttpServletResponse response) {
         Member member = memberRepository.findMemberByIdAndUseYn(dto.getMemberId(), LOGIN_USE_YN).orElseThrow(() -> new MemberNotFoundException(dto.getMemberId()));
         member.checkPassword(dto.getPassword(), memberPasswordEncoder);
@@ -54,7 +54,6 @@ public class JpaMemberService implements MemberService {
     }
 
     @Override
-    @Transactional
     public Member createMember(final MemberCreateRequest dto) {
         Optional<Member> checkDuplicated = memberRepository.findById(dto.getMemberId());
 
@@ -79,7 +78,6 @@ public class JpaMemberService implements MemberService {
     }
 
     @Override
-    @Transactional
     public Member updateUser(final MemberUpdateRequest dto) {
         Member member = getMemberById(dto.getMemberId());
 
