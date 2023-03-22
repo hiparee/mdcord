@@ -2,7 +2,7 @@ package com.lemon.mdcord.controller;
 
 import com.lemon.mdcord.dto.channel.member.ChannelMemberCreateRequest;
 import com.lemon.mdcord.dto.channel.member.ChannelMemberCreateReseponse;
-import com.lemon.mdcord.dto.channel.member.ChannelMemberReseponse;
+import com.lemon.mdcord.dto.channel.member.ChannelMemberResponse;
 import com.lemon.mdcord.service.channel.ChannelMemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Tag(name = "ChannelMember Controller")
 @RestController
@@ -37,12 +36,8 @@ public class ChannelMemberController {
 
     @Operation(summary = "소속 채널의 인원 목록 조회", description = "소속 채널의 인원 목록 조회 API")
     @GetMapping("/channel-member")
-    public List<ChannelMemberReseponse> getJoinedChannelsMemberList() {
-        List<ChannelMemberReseponse> result = channelMemberService.getJoinedChannelsMemberList().stream()
-                .map(ChannelMemberReseponse::new)
-                .collect(Collectors.toList());
-
-        return result;
+    public List<ChannelMemberResponse> getJoinedChannelsMemberList() {
+        return channelMemberService.getJoinedChannelsMemberList();
     }
 
 }
