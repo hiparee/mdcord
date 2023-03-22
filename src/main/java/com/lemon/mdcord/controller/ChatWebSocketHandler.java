@@ -150,14 +150,16 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
      */
     private void sendMemberAccessInfo(String memberId, List<Long> memberChannels, String state) {
         if(memberChannels.size() > 0) {
-            Map<String, Object> memberAccessMap = new HashMap<>();
-            memberAccessMap.put("messageType", MessageType.ACCESS);
-            memberAccessMap.put(memberId, state);
-
             // 사용자 + 접속 정보 TextMessage화
             TextMessage message = null;
             try {
-                message = new TextMessage(objectMapper.writeValueAsString(new Gson().toJson(memberAccessMap)));
+                Map<String, Object> memberAccessMap = new HashMap<>();
+                memberAccessMap.put("messageType", MessageType.ACCESS);
+                memberAccessMap.put(memberId, state);
+
+                JsonNode jsonNode = objectMapper.readTree(memberAccessMap.toString());
+
+                message = new TextMessage(objectMapper.writeValueAsString(new Gson().toJson(jsonNode)));
             } catch(Exception e) {
                 log.error("getClass : {}", e.getClass());
                 log.error("getLocalizedMessage : {}", e.getLocalizedMessage());
