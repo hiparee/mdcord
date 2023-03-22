@@ -19,6 +19,7 @@
       <!--  사용자 검색바 컴포넌트  -->
       <search-bar-component
         v-model="keyword"
+        :searchbar-placeholder="'이름으로 검색하기'"
         @clearKeywordEvent="clearKeywordEvent"
       />
 
@@ -41,7 +42,7 @@
         </h2>
       </div>
       <!--  사용자가 없는 경우  -->
-      <template v-if="searchedTotalCount === 0">
+      <template v-if="totalCount === 0 || searchedTotalCount === 0">
         <div class="empty-container">
           <div class="d-flex flex-column">
             <div class="empty-image"></div>
@@ -89,29 +90,36 @@
                 </tr>
                 <tr
                   v-else
-                  v-for="(user, index) in searchedMember"
+                  v-for="(member, index) in searchedMember"
                   :key="index"
                   class="member-row"
+                  @click="openUpdateUserModal(member)"
                 >
                   <td>{{ index + 1 }}</td>
                   <td>
                     <div class="img-section d-flex flex-row align-items-center">
                       <span class="mr-2"
                         ><img
-                          :src="imageUrl(userProfileIcon(user.iconFileId))"
+                          :src="
+                            getImageUrl(
+                              `profile/${userProfileIcon(
+                                member.iconFileId,
+                              )}.png`,
+                            )
+                          "
                           alt=""
                           width="40"
                           height="40"
                       /></span>
-                      <span>{{ user.name }}</span>
+                      <span>{{ member.name }}</span>
                     </div>
                   </td>
-                  <td>{{ user.memberId }}</td>
-                  <td>{{ user.type === 'USER' ? '사용자' : '관리자' }}</td>
+                  <td>{{ member.memberId }}</td>
+                  <td>{{ userType(member.type) }}</td>
                   <td>
-                    {{ $dayjs(user.createDate).format('YYYY/MM/DD HH:mm') }}
+                    {{ $dayjs(member.createDate).format('YYYY/MM/DD HH:mm') }}
                   </td>
-                  <td>{{ user.useYn === 'Y' ? '활성' : '비활성' }}</td>
+                  <td>{{ userUseYn(member.useYn) }}</td>
                 </tr>
               </tbody>
             </table>
@@ -122,16 +130,29 @@
   </div>
   <!-- 사용자 추가 Modal -->
   <user-register-modal @reload-fetch-members="getMembers" />
+  <!-- 사용자 정보 편집 Modal -->
+  <user-update-modal
+    :showUpdateUserModal="showUpdateUserModal"
+    :memberInfo="memberInfo"
+    @reload-fetch-members="getMembers"
+    @update:showUpdateUserModal="closeUpdateUserModal"
+  />
 </template>
 
 <script setup>
 import { computed, onBeforeMount, ref } from 'vue';
 import { fetchMembers } from '@/api/user';
-import { userProfileIcon } from '@/utils/common';
+import {
+  getImageUrl,
+  userProfileIcon,
+  userType,
+  userUseYn,
+} from '@/utils/common';
 import SearchBarComponent from '@/components/common/SearchBarComponent.vue';
 import UserRegisterModal from '@/components/UserRegisterModal.vue';
 import SpinnerComponent from '@/components/common/SpinnerComponent.vue';
-import SkeletonComponent from '@/components/SkeletonComponent.vue';
+import UserUpdateModal from '@/components/UserUpdateModal.vue';
+import { useUserStore } from '@/store/modules/user';
 
 const members = ref([]);
 const totalCount = ref(0);
@@ -150,8 +171,8 @@ const getMembers = async () => {
   const params = {};
   try {
     const { data } = await fetchMembers();
-    members.value = data.content;
-    totalCount.value = data.totalElements;
+    members.value = data;
+    totalCount.value = data.length;
   } catch (err) {
     console.log('error ::', err);
   } finally {
@@ -177,9 +198,17 @@ const searchedTotalCount = computed(() => {
   return keyword.value === '' ? totalCount : searchedMember.value.length;
 });
 
-// 추후 대리님이 추가하신 공통함수 적용
-const imageUrl = user => {
-  return new URL(`../assets/images/profile/${user}.png`, import.meta.url).href;
+const showUpdateUserModal = ref(false);
+const memberInfo = ref({});
+
+const emits = defineEmits(['update:showUpdateUserModal']);
+const openUpdateUserModal = member => {
+  console.log(member);
+  showUpdateUserModal.value = true;
+  memberInfo.value = { ...member };
+};
+const closeUpdateUserModal = member => {
+  showUpdateUserModal.value = false;
 };
 </script>
 
@@ -259,4 +288,12 @@ table.member-table .member-row:hover {
 .table-custom-scrollbar::-webkit-scrollbar-track {
   background: #2b2d31;
 }
+/*.member-row:first-child {
+  transition: background-color 2s, transform 2s;
+  transform: translateY(0%) translateZ(0px);
+  background-color: aliceblue;
+}
+.member-row:first-child {
+  background-color: #2f3136;
+}*/
 </style>

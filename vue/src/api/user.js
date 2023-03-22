@@ -19,8 +19,10 @@ const fetchLogin = async params => {
  * @param {string} password 비밀번호
  *
  * @returns {
+ *   {
  *   "memberId": "lemon4",
  *   "name": "사용자4"
+ * }
  * }
  * */
 const signupUser = payload => {
@@ -28,48 +30,21 @@ const signupUser = payload => {
 };
 
 /**
- * 사용자 목록 조회
- * @param {object} pageable 페이징
- *
+ * 사용자 목록 조회 (페이징 처리 보류)
  * @returns {
- *   "totalPages": 0,
- *   "totalElements": 0,
- *   "size": 0,
- *   "content": [
- *     {
- *       "memberId": "string",
- *       "name": "string",
- *       "iconFileId": 0,
- *       "useYn": "string",
- *       "createDate": "2023-03-06T06:53:37.603Z",
- *       "createBy": "string",
- *       "updateDate": "2023-03-06T06:53:37.603Z",
- *       "updateBy": "string",
- *       "type": "ADMIN"
- *     }
- *   ],
- *   "number": 0,
- *   "sort": {
- *     "empty": true,
- *     "sorted": true,
- *     "unsorted": true
- *   },
- *   "first": true,
- *   "last": true,
- *   "numberOfElements": 0,
- *   "pageable": {
- *     "offset": 0,
- *     "sort": {
- *       "empty": true,
- *       "sorted": true,
- *       "unsorted": true
- *     },
- *     "pageNumber": 0,
- *     "pageSize": 0,
- *     "paged": true,
- *     "unpaged": true
- *   },
- *   "empty": true
+ *   [
+ *   {
+ *     "memberId": "awdr81818",
+ *     "name": "ajdkfjsdf",
+ *     "iconFileId": 41,
+ *     "useYn": "Y",
+ *     "createDate": "2023-03-15T16:37:24",
+ *     "createBy": "lemon",
+ *     "updateDate": null,
+ *     "updateBy": null,
+ *     "type": "USER"
+ *   },{}
+ * ]
  * }
  * */
 const fetchMembers = payload => {
@@ -82,17 +57,18 @@ const fetchMembers = payload => {
  * @param {string} name 이름,
  * @param {string} password 비밀번호,
  * @param {string} useYn 활성여부,
- * @param {int} iconFileId 활성여부,
+ * @param {int} iconFileId 프로필 아이콘 아이디,
+ * @param {string} role 타입(사용자 |관리자 )
  *
  * @returns {
+ *   {
  *   "name": "사용자",
  *   "iconFileId": 1,
  *   "useYn": "Y"
  * }
+ * }
  * */
 const fetchUpdateMember = payload => {
-  console.log('payload --> ', JSON.stringify(payload));
-  console.log('{ ...payload } --> ', JSON.stringify({ ...payload }));
   return user.put(`${URL_PREFIX}`, payload);
 };
 export { fetchLogin, signupUser, fetchMembers, fetchUpdateMember };
