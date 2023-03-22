@@ -1,9 +1,9 @@
 <template>
   <settings-sidebar-component />
-  <div class="settings-content">
+  <div class="settings-content overflow-auto settings-bg">
     <router-view></router-view>
   </div>
-  <div class="exit-button">
+  <div class="exit-button settings-bg">
     <div
       class="close-button"
       aria-label="닫기"
@@ -47,5 +47,8 @@ const router = useRouter();
 .close-text {
   font-weight: 500;
   font-size: 14px;
+}
+.settings-bg {
+  background-color: #313338;
 }
 </style>

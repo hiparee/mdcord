@@ -14,16 +14,15 @@
           </div>
           <div class="nav-item" role="listitem">
             <router-link
-              to="/settings/adm/user"
+              to="/settings/member"
               class="nav-link active"
               aria-current="page"
               replace
             >
               사용자 관리
             </router-link>
-            <!--            @click.prevent="router.replace('/settings/adm/user')"-->
           </div>
-          <div class="nav-item" role="listitem">
+          <!--          <div class="nav-item" role="listitem">
             <router-link
               to="/settings/adm/user/register"
               class="nav-link"
@@ -31,8 +30,7 @@
             >
               사용자 등록
             </router-link>
-            <!--            @click.prevent="router.replace('/settings/adm/user/register')"-->
-          </div>
+          </div>-->
           <div class="separator"></div>
           <div
             class=""
