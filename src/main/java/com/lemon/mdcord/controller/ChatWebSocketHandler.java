@@ -155,7 +155,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             try {
                 Map<String, Object> memberAccessMap = new HashMap<>();
                 memberAccessMap.put("messageType", MessageType.ACCESS);
-                memberAccessMap.put(memberId, state);
+                memberAccessMap.put("messageInfo", new HashMap<String, String>().put(memberId, state));
 
                 JsonNode jsonNode = objectMapper.readTree(new Gson().toJson(memberAccessMap));
 
