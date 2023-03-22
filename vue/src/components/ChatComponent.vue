@@ -185,13 +185,30 @@
           </div>
         </div>
       </div>
-      <div class="channel-member-list">
+      <div class="channel-member-list" style="overflow-y: scroll">
         <div>
-          <div>
-            <h5 class="text-primary">{{ accessedServerName }} 참여자</h5>
+          <div class="mb-3">
+            <span class="text-warning"
+              >{{ accessedServerName }} 참여자
+              <span style="font-size: 12px">
+                ― {{ accessedMemberList ? accessedMemberList.length : 0 }}
+              </span>
+            </span>
           </div>
           <div>
-            <div v-for="i in 10" :key="i">홍길동</div>
+            <div v-for="member in accessedMemberList" :key="member.memberId">
+              <div class="member-item" :class="{ on: member.state == 'ON' }">
+                <img
+                  class="profile-img"
+                  :src="
+                    getImageUrl(
+                      `profile/${userProfileIcon(member.iconFileId)}.png`,
+                    )
+                  "
+                />
+                <span :title="member.memberId"> {{ member.memberName }}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -247,11 +264,28 @@ const accessedChannelId = computed(
 const accessedChannelData = computed(() => {
   return chatStore.chatList.channels[accessedChannelId.value];
 });
+const accessedServerId = computed(() => {
+  return channelStore.accessedChannelInfo.serverId;
+});
 const accessedServerName = computed(() => {
-  const serverId = channelStore.accessedChannelInfo.serverId;
+  const serverId = accessedServerId.value;
   const obj = channelStore.serverList.find(item => item.id === serverId);
   const name = obj.name;
   return name;
+});
+const accessedMemberList = computed(() => {
+  const memberList = channelStore.getMemberList[accessedServerId.value];
+  console.log(memberList);
+  if (memberList) {
+    return memberList.sort((a, b) => {
+      if (a.state !== b.state) {
+        return b.state.localeCompare(a.state);
+      }
+      return a.memberName.localeCompare(b.memberName);
+    });
+  } else {
+    return memberList;
+  }
 });
 const getDividerText = (index, createDate) => {
   const nowDate = dayjs().format('YYYYMMDD');
@@ -501,17 +535,36 @@ const setChatTitle = () => {
     });
   });
 };
+const setChannelMemberList = () => {
+  channelStore.SET_MEMBER_LIST();
+};
 
 onBeforeMount(() => {
+  console.log('onBeforeMount 호출');
+  setChannelMemberList();
   setChatTitle();
   setChatList();
 });
+
+watch(
+  () => accessedServerId.value,
+  () => {
+    console.log('서버바뀜');
+  },
+);
 
 watch(
   () => route.params,
   () => {
     setChatTitle();
     setChatList();
+  },
+);
+
+watch(
+  () => accessedMemberList,
+  () => {
+    console.log('memberList 변경이력있음');
   },
 );
 

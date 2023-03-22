@@ -66,16 +66,10 @@ router.beforeEach(async (to, from, next) => {
         webSocketStore().WEB_SOCKET_CONNECT();
       }
 
-      console.log(
-        'websocket ********',
-        webSocketStore().websocket,
-        webSocketStore().websocket.readyState,
-        typeof webSocketStore().websocket,
-      );
-
       await useChannelStore().SET_CHANNEL_LIST();
-      console.log(from, to);
+      // console.log(from, to);
     } catch (error) {
+      console.log(error);
       useToast().error('로그인정보 만료');
       next({ name: 'login' });
     }

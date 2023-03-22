@@ -178,6 +178,7 @@ html {
 
   & .page-content {
     flex: 1;
+    overflow: hidden;
     flex-direction: row;
     display: flex !important;
 
@@ -231,6 +232,44 @@ html {
       width: 250px;
       background: #2b2d31;
       padding: 20px;
+
+      & .member-item {
+        padding: 7px;
+        margin-bottom: 7px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        cursor: pointer;
+        opacity: 0.4;
+
+        &.on {
+          opacity: 1;
+        }
+
+        &:hover {
+          background: $content;
+          opacity: 1;
+        }
+
+        & .profile-img {
+          width: 35px;
+          height: 35px;
+          margin-right: 10px;
+        }
+      }
+
+      &::-webkit-scrollbar {
+        width: 3px; /* 스크롤바의 너비 */
+      }
+
+      &:hover::-webkit-scrollbar-thumb {
+        background: $secondary; /* 스크롤바의 색상 */
+        border-radius: 10px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: $dark; /*스크롤바 뒷 배경 색상*/
+      }
     }
   }
 

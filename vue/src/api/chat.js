@@ -17,7 +17,7 @@ const fetchMultiFileUpload = async formData => {
 const fetchChatlist = async channelId => {
   try {
     const res = await chat.get(`/api/channels/${channelId}/chat`);
-    console.log(res);
+    // console.log(res);
     return res;
   } catch (error) {
     console.log(error);

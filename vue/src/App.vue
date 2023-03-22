@@ -19,20 +19,10 @@ import { useRoute } from 'vue-router';
 
 const route = useRoute();
 const isLogin = computed(() => {
-  console.log(
-    '###############1',
-    route.matched.some(record => record.meta.requiresAuth),
-  );
   return route.matched.some(record => record.meta.requiresAuth);
 });
 
-onMounted(() => {
-  console.log('isLogin #####################', isLogin);
-  if (isLogin.value) {
-    // console.error(webSocketStore().websocket.readyState);
-    // webSocketStore().WEB_SOCKET_CONNECT();
-  }
-});
+onMounted(() => {});
 </script>
 
 <style></style>
