@@ -6,6 +6,7 @@ import com.lemon.mdcord.domain.channel.ChannelList;
 import com.lemon.mdcord.domain.channel.ChannelMember;
 import com.lemon.mdcord.domain.member.Member;
 import com.lemon.mdcord.dto.channel.member.ChannelMemberCreateRequest;
+import com.lemon.mdcord.dto.channel.member.ChannelMemberResponse;
 import com.lemon.mdcord.repository.ChannelListRepository;
 import com.lemon.mdcord.repository.ChannelMemberRepository;
 import com.lemon.mdcord.repository.MemberRepository;
@@ -55,14 +56,17 @@ public class JpaChannelMemberService implements ChannelMemberService {
     }
 
     @Override
-    public List<ChannelMember> getJoinedChannelsMemberList() {
+    @Transactional
+    public List<ChannelMemberResponse> getJoinedChannelsMemberList() {
         String currentMemberId = getAuthentication().getName();
         List<ChannelMember> joinedChannels = channelMemberRepository.findByMemberId(currentMemberId);
         List<Long> joinedChannelIds = joinedChannels.stream()
                 .map(o -> o.getChannelList().getId())
                 .collect(Collectors.toList());
 
-        return channelMemberRepository.findByChannelListIdIn(joinedChannelIds);
+        return channelMemberRepository.findByChannelListIdIn(joinedChannelIds).stream()
+                .map(ChannelMemberResponse::new)
+                .collect(Collectors.toList());
     }
 
     @Override
