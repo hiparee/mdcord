@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class JpaChannelListService implements ChannelListService {
 
@@ -31,7 +32,6 @@ public class JpaChannelListService implements ChannelListService {
     private final String USE_N = "N";
 
     @Override
-    @Transactional
     public ChannelList createChannel(final ChannelListCreateRequest dto) {
         ChannelList checkDuplicated = channelListRepository.findByNameAndParentIdAndUseYn(dto.getName(), dto.getParentId(), USE_Y);
         if(checkDuplicated != null) throw new ChannelListDuplicatedException(dto.getName());
@@ -72,7 +72,6 @@ public class JpaChannelListService implements ChannelListService {
     }
 
     @Override
-    @Transactional
     public void deleteChannel(Long id) {
         ChannelList channel = getTargetChannel(id);
         if(channel.getUseYn().equals(USE_N)) throw new ChannelAlreadyDisabledException();
@@ -84,7 +83,6 @@ public class JpaChannelListService implements ChannelListService {
     }
 
     @Override
-    @Transactional
     public ChannelList updateChannelInfo(ChannelListUpdateRequest dto) {
         ChannelList channel = getTargetChannel(dto.getId());
         channel.updateChannelInfo(
@@ -96,7 +94,6 @@ public class JpaChannelListService implements ChannelListService {
     }
 
     @Override
-    @Transactional
     public void updateChannelOrder(List<ChannelListOrderUpdateRequest> list) {
         Map<Long, ChannelListOrderUpdateRequest> dtoListToMap = list.stream()
                 .collect(Collectors.toMap(
