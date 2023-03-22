@@ -3,7 +3,7 @@
     <input
       type="text"
       class="col-12 search-input"
-      placeholder="검색하기"
+      :placeholder="props.searchbarPlaceholder"
       aria-label="검색하기"
       :value="modelValue"
       @input="$emit('update:modelValue', $event.target.value)"
@@ -31,7 +31,7 @@
 <script setup>
 import { computed } from 'vue';
 
-const props = defineProps(['modelValue']);
+const props = defineProps(['modelValue', 'searchbarPlaceholder']);
 defineEmits(['update:modelValue', 'clearKeywordEvent']);
 
 // 입력폼 값 감시

@@ -69,14 +69,14 @@
             <div class="collapse show" :id="`channel${channel.id}`">
               <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
                 <li v-for="sub in channel.subChannel" :key="sub.id">
-                  <div v-if="sub.useYn === 'Y'" >
-                  <!-- <router-link :to="`/channels/${sub.id}`" class="rounded"> -->
-                  <router-link
-                    :to="{ path: `/channels/${sub.id}` }"
-                    class="rounded"
-                  >
-                    {{ sub.name }}
-                  </router-link>
+                  <div v-if="sub.useYn === 'Y'">
+                    <!-- <router-link :to="`/channels/${sub.id}`" class="rounded"> -->
+                    <router-link
+                      :to="{ path: `/channels/${sub.id}` }"
+                      class="rounded"
+                    >
+                      {{ sub.name }}
+                    </router-link>
                   </div>
                 </li>
               </ul>
@@ -228,6 +228,22 @@
                   --bs-btn-hover-bg: #3a3b42;
                   --bs-btn-active-bg: #3a3b42;
                 "
+                @click.stop="clickSignOut()"
+              >
+                <span> <i class="bi bi-box-arrow-right"></i></span>
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                style="
+                  width: 33px;
+                  height: 33px;
+                  font-size: 23px;
+                  padding: 0;
+                  border: none;
+                  --bs-btn-hover-bg: #3a3b42;
+                  --bs-btn-active-bg: #3a3b42;
+                "
                 @click.stop="router.push('/settings')"
               >
                 <span> <i class="bi-gear"></i></span>
@@ -249,6 +265,7 @@ const serverChange = serverId => {
   router.push('/channels');
   store.SET_ACCESSED_CHANNEL_INFO('serverId', serverId);
 };
+const clickSignOut = () => {};
 </script>
 
 <style scoped>
