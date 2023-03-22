@@ -8507,6 +8507,7 @@ html {
   flex-direction: column; }
   #page-content-wrapper .page-content {
     flex: 1;
+    overflow: hidden;
     flex-direction: row;
     display: flex !important; }
     #page-content-wrapper .page-content .content-chat-area {
@@ -8546,6 +8547,33 @@ html {
       width: 250px;
       background: #2b2d31;
       padding: 20px; }
+      #page-content-wrapper .page-content .channel-member-list .member-item {
+        padding: 7px;
+        margin-bottom: 7px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        cursor: pointer;
+        opacity: 0.4; }
+        #page-content-wrapper .page-content .channel-member-list .member-item.on {
+          opacity: 1; }
+        #page-content-wrapper .page-content .channel-member-list .member-item:hover {
+          background: #32353b;
+          opacity: 1; }
+        #page-content-wrapper .page-content .channel-member-list .member-item .profile-img {
+          width: 35px;
+          height: 35px;
+          margin-right: 10px; }
+      #page-content-wrapper .page-content .channel-member-list::-webkit-scrollbar {
+        width: 3px;
+        /* 스크롤바의 너비 */ }
+      #page-content-wrapper .page-content .channel-member-list:hover::-webkit-scrollbar-thumb {
+        background: #6c757d;
+        /* 스크롤바의 색상 */
+        border-radius: 10px; }
+      #page-content-wrapper .page-content .channel-member-list::-webkit-scrollbar-track {
+        background: #2f3136;
+        /*스크롤바 뒷 배경 색상*/ }
   #page-content-wrapper > nav.navbar {
     border-bottom: 1px solid #54565a; }
     #page-content-wrapper > nav.navbar * {

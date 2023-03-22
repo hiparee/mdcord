@@ -37,10 +37,31 @@ export const webSocketStore = defineStore('socket', () => {
     websocket.value.onmessage = ({ data }) => {
       console.log('▶ websocket.value.onmessage', JSON.parse(data));
       const parseData = JSON.parse(data);
-      // if (JSON.parse(data).messageType == 'ACCESS') {
-      if (!JSON.parse(data).messageType) {
-        return;
-      } else if (JSON.parse(data).messageType == 'FILE') {
+
+      if (parseData.messageType == 'ACCESS') {
+        for (const [key, val] of Object.entries(parseData.messageInfo)) {
+          console.log(`${key} is ${val}`);
+          const memberList = useChannelStore().memberList;
+          Object.values(memberList).forEach(objects => {
+            console.log('objects => ', objects);
+            objects.forEach(obj => {
+              if (obj.memberId === key) {
+                obj.state = val;
+              }
+            });
+
+            // console.log('objects.sort 시작');
+            // objects.sort((a, b) => {
+            //   if (a.state !== b.state) {
+            //     return b.state.localeCompare(a.state);
+            //   }
+            //   return a.memberName.localeCompare(b.memberName);
+            // });
+          });
+        }
+
+        console.log(data);
+      } else if (parseData.messageType == 'FILE') {
         const channelId = parseData.channelId;
         const chatId = parseData.chatId;
         const fileData = JSON.parse(parseData.fileList);
@@ -48,7 +69,7 @@ export const webSocketStore = defineStore('socket', () => {
         console.log('file', fileData);
         console.log('chatId', chatId);
         console.log('channelId', channelId);
-      } else {
+      } else if (parseData.messageType == 'SEND') {
         console.log('수신데이터', parseData);
         const parseChannelId = parseData.channelId;
         const parseChannelName = parseData.channelName;
@@ -68,7 +89,6 @@ export const webSocketStore = defineStore('socket', () => {
             <div style='max-width:200px;overflow:hidden;text-overflow: ellipsis;
       white-space: nowrap;'>${parseData.content}</div>`);
         }
-        console.log('%%%%%%%%%%%%%%%%%%%%%%%%%55', parseData.commitTime);
         const createDate = dayjs(parseData.commitTime).format(
           'YYYY-MM-DD HH:mm:ss',
         );
