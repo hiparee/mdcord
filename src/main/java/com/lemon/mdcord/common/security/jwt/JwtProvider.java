@@ -202,6 +202,24 @@ public class JwtProvider {
     }
 
     /**
+     * 토큰을 쿠키에서 제거
+     * @param token
+     * @param response
+     */
+    public void deleteTokenInCookie(String token, HttpServletResponse response) {
+        ResponseCookie cookie = ResponseCookie.from(header, token)
+                .maxAge(0)
+                .path("/")
+                .domain(domain)
+                .secure(isProduct)
+                .httpOnly(true)
+                .sameSite("Lax")
+                .build();
+
+        response.setHeader("Set-Cookie", cookie.toString());
+    }
+
+    /**
      * SecurityContextHolder Authentication 값 생성
      * @param token
      * @return

@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Optional;
@@ -96,6 +97,12 @@ public class JpaMemberService implements MemberService {
     @Override
     public List<Member> getMemberList() {
         return memberRepository.findAll();
+    }
+
+    @Override
+    public void memberLogout(HttpServletRequest request, HttpServletResponse response) {
+        String token = jwtProvider.resolveToken(request);
+        jwtProvider.deleteTokenInCookie(token, response);
     }
 
     private static int getRandomIconFileId() {

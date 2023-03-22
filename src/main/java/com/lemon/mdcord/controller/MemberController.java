@@ -5,8 +5,11 @@ import com.lemon.mdcord.service.member.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.List;
@@ -28,7 +31,7 @@ public class MemberController {
 
     @Operation(summary = "로그인", description = "로그인 API")
     @PostMapping("/members/signin")
-    public MemberLoginResponse signin(@RequestBody @Valid final MemberLoginRequest dto, HttpServletResponse response) {
+    public MemberLoginResponse signIn(@RequestBody @Valid final MemberLoginRequest dto, HttpServletResponse response) {
         return new MemberLoginResponse(memberService.memberLogin(dto, response));
     }
 
@@ -45,6 +48,14 @@ public class MemberController {
                 .map(MemberListResponse::new)
                 .collect(Collectors.toList());
         return result;
+    }
+
+    @Operation(summary = "로그아웃", description = "로그아웃 API")
+    @PostMapping("/members/signout")
+    public ResponseEntity<Void> signOut(HttpServletRequest request, HttpServletResponse response) {
+        memberService.memberLogout(request, response);
+        SecurityContextHolder.clearContext();
+        return ResponseEntity.ok(null);
     }
 
 }
