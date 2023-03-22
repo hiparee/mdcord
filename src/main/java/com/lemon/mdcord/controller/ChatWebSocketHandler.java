@@ -157,9 +157,9 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 memberAccessMap.put("messageType", MessageType.ACCESS);
                 memberAccessMap.put(memberId, state);
 
-                JsonNode jsonNode = objectMapper.readTree(memberAccessMap.toString());
+                JsonNode jsonNode = objectMapper.readTree(new Gson().toJson(memberAccessMap));
 
-                message = new TextMessage(objectMapper.writeValueAsString(new Gson().toJson(jsonNode)));
+                message = new TextMessage(objectMapper.writeValueAsString(jsonNode));
             } catch(Exception e) {
                 log.error("getClass : {}", e.getClass());
                 log.error("getLocalizedMessage : {}", e.getLocalizedMessage());
@@ -167,7 +167,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 log.error("getCause : {}", e.getCause());
             }
 
-            // TODO - 부적절함. 수정 필요
+            // TODO - 부적절함. 수정 필요 - d
             // TextMessage가 null이 아닐 경우, 현재 세션 접속자들에게 알림
             if(message != null) {
                 for(WebSocketSession webSocketSession : memberStateList) {

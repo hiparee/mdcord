@@ -5,15 +5,20 @@ import lombok.Getter;
 
 
 @Getter
-public class ChannelMemberReseponse {
+public class ChannelMemberResponse {
 
     private String memberId;
     private Long channelId;
     private String state;
+    private String memberName;
+    private Integer iconFileId;
 
-    public ChannelMemberReseponse(ChannelMember ch) {
+
+    public ChannelMemberResponse(ChannelMember ch) {
         this.memberId = ch.getMember().getId();
         this.channelId = ch.getChannelList().getId();
         this.state = ch.getState();
+        this.memberName = ch.getMember().getName();
+        this.iconFileId = ch.getMember().getIconFileId();
     }
 }
