@@ -228,6 +228,22 @@
                   --bs-btn-hover-bg: #3a3b42;
                   --bs-btn-active-bg: #3a3b42;
                 "
+                @click.stop="clickSignOut()"
+              >
+                <span> <i class="bi bi-box-arrow-right"></i></span>
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                style="
+                  width: 33px;
+                  height: 33px;
+                  font-size: 23px;
+                  padding: 0;
+                  border: none;
+                  --bs-btn-hover-bg: #3a3b42;
+                  --bs-btn-active-bg: #3a3b42;
+                "
                 @click.stop="router.push('/settings')"
               >
                 <span> <i class="bi-gear"></i></span>
@@ -257,6 +273,7 @@ const getServername = computed(() => {
     return store.accessedChannelInfo.serverId == server.id;
   }).name;
 });
+const clickSignOut = () => {};
 </script>
 
 <style scoped>
