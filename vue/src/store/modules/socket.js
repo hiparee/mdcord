@@ -124,8 +124,11 @@ export const webSocketStore = defineStore('socket', () => {
           'YYYY-MM-DD HH:mm',
         );
 
-        console.log(newCreateDate, lastCreateDate);
-        if (newCreateDate == lastCreateDate) {
+        // 이전 채팅 친 사용자와 같고 시:분까지 동일한 경우
+        if (
+          newCreateDate == lastCreateDate &&
+          parseData.memberId == lastItem.memberId
+        ) {
           useChatStore().chatList.channels[parseChannelId][lastIndex].push(
             ...pushData,
           );
