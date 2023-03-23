@@ -133,7 +133,7 @@ const submit = () => {
             // webSocketStore().WEB_SOCKET_CONNECT();
 
             useUserStore().$patch({
-              userInfo: JSON.stringify(response.data),
+              userInfo: { ...response.data },
             });
             // webSocketStore().WEB_SOCKET_CONNECT();
             saveId();
