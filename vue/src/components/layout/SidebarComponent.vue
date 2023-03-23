@@ -258,8 +258,9 @@
 
 <script setup>
 import { computed } from 'vue';
-import { useChannelStore } from '@/store/store.js';
+import { useChannelStore, useUserStore } from '@/store/store.js';
 import { useRouter } from 'vue-router';
+import { signOutUser } from '@/api/user';
 const store = useChannelStore();
 const router = useRouter();
 const serverChange = serverId => {
@@ -271,9 +272,17 @@ const serverChange = serverId => {
 const getServername = computed(() => {
   return store.getServerList.find(server => {
     return store.accessedChannelInfo.serverId == server.id;
-  }).name;
+  })?.name;
 });
-const clickSignOut = () => {};
+const clickSignOut = async () => {
+  try {
+    await signOutUser();
+    useUserStore().SET_SIGN_OUT();
+    await router.replace('/');
+  } catch (e) {
+    console.log('err ::', e);
+  }
+};
 </script>
 
 <style scoped>
