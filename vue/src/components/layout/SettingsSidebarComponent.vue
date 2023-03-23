@@ -64,7 +64,7 @@ const router = useRouter();
 #sidebar-wrapper {
   position: relative;
   background-color: #2b2d31;
-  z-index: 2;
+  z-index: 0;
 }
 .sidebar-header {
   margin: 16px 0 16px 16px;
