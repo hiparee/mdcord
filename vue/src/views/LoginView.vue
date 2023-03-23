@@ -19,6 +19,7 @@
                   v-model="id"
                   class="form-control form-control-lg bg-dark text-white fs-6"
                   placeholder="ID"
+                  autocomplete="off"
                 />
               </div>
 
@@ -30,6 +31,7 @@
                   @keyup.enter="submit()"
                   class="form-control form-control-lg bg-dark text-white fs-6"
                   placeholder="PASSWORD"
+                  autocomplete="new-password"
                 />
               </div>
 

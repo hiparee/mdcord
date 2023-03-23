@@ -4,7 +4,7 @@
     class="modal fade"
     id="registerModal"
     tabindex="-1"
-    aria-labelledby="exampleModalLabel"
+    aria-labelledby="registerModalLabel"
     aria-hidden="true"
     role="dialog"
     data-bs-backdrop="true"
@@ -35,7 +35,7 @@
                 <label class="d-block"> 아이디 </label>
                 <input
                   v-model="memberId"
-                  class="mt-1 register-input"
+                  class="mt-1 custom-input"
                   type="text"
                   placeholder="아이디를 입력해주세요."
                   required
@@ -46,7 +46,7 @@
                 <label class="d-block"> 이름 </label>
                 <input
                   v-model="name"
-                  class="mt-1 register-input"
+                  class="mt-1 custom-input"
                   type="text"
                   placeholder="이름을 입력해주세요."
                   autocomplete="off"
@@ -57,7 +57,7 @@
                 <label class="d-block"> 비밀번호 </label>
                 <input
                   v-model="password"
-                  class="mt-1 register-input"
+                  class="mt-1 custom-input"
                   type="password"
                   placeholder="비밀번호를 입력해주세요."
                   autocomplete="off"
@@ -69,7 +69,7 @@
                 type="submit"
                 :class="`${
                   formValid() === false ? 'disabled' : ''
-                } btn register-btn`"
+                } btn custom-confirm-btn`"
                 :style="{
                   'pointer-events': loading === true ? 'none' : '',
                 }"
@@ -101,6 +101,7 @@ import { ref } from 'vue';
 import { signupUser } from '@/api/user';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toast-notification';
+
 const router = useRouter();
 
 const loading = ref(false);

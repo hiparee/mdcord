@@ -192,16 +192,14 @@
             <div>
               <button
                 type="button"
-                class="btn btn-outline-secondary"
-                style="
-                  width: 33px;
-                  height: 33px;
-                  font-size: 23px;
-                  padding: 0;
-                  border: none;
-                  --bs-btn-hover-bg: #3a3b42;
-                  --bs-btn-active-bg: #3a3b42;
-                "
+                class="btn btn-outline-secondary bottom-button"
+                @click.stop="clickSignOut()"
+              >
+                <span> <i class="bi bi-box-arrow-right"></i></span>
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-secondary bottom-button"
                 @click.stop="router.push('/settings')"
               >
                 <span> <i class="bi-gear"></i></span>
@@ -218,6 +216,7 @@
 import { computed } from 'vue';
 import { useChannelStore, useUserStore } from '@/store/store.js';
 import { useRouter } from 'vue-router';
+import { signOutUser } from '@/api/user';
 import { userProfileIcon, getImageUrl } from '@/utils/common.js';
 
 const store = useChannelStore();
@@ -236,8 +235,17 @@ const myInfo = computed(() => {
 const getServername = computed(() => {
   return store.getServerList.find(server => {
     return store.accessedChannelInfo.serverId == server.id;
-  }).name;
+  })?.name;
 });
+const clickSignOut = async () => {
+  try {
+    await signOutUser();
+    userStore.SET_SIGN_OUT();
+    await router.replace('/');
+  } catch (e) {
+    console.log('err ::', e);
+  }
+};
 </script>
 
 <style scoped>
@@ -263,5 +271,15 @@ const getServername = computed(() => {
 }
 .router-link-active::before {
   color: #ffffff;
+}
+
+.bottom-button {
+  width: 33px;
+  height: 33px;
+  font-size: 20px;
+  padding: 0;
+  border: none;
+  --bs-btn-hover-bg: #3a3b42;
+  --bs-btn-active-bg: #3a3b42;
 }
 </style>
