@@ -10,7 +10,7 @@ import router from '@/router/routes';
 
 export const webSocketStore = defineStore('socket', () => {
   // const dayjs = inject('dayjs');
-  const memberId = JSON.parse(useUserStore().userInfo).memberId;
+  const memberId = useUserStore().userInfo.memberId;
   const socketUrl = import.meta.env.VITE_APP_WEB_SOCKET_URL;
 
   const websocket = ref({});

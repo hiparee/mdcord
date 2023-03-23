@@ -3,7 +3,7 @@ import ErrorView from '@/views/ErrorView.vue';
 import ContentsView from '@/views/ContentsView.vue';
 import MainView from '@/views/MainView.vue';
 import LoginView from '@/views/LoginView.vue';
-import { useChannelStore } from '@/store/store.js';
+import { useChannelStore, useUserStore } from '@/store/store.js';
 import { useToast } from 'vue-toast-notification';
 import SettingsView from '@/views/SettingsView.vue';
 import UserListView from '@/views/UserListView.vue';
@@ -24,6 +24,11 @@ const router = createRouter({
       name: 'login',
       meta: { requiresAuth: false },
       component: LoginView,
+      beforeEnter: (to, from, next) => {
+        Object.entries(useUserStore().userInfo).length !== 0
+          ? next('/channels')
+          : next();
+      },
     },
     {
       path: '/channels',

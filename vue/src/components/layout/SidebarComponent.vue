@@ -181,13 +181,17 @@
                 style="width: 30px; border-radius: 10px"
                 :src="
                   getImageUrl(
-                    `profile/${userProfileIcon(myInfo.iconFileId)}.png`,
+                    `profile/${userProfileIcon(
+                      userStore.userInfo.iconFileId,
+                    )}.png`,
                   )
                 "
               />
             </div>
             <div class="flex-grow-1 ms-3 align-self-center">
-              <p class="m-0 p-0 text-white">{{ myInfo.name }}</p>
+              <p class="m-0 p-0 text-white">
+                {{ userStore.userInfo.name }}
+              </p>
             </div>
             <div>
               <button
@@ -227,10 +231,6 @@ const serverChange = serverId => {
   store.SET_ACCESSED_CHANNEL_INFO('serverId', serverId);
   store.SET_ACCESSED_CHANNEL_INFO('channelId', null);
 };
-
-const myInfo = computed(() => {
-  return JSON.parse(userStore.userInfo);
-});
 
 const getServername = computed(() => {
   return store.getServerList.find(server => {
