@@ -6,13 +6,14 @@ import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Getter
 @MappedSuperclass
 public abstract class BaseEntity {
 
     @Column(name = "create_date")
-    private LocalDateTime createDate = LocalDateTime.now();
+    private LocalDateTime createDate = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
 
     @NotBlank
     @Column(name = "create_by")
