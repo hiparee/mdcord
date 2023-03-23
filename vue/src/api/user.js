@@ -18,11 +18,9 @@ const fetchLogin = async params => {
  * @param {string} name 이름,
  * @param {string} password 비밀번호
  *
- * @returns {
- *   {
+ * @returns {Promise<T>} {
  *   "memberId": "lemon4",
  *   "name": "사용자4"
- * }
  * }
  * */
 const signupUser = payload => {
@@ -31,8 +29,7 @@ const signupUser = payload => {
 
 /**
  * 사용자 목록 조회 (페이징 처리 보류)
- * @returns {
- *   [
+ * @returns {Promise<T>} [
  *   {
  *     "memberId": "awdr81818",
  *     "name": "ajdkfjsdf",
@@ -45,10 +42,9 @@ const signupUser = payload => {
  *     "type": "USER"
  *   },{}
  * ]
- * }
  * */
-const fetchMembers = payload => {
-  return user.get(`${URL_PREFIX}`, payload);
+const fetchMembers = () => {
+  return user.get(`${URL_PREFIX}`);
 };
 
 /**
@@ -60,15 +56,22 @@ const fetchMembers = payload => {
  * @param {int} iconFileId 프로필 아이콘 아이디,
  * @param {string} role 타입(사용자 |관리자 )
  *
- * @returns {
- *   {
+ * @returns {Promise<T>}  {
  *   "name": "사용자",
  *   "iconFileId": 1,
  *   "useYn": "Y"
- * }
  * }
  * */
 const fetchUpdateMember = payload => {
   return user.put(`${URL_PREFIX}`, payload);
 };
-export { fetchLogin, signupUser, fetchMembers, fetchUpdateMember };
+
+/**
+ * 사용자 로그아웃
+ * @returns {Promise<T>}
+ * */
+const signOutUser = () => {
+  return user.post(`${URL_PREFIX}/signout`);
+};
+
+export { fetchLogin, signupUser, fetchMembers, fetchUpdateMember, signOutUser };

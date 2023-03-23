@@ -152,7 +152,6 @@ import SearchBarComponent from '@/components/common/SearchBarComponent.vue';
 import UserRegisterModal from '@/components/UserRegisterModal.vue';
 import SpinnerComponent from '@/components/common/SpinnerComponent.vue';
 import UserUpdateModal from '@/components/UserUpdateModal.vue';
-import { useUserStore } from '@/store/modules/user';
 
 const members = ref([]);
 const totalCount = ref(0);
@@ -168,7 +167,6 @@ onBeforeMount(async () => {
 // 사용자 목록 조회
 const getMembers = async () => {
   isLoading.value = true;
-  const params = {};
   try {
     const { data } = await fetchMembers();
     members.value = data;
