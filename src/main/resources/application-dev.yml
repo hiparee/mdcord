@@ -1,3 +1,6 @@
+server:
+  port: 8080
+
 jwt:
   header: Authorization
   secret: QHp4Y3YoKTAxQCNAenhjdigpMDFAI0B6eGN2KCkwMUAj
@@ -8,7 +11,7 @@ springdoc:
   default-consumes-media-type: application/json
   default-produces-media-type: application/json
   api-docs:
-    enabled: true # swagger 필요없어질 경우 false
+    enabled: false # swagger 필요없어질 경우 false
     path: /api-docs
   packages-to-scan: com.lemon.mdcord.controller
   swagger-ui:
