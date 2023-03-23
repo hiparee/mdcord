@@ -1,3 +1,6 @@
+server:
+  port: 9000
+
 jwt:
   header: Authorization
   secret: QHp4Y3YoKTAxQCNAenhjdigpMDFAI0B6eGN2KCkwMUAj
