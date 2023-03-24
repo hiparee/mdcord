@@ -115,7 +115,7 @@
                     </div>
                   </td>
                   <td>{{ member.memberId }}</td>
-                  <td>{{ userType(member.type) }}</td>
+                  <td>{{ userType(member.role) }}</td>
                   <td>
                     {{ $dayjs(member.createDate).format('YYYY/MM/DD HH:mm') }}
                   </td>
@@ -136,6 +136,7 @@
     :memberInfo="memberInfo"
     @reload-fetch-members="getMembers"
     @update:showUpdateUserModal="closeUpdateUserModal"
+    @submit-update-member-info="updateMemberInfo"
   />
 </template>
 
@@ -199,7 +200,7 @@ const searchedTotalCount = computed(() => {
 const showUpdateUserModal = ref(false);
 const memberInfo = ref({});
 
-const emits = defineEmits(['update:showUpdateUserModal']);
+defineEmits(['update:showUpdateUserModal', 'submitUpdateMemberInfo']);
 const openUpdateUserModal = member => {
   console.log(member);
   showUpdateUserModal.value = true;
@@ -207,6 +208,10 @@ const openUpdateUserModal = member => {
 };
 const closeUpdateUserModal = member => {
   showUpdateUserModal.value = false;
+};
+const updateMemberInfo = async payload => {
+  memberInfo.value = { ...payload };
+  await getMembers();
 };
 </script>
 
