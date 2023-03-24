@@ -162,14 +162,6 @@
                   >사용자 관리</a
                 >
               </li>
-              <!-- <li>
-                <a
-                  href="javascript:"
-                  class="rounded"
-                  @click="$router.push('/adm/create')"
-                  >사용자 등록</a
-                >
-              </li> -->
               <li>
                 <a href="javascript:" class="rounded"></a>
               </li>
@@ -185,65 +177,33 @@
           <div class="d-flex text-light">
             <div class="flex-shrink-0">
               <img
-                src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp"
-                alt="Generic placeholder image"
-                class="img-fluid"
+                class="profile-img"
                 style="width: 30px; border-radius: 10px"
+                :src="
+                  getImageUrl(
+                    `profile/${userProfileIcon(
+                      userStore.userInfo.iconFileId,
+                    )}.png`,
+                  )
+                "
               />
             </div>
             <div class="flex-grow-1 ms-3 align-self-center">
-              <p class="m-0 p-0 text-white">홍길동</p>
-              <!--              <div class="d-flex flex-column" style="background-color: #efefef">
-                <div class="flex:1">
-                  <p class="small text-muted my-1 mx-1">글 <span>241</span></p>
-                </div>
-                <div class="flex:1">
-                  <p class="small text-muted my-1 mx-1">
-                    첨부파일 <span>41</span>
-                  </p>
-                </div>
-              </div>
-              <div class="d-flex pt-1">
-                <button
-                  type="button"
-                  class="btn btn-outline-danger text-dark btn-sm me-1 flex-grow-1"
-                >
-                  Chat
-                </button>
-                <button type="button" class="btn btn-danger btn-sm flex-grow-1">
-                  Logout
-                </button>
-              </div>-->
+              <p class="m-0 p-0 text-white">
+                {{ userStore.userInfo.name }}
+              </p>
             </div>
             <div>
               <button
                 type="button"
-                class="btn btn-outline-secondary"
-                style="
-                  width: 33px;
-                  height: 33px;
-                  font-size: 23px;
-                  padding: 0;
-                  border: none;
-                  --bs-btn-hover-bg: #3a3b42;
-                  --bs-btn-active-bg: #3a3b42;
-                "
+                class="btn btn-outline-secondary bottom-button"
                 @click.stop="clickSignOut()"
               >
                 <span> <i class="bi bi-box-arrow-right"></i></span>
               </button>
               <button
                 type="button"
-                class="btn btn-outline-secondary"
-                style="
-                  width: 33px;
-                  height: 33px;
-                  font-size: 23px;
-                  padding: 0;
-                  border: none;
-                  --bs-btn-hover-bg: #3a3b42;
-                  --bs-btn-active-bg: #3a3b42;
-                "
+                class="btn btn-outline-secondary bottom-button"
                 @click.stop="router.push('/settings')"
               >
                 <span> <i class="bi-gear"></i></span>
@@ -258,9 +218,13 @@
 
 <script setup>
 import { computed } from 'vue';
-import { useChannelStore } from '@/store/store.js';
+import { useChannelStore, useUserStore } from '@/store/store.js';
 import { useRouter } from 'vue-router';
+import { signOutUser } from '@/api/user';
+import { userProfileIcon, getImageUrl } from '@/utils/common.js';
+
 const store = useChannelStore();
+const userStore = useUserStore();
 const router = useRouter();
 const serverChange = serverId => {
   router.push('/channels');
@@ -271,9 +235,17 @@ const serverChange = serverId => {
 const getServername = computed(() => {
   return store.getServerList.find(server => {
     return store.accessedChannelInfo.serverId == server.id;
-  }).name;
+  })?.name;
 });
-const clickSignOut = () => {};
+const clickSignOut = async () => {
+  try {
+    await signOutUser();
+    userStore.SET_SIGN_OUT();
+    await router.replace('/');
+  } catch (e) {
+    console.log('err ::', e);
+  }
+};
 </script>
 
 <style scoped>
@@ -286,7 +258,6 @@ const clickSignOut = () => {};
   bottom: 0;
   left: 0;
   right: 0;
-  /*background: rgb(145, 145, 145);*/
 }
 
 .plus-icon {
@@ -300,5 +271,15 @@ const clickSignOut = () => {};
 }
 .router-link-active::before {
   color: #ffffff;
+}
+
+.bottom-button {
+  width: 33px;
+  height: 33px;
+  font-size: 20px;
+  padding: 0;
+  border: none;
+  --bs-btn-hover-bg: #3a3b42;
+  --bs-btn-active-bg: #3a3b42;
 }
 </style>

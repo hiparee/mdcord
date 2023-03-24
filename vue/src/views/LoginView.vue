@@ -19,10 +19,11 @@
                   v-model="id"
                   class="form-control form-control-lg bg-dark text-white fs-6"
                   placeholder="ID"
+                  autocomplete="off"
                 />
               </div>
 
-              <div class="form-outline form-white mb-5">
+              <div class="form-outline form-white mb-2">
                 <input
                   type="password"
                   id="password"
@@ -30,7 +31,23 @@
                   @keyup.enter="submit()"
                   class="form-control form-control-lg bg-dark text-white fs-6"
                   placeholder="PASSWORD"
+                  autocomplete="new-password"
                 />
+              </div>
+
+              <div class="form-check form-switch mb-5">
+                <div style="float: right">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="saveIdCheck"
+                    v-model="saveIdCheck"
+                    @change="saveId()"
+                  />
+                  <label class="form-check-label" for="saveIdCheck"
+                    >로그인 아이디 저장</label
+                  >
+                </div>
               </div>
 
               <button
@@ -79,11 +96,14 @@ const $toast = useToast({
   duration: 1000,
 });
 
-const id = ref('lemon');
-const password = ref('password1234');
+const id = ref('');
+const password = ref('');
+const savedId = ref('');
+const saveIdCheck = ref(true);
 
 onMounted(() => {
   onFocus();
+  setSaveId();
 });
 
 const submit = () => {
@@ -113,9 +133,10 @@ const submit = () => {
             // webSocketStore().WEB_SOCKET_CONNECT();
 
             useUserStore().$patch({
-              userInfo: JSON.stringify(response.data),
+              userInfo: { ...response.data },
             });
             // webSocketStore().WEB_SOCKET_CONNECT();
+            saveId();
             router.push('/channels');
             disToggle(false);
           },
@@ -139,6 +160,22 @@ const disToggle = disabled => {
   document.getElementById('password').disabled = disabled;
   document.getElementById('submitBtn').disabled = disabled;
 };
+
+const saveId = () => {
+  if (saveIdCheck.value) {
+    localStorage.setItem('savedId', id.value);
+  } else {
+    localStorage.removeItem('savedId');
+  }
+};
+
+const setSaveId = () => {
+  if (localStorage.getItem('savedId')) {
+    savedId.value = localStorage.getItem('savedId');
+    id.value = savedId.value;
+    saveIdCheck.value = true;
+  }
+};
 </script>
 
 <style scoped>
@@ -153,5 +190,9 @@ const disToggle = disabled => {
 input:disabled {
   transition: 0.2s;
   background: #000000 !important;
+}
+#saveIdCheck {
+  float: none;
+  margin-right: 10px;
 }
 </style>

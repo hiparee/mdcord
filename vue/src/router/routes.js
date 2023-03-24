@@ -3,12 +3,15 @@ import ErrorView from '@/views/ErrorView.vue';
 import ContentsView from '@/views/ContentsView.vue';
 import MainView from '@/views/MainView.vue';
 import LoginView from '@/views/LoginView.vue';
-import { useChannelStore } from '@/store/store.js';
+import {
+  useChannelStore,
+  useUserStore,
+  webSocketStore,
+} from '@/store/store.js';
 import { useToast } from 'vue-toast-notification';
 import SettingsView from '@/views/SettingsView.vue';
 import UserListView from '@/views/UserListView.vue';
 import ChannelView from '@/views/ChannelView.vue';
-import { webSocketStore } from '@/store/store';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -24,6 +27,11 @@ const router = createRouter({
       name: 'login',
       meta: { requiresAuth: false },
       component: LoginView,
+      beforeEnter: (to, from, next) => {
+        Object.entries(useUserStore().userInfo).length !== 0
+          ? next('/channels')
+          : next();
+      },
     },
     {
       path: '/channels',
@@ -61,6 +69,10 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
     try {
+      if (Object.entries(useUserStore().userInfo).length === 0) {
+        router.push('/');
+      }
+
       const socket = webSocketStore().websocket;
       if (socket.readyState != 0 && socket.readyState != 1) {
         webSocketStore().WEB_SOCKET_CONNECT();

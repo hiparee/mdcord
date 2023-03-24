@@ -240,7 +240,7 @@ import NavbarTitleComponent from '@/components/layout/NavbarTitleComponent.vue';
 import { useRoute } from 'vue-router';
 const route = useRoute();
 const dayjs = inject('dayjs');
-const userInfo = JSON.parse(useUserStore().userInfo);
+const userInfo = useUserStore().userInfo;
 const channelStore = useChannelStore();
 const chatStore = useChatStore();
 const socketStore = webSocketStore();

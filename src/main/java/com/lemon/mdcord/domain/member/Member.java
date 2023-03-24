@@ -39,7 +39,6 @@ public class Member extends BaseEntity {
     @Column(name = "password", nullable = false, length = 100)
     private String password;
 
-    // TODO - 별도의 테이블이 없으면 String이 낫지않을려나? 물어보기
     @Column(name = "icon_file_id")
     private Integer iconFileId;
 
@@ -47,8 +46,7 @@ public class Member extends BaseEntity {
     @ColumnDefault("'Y'")
     private String useYn;
 
-    // TODO - ERD 반영 필요
-    @Column(name = "type", nullable = false, length = 10)
+    @Column(name = "role", nullable = false, length = 10)
     @Enumerated(EnumType.STRING)
     private MemberRole memberRole;
 
