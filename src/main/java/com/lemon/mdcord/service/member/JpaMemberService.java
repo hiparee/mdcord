@@ -42,9 +42,7 @@ public class JpaMemberService implements MemberService {
             , MemberPasswordEncoder memberPasswordEncoder
             , ChannelMemberRepository channelMemberRepository
             , ChannelListRepository channelListRepository
-            , JwtProvider jwtProvider
-            , @Value("${jwt.header}") String header
-            , @Value("${jwt.validity-in-seconds}") long validitySeconds) {
+            , JwtProvider jwtProvider) {
         this.memberRepository = memberRepository;
         this.channelMemberRepository = channelMemberRepository;
         this.channelListRepository = channelListRepository;
