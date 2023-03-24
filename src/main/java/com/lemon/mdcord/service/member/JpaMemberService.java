@@ -1,13 +1,18 @@
 package com.lemon.mdcord.service.member;
 
+import com.lemon.mdcord.common.exception.ChannelNotFoundException;
 import com.lemon.mdcord.common.exception.MemberDuplicatedException;
 import com.lemon.mdcord.common.exception.MemberNotFoundException;
 import com.lemon.mdcord.common.security.jwt.JwtProvider;
+import com.lemon.mdcord.domain.channel.ChannelList;
+import com.lemon.mdcord.domain.channel.ChannelMember;
 import com.lemon.mdcord.domain.member.Member;
 import com.lemon.mdcord.dto.member.MemberCreateRequest;
 import com.lemon.mdcord.dto.member.MemberLoginRequest;
 import com.lemon.mdcord.dto.member.MemberPasswordEncoder;
 import com.lemon.mdcord.dto.member.MemberUpdateRequest;
+import com.lemon.mdcord.repository.ChannelListRepository;
+import com.lemon.mdcord.repository.ChannelMemberRepository;
 import com.lemon.mdcord.repository.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +33,8 @@ import java.util.concurrent.ThreadLocalRandom;
 public class JpaMemberService implements MemberService {
     private final MemberRepository memberRepository;
     private final MemberPasswordEncoder memberPasswordEncoder;
+    private final ChannelListRepository channelListRepository;
+    private final ChannelMemberRepository channelMemberRepository;
     private final JwtProvider jwtProvider;
     private final String header;
     private final long validitySeconds;
@@ -35,10 +42,14 @@ public class JpaMemberService implements MemberService {
 
     public JpaMemberService(MemberRepository memberRepository
             , MemberPasswordEncoder memberPasswordEncoder
+            , ChannelMemberRepository channelMemberRepository
+            , ChannelListRepository channelListRepository
             , JwtProvider jwtProvider
             , @Value("${jwt.header}") String header
             , @Value("${jwt.validity-in-seconds}") long validitySeconds) {
         this.memberRepository = memberRepository;
+        this.channelMemberRepository = channelMemberRepository;
+        this.channelListRepository = channelListRepository;
         this.memberPasswordEncoder = memberPasswordEncoder;
         this.jwtProvider = jwtProvider;
         this.header = header;
@@ -64,18 +75,27 @@ public class JpaMemberService implements MemberService {
 
         String currentMemberId = getAuthentication().getName();
 
-        int randomIconFileId = getRandomIconFileId();
-
         Member member = Member.builder()
                 .id(dto.getMemberId())
                 .name(dto.getName())
-                .iconFileId(randomIconFileId)
+                .iconFileId(getRandomIconFileId())
                 .password(dto.getPassword())
                 .passwordEncoder(memberPasswordEncoder)
                 .createBy(currentMemberId)
                 .build();
 
-        return memberRepository.save(member);
+        Member savedMember = memberRepository.save(member);
+
+        long rootChannelId = -1l;
+        ChannelList rootChannelList = channelListRepository.findById(rootChannelId).orElseThrow(() -> new ChannelNotFoundException(rootChannelId));
+        ChannelMember channelMember = ChannelMember.builder()
+                .member(savedMember)
+                .channelList(rootChannelList)
+                .createBy(currentMemberId)
+                .build();
+        channelMemberRepository.save(channelMember);
+
+        return savedMember;
     }
 
     @Override
