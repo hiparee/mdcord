@@ -26,7 +26,6 @@ const router = useRouter();
 .settings-content {
   display: flex;
   flex-direction: column;
-  position: relative;
   flex: 1 1 auto;
   height: 100%;
   overflow: hidden;
