@@ -5,14 +5,13 @@ import { useToast } from 'vue-toast-notification';
 import { fetchChatlist, fetchMoreChatlist } from '@/api/chat.js';
 import { timeAgo } from '@/utils/chat.js';
 import { userProfileIcon } from '@/utils/common.js';
-import { useRouter } from 'vue-router/dist/vue-router';
 import dayjs from 'dayjs';
+import router from '@/router/routes';
 
 export const webSocketStore = defineStore('socket', () => {
   // const dayjs = inject('dayjs');
-  const memberId = JSON.parse(useUserStore().userInfo).memberId;
+  const memberId = useUserStore().userInfo.memberId;
   const socketUrl = import.meta.env.VITE_APP_WEB_SOCKET_URL;
-  const router = useRouter();
 
   const websocket = ref({});
   const WEB_SOCKET_CONNECT = () => {
@@ -22,10 +21,8 @@ export const webSocketStore = defineStore('socket', () => {
       console.log('%c# [WebSocket] : connected', 'color:green');
     };
 
-    websocket.value.onclose = event => {
+    websocket.value.onclose = async event => {
       console.log('%c# [WebSocket] : close', 'color:red');
-      router.push(`/`);
-
       useToast({
         duration: 5000,
         position: 'bottom-right',
@@ -127,8 +124,11 @@ export const webSocketStore = defineStore('socket', () => {
           'YYYY-MM-DD HH:mm',
         );
 
-        console.log(newCreateDate, lastCreateDate);
-        if (newCreateDate == lastCreateDate) {
+        // 이전 채팅 친 사용자와 같고 시:분까지 동일한 경우
+        if (
+          newCreateDate == lastCreateDate &&
+          parseData.memberId == lastItem.memberId
+        ) {
           useChatStore().chatList.channels[parseChannelId][lastIndex].push(
             ...pushData,
           );

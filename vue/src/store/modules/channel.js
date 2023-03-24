@@ -62,6 +62,15 @@ export const useChannelStore = defineStore(
       }
     };
 
+    const CLEAR_CHANNEL_SESSION = () => {
+      channelList.value = [];
+      accessedChannelInfo.value = {
+        title: '',
+        channelId: null,
+        serverId: null,
+      };
+    };
+
     return {
       channelList,
       serverList,
@@ -73,6 +82,7 @@ export const useChannelStore = defineStore(
       SET_ACCESSED_CHANNEL_INFO,
       SET_CHANNEL_LIST,
       SET_MEMBER_LIST,
+      CLEAR_CHANNEL_SESSION,
     };
   },
   {
