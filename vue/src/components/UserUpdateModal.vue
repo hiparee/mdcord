@@ -41,7 +41,6 @@
               <form class="profile-update-form" @submit.prevent="submitForm">
                 <div class="mb-3 update-input-box">
                   <label class="d-block"> 이름</label>
-                  <!--                  :value="memberInfo.name"-->
                   <input
                     class="mt-1 custom-input"
                     type="text"
@@ -50,19 +49,18 @@
                     required
                     :readonly="!updateMode"
                     ref="nameInput"
-                    v-model="name"
+                    v-model="updateMemberInfo.name"
                   />
                 </div>
                 <div class="mb-3 update-input-box">
                   <label class="d-block"> 아이디</label>
-                  <!--                  :value="memberInfo.memberId"-->
                   <input
                     class="mt-1 custom-input"
                     type="text"
                     placeholder="아이디를 입력해주세요."
                     required
                     :readonly="!updateMode"
-                    v-model="memberId"
+                    v-model="updateMemberInfo.memberId"
                   />
                   <!--            type="email"-->
                 </div>
@@ -89,14 +87,14 @@
                         line-height: 16px;
                       "
                     >
-                      {{ userType(memberInfo.type) }}
+                      {{ userType(updateMemberInfo.role) }}
                     </div>
                   </div>
                   <div v-else>
                     <select
                       class="form-select"
                       aria-label="Default select example"
-                      v-model="memberType"
+                      v-model="updateMemberInfo.role"
                     >
                       <option value="USER">사용자</option>
                       <option value="ADMIN">관리자</option>
@@ -174,21 +172,31 @@ const props = defineProps({
     required: true,
   },
 });
-const emits = defineEmits(['reloadFetchMembers', 'update:showUpdateUserModal']);
+const emits = defineEmits([
+  'reloadFetchMembers',
+  'update:showUpdateUserModal',
+  'submitUpdateModal',
+]);
 
 // form values
-const memberId = ref('');
-const name = ref('');
-const password = ref('');
-const memberType = ref('');
+const updateMemberInfo = ref({
+  memberId: '',
+  name: '',
+  role: '',
+  useYn: '',
+  iconFileId: '',
+});
 
+const password = ref('');
 // 타입 셀렉트 박스 show/hide 여부
 const selectBoxShow = ref(false);
 
 onBeforeUpdate(() => {
-  memberId.value = props.memberInfo.memberId;
-  name.value = props.memberInfo.name;
-  memberType.value = props.memberInfo.type;
+  updateMemberInfo.value.memberId = props.memberInfo.memberId;
+  updateMemberInfo.value.name = props.memberInfo.name;
+  updateMemberInfo.value.useYn = props.memberInfo.useYn;
+  updateMemberInfo.value.role = props.memberInfo.role;
+  updateMemberInfo.value.iconFileId = props.memberInfo.iconFileId;
 });
 
 const logMessage = ref('');
@@ -217,20 +225,22 @@ const submitForm = async () => {
    *   "password": "password1234",
    *   "iconFileId": 1,
    *   "useYn": "Y"
+   *   "role": "USER"
    * }
    * */
-  console.log('hi');
   const payload = {
-    memberId: memberId.value,
-    name: name.value,
+    memberId: updateMemberInfo.value.memberId,
+    name: updateMemberInfo.value.name,
     password: password.value,
-    // type: password.value,
+    useYn: updateMemberInfo.value.useYn,
+    role: updateMemberInfo.value.role,
   };
   try {
     const { data } = await fetchUpdateMember(payload);
     if (Object.prototype.hasOwnProperty.call(data, 'errorMessage')) {
       let detailErrrorType = '';
       if (data.details && data.details.split(' ').length === 1) {
+        // TODO 에러처리
         /*data.details === 'memberId'
           ? (detailErrrorType = '아이디 - ')
           : data.details === 'name'
@@ -241,7 +251,7 @@ const submitForm = async () => {
     } else {
       updateMode.value = false;
       $toast.success('사용자 정보 수정 완료');
-      emits('reloadFetchMembers');
+      emits('submitUpdateMemberInfo', updateMemberInfo.value);
     }
   } catch (err) {
     console.log('error :::: ', err);
@@ -253,7 +263,11 @@ const submitForm = async () => {
 };
 
 const formValid = () => {
-  if (!memberId.value || !name.value || !memberType.value) {
+  if (
+    !updateMemberInfo.value.memberId ||
+    !updateMemberInfo.value.name ||
+    !updateMemberInfo.value.role
+  ) {
     return false;
   }
 };
@@ -261,9 +275,9 @@ const formValid = () => {
 // input form 초기화
 const initInputForm = () => {
   logMessage.value = '';
-  memberId.value = props.memberInfo.memberId;
-  name.value = props.memberInfo.name;
-  memberType.value = props.memberInfo.type;
+  updateMemberInfo.value.memberId = props.memberInfo.memberId;
+  updateMemberInfo.value.name = props.memberInfo.name;
+  updateMemberInfo.value.role = props.memberInfo.role;
 };
 
 // 추후 대리님이 추가하신 공통함수 적용
