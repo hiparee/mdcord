@@ -17,7 +17,7 @@ public class MemberListResponse {
     private String createBy;
     private LocalDateTime updateDate;
     private String updateBy;
-    private MemberRole type;
+    private MemberRole role;
 
     public MemberListResponse(Member member) {
         this.memberId = member.getId();
@@ -28,6 +28,6 @@ public class MemberListResponse {
         this.createBy = member.getCreateBy();
         this.updateDate = member.getUpdateDate();
         this.updateBy = member.getUpdateBy();
-        this.type = member.getMemberRole();
+        this.role = member.getMemberRole();
     }
 }
