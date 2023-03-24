@@ -36,8 +36,6 @@ public class JpaMemberService implements MemberService {
     private final ChannelListRepository channelListRepository;
     private final ChannelMemberRepository channelMemberRepository;
     private final JwtProvider jwtProvider;
-    private final String header;
-    private final long validitySeconds;
     private final String LOGIN_USE_YN = "Y";
 
     public JpaMemberService(MemberRepository memberRepository
@@ -52,8 +50,6 @@ public class JpaMemberService implements MemberService {
         this.channelListRepository = channelListRepository;
         this.memberPasswordEncoder = memberPasswordEncoder;
         this.jwtProvider = jwtProvider;
-        this.header = header;
-        this.validitySeconds = validitySeconds;
     }
 
     @Override
