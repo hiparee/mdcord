@@ -250,6 +250,7 @@ const refContextMenu = ref(null);
 const message = ref('');
 const fileList = ref([]);
 const fileDragOverStatus = ref(false);
+const mouseDown = ref(false);
 // const props = defineProps({
 //   isLoading: {
 //     type: Boolean,
@@ -353,7 +354,7 @@ const onDragOver = event => {
   const isDraggingFile =
     Array.from(event.dataTransfer.types).includes('Files') ||
     Array.from(event.dataTransfer.types).includes('application/x-moz-file');
-  if (isDraggingFile) {
+  if (isDraggingFile && mouseDown.value == false) {
     fileDragOverStatus.value = true;
     console.log('파일 드래그 중');
   } else {
@@ -367,6 +368,9 @@ const onDragLeave = event => {
 };
 
 const onDrop = event => {
+  mouseDown.value = false;
+  if (fileDragOverStatus.value == false) return;
+
   fileDragOverStatus.value = false;
   event.preventDefault();
 
@@ -457,6 +461,16 @@ onMounted(() => {
   }, 5000);
 });
 
+window.addEventListener('mousedown', () => {
+  mouseDown.value = true;
+  console.log(true);
+});
+
+window.addEventListener('mouseup', () => {
+  mouseDown.value = false;
+  console.log(false);
+});
+
 const chatScrollSetting = () => {
   if (listBox.value) {
     listBox.value.scrollTop = listBox.value.scrollHeight;
@@ -503,11 +517,13 @@ const handleScroll = async () => {
 };
 
 const updateChatListTimeAgo = () => {
-  for (let i = 0; i < accessedChannelData.value.length; i++) {
-    accessedChannelData.value[i] = accessedChannelData.value[i].map(chat => {
-      chat.timeAgo = timeAgo(chat.createDate);
-      return chat;
-    });
+  if (accessedChannelData.value) {
+    for (let i = 0; i < accessedChannelData.value.length; i++) {
+      accessedChannelData.value[i] = accessedChannelData.value[i].map(chat => {
+        chat.timeAgo = timeAgo(chat.createDate);
+        return chat;
+      });
+    }
   }
 };
 

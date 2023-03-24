@@ -34,7 +34,6 @@
             <li>
               <hr class="dropdown-divider bg-light" />
             </li>
-            <!--            <li><a class="dropdown-item" href="#">{{  }}</a></li>-->
             <li v-for="server in store.getServerList" :key="server.id">
               <!-- 서버명 -->
               <span class="dropdown-item" @click="serverChange(server.id)"
@@ -76,62 +75,62 @@
         class="list-group list-group-flush channel-list"
       >
         <ul id="sidebar" class="list-unstyled ps-0">
-          <template v-for="channel in store.getChannelList" :key="channel.id">
+          <template
+            v-for="(channel, index) in store.getChannelList"
+            :key="index"
+          >
             <li
               v-if="channel.parentId == store.accessedChannelInfo.serverId"
-              class="mb-2"
+              class="mb-2 nav-item"
               style="display: grid"
             >
               <button
                 :class="{ 'custom-button': channel.id === channelNumber }"
                 :data-bs-target="`#channel${channel.id}`"
-                aria-expanded="true"
                 class="btn border-0"
-                data-bs-toggle="collapse"
                 style="color: #cfcfcf; text-align: left"
                 @click="channelListNumber(channel)"
+                @contextmenu.prevent.stop="handleClick($event, channel)"
               >
                 {{ channel.name }}
               </button>
             </li>
           </template>
         </ul>
+        <VueContextMenu
+          ref="vueSimpleContextMenu"
+          :options="menuOptions"
+          element-id="myFirstMenu"
+          @option-clicked="optionClicked"
+        ></VueContextMenu>
       </div>
       <!--    <ul-->
       <!--      채널목록-->
       <div style="width: 100%">
         <div>
           <div>
-            <!--            <vue-draggable-->
-            <!--              @dragstart="onDragStart"-->
-            <!--              :list="channelList"-->
-            <!--              @choose="changeBackgroundColor"-->
-            <!--              @unchoose="revertBackgroundColor"-->
-            <!--              class="draggable-list"-->
-            <!--              group="my-group"-->
-            <!--            >-->
             <vue-draggable
-              @dragstart="onDragStart"
               :list="channelList"
-              @choose="changeBackgroundColor"
-              @unchoose="revertBackgroundColor"
               class="draggable-list"
               group="my-group"
+              @choose="changeBackgroundColor"
+              @dragstart="onDragStart"
+              @unchoose="revertBackgroundColor"
             >
               <div
                 v-for="(element, index) in channelList"
                 :key="element.name"
                 class="list-item"
+                style="margin-bottom: 8px; background-color: #2b2d31"
                 @mousedown="onDragStart(element)"
                 @mouseup="onDragStart(element)"
-                style="margin-bottom: 8px; background-color: #2b2d31"
               >
                 <div
-                  class="discord-element"
-                  style="display: flex; padding: 10px"
                   :class="{
                     'list-clicked': listClickd && index === listId,
                   }"
+                  class="high-channels"
+                  style="display: flex; padding: 10px"
                 >
                   <span style="flex: 1 0; color: #f2f3f5">
                     {{ element.name }}
@@ -140,7 +139,6 @@
                     <input
                       v-model="inputChecked"
                       :value="element.id"
-                      @click="changeChannelStatus(element)"
                       style="
                         position: absolute;
                         z-index: 5;
@@ -150,6 +148,7 @@
                         right: 15px;
                       "
                       type="checkbox"
+                      @click="changeChannelStatus(element)"
                     />
                     <label class="custom-checkbox-label"></label>
                   </div>
@@ -171,8 +170,11 @@
 
 <script setup>
 import { useChannelStore } from '@/store/modules/channel';
-import { computed, onBeforeMount, ref } from 'vue';
+import { getCurrentInstance, onBeforeMount, ref } from 'vue';
 import { fetchEditChannelName } from '@/api/channel';
+import VueContextMenu from 'vue-simple-context-menu';
+
+const vm = getCurrentInstance();
 
 const store = useChannelStore();
 const serverListValue = ref([]);
@@ -184,7 +186,6 @@ const inputChecked = ref([]);
 const listClickd = ref(false);
 const listId = ref(null);
 const channelNumber = ref(null);
-
 const channelListNumber = channel => {
   inputChecked.value = [];
   console.log(channel);
@@ -242,6 +243,35 @@ onBeforeMount(() => {
     }
   }
 });
+
+// 컨텍스트 메뉴
+const menuOptions = ref([
+  {
+    name: '채널이름 수정',
+    slug: 'edit-channel-name',
+    class: 'custom-context-name',
+  },
+  { type: 'divider' },
+  {
+    name: '채널 활성화',
+    slug: 'enable-channel',
+    class: 'custom-context-name',
+  },
+  {
+    name: '채널 비활성화',
+    slug: 'disable-channel',
+    class: 'custom-context-disable',
+  },
+]);
+const handleClick = (event, item) => {
+  console.log('vm', vm.refs);
+  console.log(vm.refs.vueSimpleContextMenu.showMenu);
+  vm.refs.vueSimpleContextMenu.showMenu(event, item);
+};
+const optionClicked = event => {
+  event.preventDefault();
+  console.log(event);
+};
 const changeBackgroundColor = event => {
   listId.value = event.oldIndex;
   listClickd.value = true;
@@ -419,8 +449,10 @@ button.edit-button:active {
 }
 
 .custom-button {
-  background-color: #5561f4ff;
+  background-color: #5561f4ff !important;
   color: #ffffff !important;
+  cursor: auto;
+  opacity: 1 !important;
 }
 
 .mb-2:hover {
@@ -491,6 +523,7 @@ button.edit-button:active {
 .custom-checkbox input:checked + label:after {
   left: 25px;
 }
+
 .hover-class {
   color: #ffffff; /* 텍스트 색상 변경 */
   background-color: #fdfdfd; /* 배경색 변경 */
@@ -500,18 +533,41 @@ button.edit-button:active {
 .list-clicked {
   background-color: #42434a !important;
 }
+
 /* 마우스가 호버될 요소를 선택 */
-.discord-element:hover {
+.high-channels:hover {
   /* hover-class 스타일 적용 */
   color: #fff;
   background-color: #393c41;
   cursor: pointer;
 }
+
 .channel-list {
   width: 25%;
   max-width: 15%;
   background-color: #2b2d31;
   margin-right: 5px;
   padding: 10px;
+}
+
+.vue-simple-context-menu {
+  /* 기본 스타일 */
+  background-color: #111214 !important;
+
+  &--active {
+    /* 활성화된 스타일 */
+  }
+
+  &__item {
+    /* 아이템 스타일 */
+
+    &:hover {
+      /* 아이템에 마우스 오버 했을 때 스타일 */
+    }
+  }
+
+  &__divider {
+    /* 구분선 스타일 */
+  }
 }
 </style>
