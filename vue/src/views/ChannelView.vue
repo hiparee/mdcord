@@ -7,7 +7,7 @@
           <a
             id="navbarDarkDropdownMenuLink"
             aria-expanded="false"
-            class="nav-link dropdown-toggle"
+            class="nav-link dropdown-toggle text-warning"
             data-bs-toggle="dropdown"
             href="#"
             role="button"
@@ -16,29 +16,27 @@
               src="@/assets/images/icon.png"
               style="width: 30px; height: 30px; margin-right: 5px"
             />
-            {{
-              store.getServerList.find(server => {
-                return store.accessedChannelInfo.serverId == server.id;
-              }).name
-            }}
+            {{ getServername }}
           </a>
           <ul
             aria-labelledby="navbarDarkDropdownMenuLink"
             class="dropdown-menu dropdown-menu-dark"
           >
-            <li>
+            <!-- <li>
               <a class="dropdown-item" href="#" @click="emitEvent()"
                 >서버추가</a
               >
-            </li>
-            <li>
-              <hr class="dropdown-divider bg-light" />
-            </li>
-            <li v-for="server in store.getServerList" :key="server.id">
+            </li> -->
+            <!-- <li><hr class="dropdown-divider bg-light" /></li> -->
+            <li
+              v-for="server in store.getServerList"
+              :key="server.id"
+              style="cursor: pointer"
+            >
               <!-- 서버명 -->
-              <span class="dropdown-item" @click="serverChange(server.id)"
-                ><i class="bi bi-play-fill mr-1"></i> {{ server.name }}</span
-              >
+              <span class="dropdown-item" @click="serverChange(server.id)">
+                <span class="text-light"> {{ server.name }}</span>
+              </span>
             </li>
           </ul>
         </li>
@@ -170,7 +168,7 @@
 
 <script setup>
 import { useChannelStore } from '@/store/modules/channel';
-import { getCurrentInstance, onBeforeMount, ref } from 'vue';
+import { computed, getCurrentInstance, onBeforeMount, ref } from 'vue';
 import { fetchEditChannelName } from '@/api/channel';
 import VueContextMenu from 'vue-simple-context-menu';
 
@@ -186,6 +184,17 @@ const inputChecked = ref([]);
 const listClickd = ref(false);
 const listId = ref(null);
 const channelNumber = ref(null);
+// 사이드바
+const serverChange = serverId => {
+  store.SET_ACCESSED_CHANNEL_INFO('serverId', serverId);
+  store.SET_ACCESSED_CHANNEL_INFO('channelId', null);
+};
+const getServername = computed(() => {
+  return store.getServerList.find(server => {
+    return store.accessedChannelInfo.serverId == server.id;
+  })?.name;
+});
+// 활성화된 채널 구분
 const channelListNumber = channel => {
   inputChecked.value = [];
   console.log(channel);
@@ -200,6 +209,7 @@ const channelListNumber = channel => {
     }
   }
 };
+// 채널 활성/비활성 로직
 const changeChannelStatus = async channel => {
   if (inputChecked.value.includes(channel.id)) {
     console.log('del');
@@ -230,6 +240,7 @@ const changeChannelStatus = async channel => {
       console.log(e);
     });
 };
+// 스토어에서 가져온 서버,채널리스트
 onBeforeMount(() => {
   console.log(inputChecked.value);
   for (const server of store.getServerList) {
