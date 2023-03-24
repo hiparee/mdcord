@@ -33,7 +33,6 @@ public class JpaChannelMemberService implements ChannelMemberService {
     @Override
     public ChannelMember createChannelMember(ChannelMemberCreateRequest request) {
         // TODO - 1.기존에 등록되어있는지 체크하기
-        //        2.이전과 달라짐. 루트 채널 초대 성공 시 insert인데, 하위 채널 찾아서 모두 넣어줘야 함.
 
         String memberId = request.getMemberId();
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(memberId));
