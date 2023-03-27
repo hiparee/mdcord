@@ -31,7 +31,7 @@ public class ChannelMemberController {
     @Operation(summary = "채널 멤버 등록", description = "채널 멤버 등록 API")
     @PostMapping("/channel-member")
     public ChannelMemberCreateReseponse createChannelList(@RequestBody @Valid final ChannelMemberCreateRequest dto) {
-        return new ChannelMemberCreateReseponse(channelMemberService.createChannelMember(dto));
+        return channelMemberService.createChannelMember(dto);
     }
 
     @Operation(summary = "소속 채널의 인원 목록 조회", description = "소속 채널의 인원 목록 조회 API")

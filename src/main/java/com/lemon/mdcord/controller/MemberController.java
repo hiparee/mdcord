@@ -26,28 +26,27 @@ public class MemberController {
     @Operation(summary = "사용자 정보 등록", description = "사용자 정보 등록 API")
     @PostMapping("/members/signup")
     public MemberCreateResponse createMember(@RequestBody @Valid final MemberCreateRequest dto) {
-        return new MemberCreateResponse(memberService.createMember(dto));
+        return memberService.createMember(dto);
     }
 
     @Operation(summary = "로그인", description = "로그인 API")
     @PostMapping("/members/signin")
     public MemberLoginResponse signIn(@RequestBody @Valid final MemberLoginRequest dto, HttpServletResponse response) {
-        return new MemberLoginResponse(memberService.memberLogin(dto, response));
+        return memberService.memberLogin(dto, response);
     }
 
     @Operation(summary = "사용자 정보 수정", description = "사용자 정보 수정 API")
     @PutMapping("/members")
     public MemberUpdateResponse updateMember(@RequestBody @Valid final MemberUpdateRequest dto) {
-        return new MemberUpdateResponse(memberService.updateUser(dto));
+        return memberService.updateUser(dto);
     }
 
     @Operation(summary = "사용자 목록 조회", description = "사용자 목록 조회 API")
     @GetMapping("/members")
     public List<MemberListResponse> getMemberList() {
-        List<MemberListResponse> result = memberService.getMemberList().stream()
+        return memberService.getMemberList().stream()
                 .map(MemberListResponse::new)
                 .collect(Collectors.toList());
-        return result;
     }
 
     @Operation(summary = "로그아웃", description = "로그아웃 API")

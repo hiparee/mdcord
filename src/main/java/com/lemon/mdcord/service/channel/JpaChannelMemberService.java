@@ -6,6 +6,7 @@ import com.lemon.mdcord.domain.channel.ChannelList;
 import com.lemon.mdcord.domain.channel.ChannelMember;
 import com.lemon.mdcord.domain.member.Member;
 import com.lemon.mdcord.dto.channel.member.ChannelMemberCreateRequest;
+import com.lemon.mdcord.dto.channel.member.ChannelMemberCreateReseponse;
 import com.lemon.mdcord.dto.channel.member.ChannelMemberResponse;
 import com.lemon.mdcord.repository.ChannelListRepository;
 import com.lemon.mdcord.repository.ChannelMemberRepository;
@@ -31,7 +32,7 @@ public class JpaChannelMemberService implements ChannelMemberService {
     private final ChannelListRepository channelListRepository;
 
     @Override
-    public ChannelMember createChannelMember(ChannelMemberCreateRequest request) {
+    public ChannelMemberCreateReseponse createChannelMember(ChannelMemberCreateRequest request) {
         // TODO - 1.기존에 등록되어있는지 체크하기
 
         String memberId = request.getMemberId();
@@ -47,7 +48,7 @@ public class JpaChannelMemberService implements ChannelMemberService {
                 .createBy(createBy)
                 .build();
 
-        return channelMemberRepository.save(channelMember);
+        return new ChannelMemberCreateReseponse(channelMemberRepository.save(channelMember));
     }
 
     @Override
