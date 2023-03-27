@@ -32,7 +32,7 @@ public class JpaChannelListService implements ChannelListService {
     private final String USE_N = "N";
 
     @Override
-    public ChannelList createChannel(final ChannelListCreateRequest dto) {
+    public ChannelListCreateResponse createChannel(final ChannelListCreateRequest dto) {
         ChannelList checkDuplicated = channelListRepository.findByNameAndParentIdAndUseYn(dto.getName(), dto.getParentId(), USE_Y);
         if(checkDuplicated != null) throw new ChannelListDuplicatedException(dto.getName());
 
@@ -47,7 +47,7 @@ public class JpaChannelListService implements ChannelListService {
                 .createBy(getAuthentication().getName())
                 .build();
 
-        return channelListRepository.save(channelList);
+        return new ChannelListCreateResponse(channelListRepository.save(channelList));
     }
 
     @Override
@@ -83,14 +83,14 @@ public class JpaChannelListService implements ChannelListService {
     }
 
     @Override
-    public ChannelList updateChannelInfo(ChannelListUpdateRequest dto) {
+    public ChannelListUpdateResponse updateChannelInfo(ChannelListUpdateRequest dto) {
         ChannelList channel = getTargetChannel(dto.getId());
         channel.updateChannelInfo(
                 dto.getChannelName(), dto.getChannelOrder(),
                 dto.getUseYn(), getAuthentication().getName()
         );
 
-        return channel;
+        return new ChannelListUpdateResponse(channel);
     }
 
     @Override
