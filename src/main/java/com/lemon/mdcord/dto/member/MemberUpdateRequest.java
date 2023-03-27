@@ -11,10 +11,6 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 public class MemberUpdateRequest {
 
-    @Size(max = 20)
-    @Schema(description = "사용자 ID", example = "lemon", maxLength = 20)
-    private String memberId;
-
     @Size(max = 10)
     @Schema(description = "사용자 이름", example = "사용자", maxLength = 10)
     private String name;

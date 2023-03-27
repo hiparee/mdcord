@@ -89,8 +89,8 @@ public class JpaMemberService implements MemberService {
     }
 
     @Override
-    public MemberUpdateResponse updateUser(final MemberUpdateRequest dto) {
-        Member member = getMemberById(dto.getMemberId());
+    public MemberUpdateResponse updateUser(final String memberId, final MemberUpdateRequest dto) {
+        Member member = getMemberById(memberId);
 
         String currentMemberId = getAuthentication().getName();
 

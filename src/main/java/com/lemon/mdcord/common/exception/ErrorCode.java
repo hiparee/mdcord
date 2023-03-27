@@ -15,7 +15,8 @@ public enum ErrorCode {
     CHANNEL_NOT_FOUND("해당 채널 ID는 존재하지 않습니다.", HttpStatus.BAD_REQUEST.value()),
     CHANNEL_CANT_DELETE("하위 채널이 남아 있어, 해당 채널의 삭제가 불가능합니다.", HttpStatus.BAD_REQUEST.value()),
     CHANNEL_ALREADY_DISABLED("이미 사용 불가능한 채널입니다.", HttpStatus.BAD_REQUEST.value()),
-    CHAT_NOT_FOUND("해당 채팅을 찾을 수 없습니다", HttpStatus.NOT_FOUND.value());
+    CHAT_NOT_FOUND("해당 채팅을 찾을 수 없습니다.", HttpStatus.NOT_FOUND.value()),
+    PASSWORD_INVALID("크기가 8에서 20 사이여야 합니다.", HttpStatus.BAD_REQUEST.value());
 
     private final String message;
     private final int status;
