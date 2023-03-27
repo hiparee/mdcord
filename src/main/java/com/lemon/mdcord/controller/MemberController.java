@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,9 +37,11 @@ public class MemberController {
     }
 
     @Operation(summary = "사용자 정보 수정", description = "사용자 정보 수정 API")
-    @PutMapping("/members")
-    public MemberUpdateResponse updateMember(@RequestBody @Valid final MemberUpdateRequest dto) {
-        return memberService.updateUser(dto);
+    @PutMapping("/members/{memberId}")
+    public MemberUpdateResponse updateMember(
+            @PathVariable("memberId") @Size(max = 20) String memberId
+            , @RequestBody @Valid final MemberUpdateRequest dto) {
+        return memberService.updateUser(memberId, dto);
     }
 
     @Operation(summary = "사용자 목록 조회", description = "사용자 목록 조회 API")

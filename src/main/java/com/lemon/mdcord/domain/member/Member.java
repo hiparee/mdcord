@@ -1,5 +1,6 @@
 package com.lemon.mdcord.domain.member;
 
+import com.lemon.mdcord.common.exception.InvalidPasswordException;
 import com.lemon.mdcord.common.exception.PasswordNotMachedException;
 import com.lemon.mdcord.domain.BaseEntity;
 import com.lemon.mdcord.domain.channel.ChannelMember;
@@ -87,6 +88,7 @@ public class Member extends BaseEntity {
     public void updateMemberInfo(String name, String password, MemberPasswordEncoder passwordEncoder, Integer iconFileId, MemberRole role, String useYn, String updateBy) {
         this.name = name;
         if(StringUtils.isNotBlank(password)) {
+            if(!checkPasswordLength(password)) throw new InvalidPasswordException();
             this.password = this.encodePassword(password, passwordEncoder);
         }
         if(iconFileId != null) {
@@ -96,6 +98,10 @@ public class Member extends BaseEntity {
         this.memberRole = role;
         this.updateBy = updateBy;
         this.updateDate = LocalDateTime.now();
+    }
+
+    private boolean checkPasswordLength(String password) {
+        return password.length() >= 8 && password.length() <= 20;
     }
 
 }

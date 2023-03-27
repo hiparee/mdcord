@@ -13,7 +13,7 @@ public interface MemberService {
 
     MemberLoginResponse memberLogin(MemberLoginRequest dto, HttpServletResponse response);
 
-    MemberUpdateResponse updateUser(MemberUpdateRequest dto);
+    MemberUpdateResponse updateUser(String memberId, MemberUpdateRequest dto);
 
     List<Member> getMemberList();
 
