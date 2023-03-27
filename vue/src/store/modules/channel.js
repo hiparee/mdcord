@@ -16,7 +16,6 @@ export const useChannelStore = defineStore(
     const SET_MEMBER_LIST = async () => {
       const { data } = await fetchChannelMemberList();
       memberList.value = {};
-      console.log(data);
       for (const obj of data) {
         const channelId = obj.channelId;
 
@@ -25,7 +24,7 @@ export const useChannelStore = defineStore(
         ) {
           memberList.value[channelId] = [];
         }
-        console.log(`${channelId} 에 push 함`);
+        // console.log(`${channelId} 에 push 함`);
         memberList.value[channelId].push(obj);
       }
     };

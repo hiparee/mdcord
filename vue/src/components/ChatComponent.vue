@@ -276,7 +276,6 @@ const accessedServerName = computed(() => {
 });
 const accessedMemberList = computed(() => {
   const memberList = channelStore.getMemberList[accessedServerId.value];
-  console.log(memberList);
   if (memberList) {
     return memberList.sort((a, b) => {
       if (a.state !== b.state) {
@@ -356,9 +355,9 @@ const onDragOver = event => {
     Array.from(event.dataTransfer.types).includes('application/x-moz-file');
   if (isDraggingFile && mouseDown.value == false) {
     fileDragOverStatus.value = true;
-    console.log('파일 드래그 중');
+    // console.log('파일 드래그 중');
   } else {
-    console.log('파일이 아닌 다른 것을 드래그 중');
+    // console.log('파일이 아닌 다른 것을 드래그 중');
   }
 };
 
@@ -463,18 +462,16 @@ onMounted(() => {
 
 window.addEventListener('mousedown', () => {
   mouseDown.value = true;
-  console.log(true);
 });
 
 window.addEventListener('mouseup', () => {
   mouseDown.value = false;
-  console.log(false);
 });
 
 const chatScrollSetting = () => {
   if (listBox.value) {
     listBox.value.scrollTop = listBox.value.scrollHeight;
-    console.log(listBox.value.scrollTop, listBox.value.scrollHeight);
+    // console.log(listBox.value.scrollTop, listBox.value.scrollHeight);
   }
 };
 
@@ -556,7 +553,7 @@ const setChannelMemberList = () => {
 };
 
 onBeforeMount(() => {
-  console.log('onBeforeMount 호출');
+  // console.log('onBeforeMount 호출');
   setChannelMemberList();
   setChatTitle();
   setChatList();

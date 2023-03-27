@@ -35,7 +35,7 @@ export const useChatStore = defineStore('chat', () => {
     channels[channelId] = [];
     return new Promise(resolve => {
       setTimeout(() => {
-        console.log('데이터 적재');
+        // console.log('데이터 적재');
         channels[channelId] = newChannelData
           .concat(channels[channelId] || [])
           .reverse();
