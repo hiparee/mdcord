@@ -7,11 +7,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public interface ChannelListRepository extends JpaRepository<ChannelList, Long> {
 
-    ChannelList findByNameAndParentIdAndUseYn(String name, Long parentId, String useYn);
+    Optional<ChannelList> findByNameAndParentIdAndUseYn(String name, Long parentId, String useYn);
 
     List<ChannelList> findByParentIdAndUseYn(Long parentId, String useYn);
     List<ChannelList> findByParentIdIn(Set<Long> channelIds);

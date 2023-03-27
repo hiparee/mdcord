@@ -33,8 +33,8 @@ public class JpaChannelListService implements ChannelListService {
 
     @Override
     public ChannelListCreateResponse createChannel(final ChannelListCreateRequest dto) {
-        ChannelList checkDuplicated = channelListRepository.findByNameAndParentIdAndUseYn(dto.getName(), dto.getParentId(), USE_Y);
-        if(checkDuplicated != null) throw new ChannelListDuplicatedException(dto.getName());
+        Optional<ChannelList> checkDuplicated = channelListRepository.findByNameAndParentIdAndUseYn(dto.getName(), dto.getParentId(), USE_Y);
+        if(checkDuplicated.isPresent()) throw new ChannelListDuplicatedException(dto.getName());
 
         int channelOrder = dto.getChannelOrder() == null ? 1 : dto.getChannelOrder();
         channelListRepository.increaseChannelOrderGreaterThanEqual(channelOrder);
