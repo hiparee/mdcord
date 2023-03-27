@@ -40,10 +40,9 @@ export const webSocketStore = defineStore('socket', () => {
 
       if (parseData.messageType == 'ACCESS') {
         for (const [key, val] of Object.entries(parseData.messageInfo)) {
-          console.log(`${key} is ${val}`);
+          // console.log(`${key} is ${val}`);
           const memberList = useChannelStore().memberList;
           Object.values(memberList).forEach(objects => {
-            console.log('objects => ', objects);
             objects.forEach(obj => {
               if (obj.memberId === key) {
                 obj.state = val;
@@ -59,8 +58,6 @@ export const webSocketStore = defineStore('socket', () => {
             // });
           });
         }
-
-        console.log(data);
       } else if (parseData.messageType == 'FILE') {
         const channelId = parseData.channelId;
         const chatId = parseData.chatId;
