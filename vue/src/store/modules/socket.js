@@ -5,6 +5,8 @@ import { useToast } from 'vue-toast-notification';
 import { fetchChatlist, fetchMoreChatlist } from '@/api/chat.js';
 import { timeAgo } from '@/utils/chat.js';
 import { userProfileIcon } from '@/utils/common.js';
+import { askNotificationPermission, notify } from '@/utils/notification.js';
+
 import dayjs from 'dayjs';
 import router from '@/router/routes';
 
@@ -19,6 +21,7 @@ export const webSocketStore = defineStore('socket', () => {
 
     websocket.value.onopen = () => {
       console.log('%c# [WebSocket] : connected', 'color:green');
+      askNotificationPermission();
     };
 
     websocket.value.onclose = async event => {
@@ -86,6 +89,11 @@ export const webSocketStore = defineStore('socket', () => {
             <div style='max-width:200px;overflow:hidden;text-overflow: ellipsis;
       white-space: nowrap;'>${parseData.content}</div>`);
         }
+
+        if (document.visibilityState != 'visible') {
+          notify(parseChannelName, parseData.content);
+        }
+
         const createDate = dayjs(parseData.commitTime).format(
           'YYYY-MM-DD HH:mm:ss',
         );
