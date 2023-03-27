@@ -7,9 +7,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ChannelMemberRepository extends JpaRepository<ChannelMember, Long> {
 
+    Optional<ChannelMember> findByMemberIdAndChannelListId(String memberId, Long channelId);
     List<ChannelMember> findByMemberId(String memberId);
     List<ChannelMember> findByChannelListIdIn(List<Long> joinedChannelIds);
 
