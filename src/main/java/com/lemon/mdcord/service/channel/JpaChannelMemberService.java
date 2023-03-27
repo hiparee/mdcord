@@ -1,5 +1,6 @@
 package com.lemon.mdcord.service.channel;
 
+import com.lemon.mdcord.common.exception.ChannelMemberAlreadyExistException;
 import com.lemon.mdcord.common.exception.ChannelNotFoundException;
 import com.lemon.mdcord.common.exception.MemberNotFoundException;
 import com.lemon.mdcord.domain.channel.ChannelList;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -33,12 +35,14 @@ public class JpaChannelMemberService implements ChannelMemberService {
 
     @Override
     public ChannelMemberCreateReseponse createChannelMember(ChannelMemberCreateRequest request) {
-        // TODO - 1.기존에 등록되어있는지 체크하기
+
+        Optional<ChannelMember> findJoinedChannelMember = channelMemberRepository.findByMemberIdAndChannelListId(request.getMemberId(), request.getChannelId());
+        if(findJoinedChannelMember.isPresent()) throw new ChannelMemberAlreadyExistException(request.getMemberId(), request.getChannelId());
 
         String memberId = request.getMemberId();
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(memberId));
         Long channelId = request.getChannelId();
-        ChannelList channelList = channelListRepository.findById(channelId).orElseThrow(() -> new ChannelNotFoundException(channelId));
+        ChannelList channelList = channelListRepository.findByIdAndParentId(channelId, 0L).orElseThrow(() -> new ChannelNotFoundException(channelId));
 
         String createBy = getAuthentication().getName();
 
