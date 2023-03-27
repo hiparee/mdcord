@@ -1,22 +1,19 @@
 package com.lemon.mdcord.service.channel;
 
 import com.lemon.mdcord.domain.channel.ChannelList;
-import com.lemon.mdcord.dto.channel.list.ChannelListOrderUpdateRequest;
-import com.lemon.mdcord.dto.channel.list.ChannelListCreateRequest;
-import com.lemon.mdcord.dto.channel.list.ChannelListUpdateRequest;
-import com.lemon.mdcord.dto.channel.list.MultipleChannelListResponse;
+import com.lemon.mdcord.dto.channel.list.*;
 
 import java.util.List;
 import java.util.Set;
 
 public interface ChannelListService {
-    ChannelList createChannel(ChannelListCreateRequest dto);
+    ChannelListCreateResponse createChannel(ChannelListCreateRequest dto);
 
     MultipleChannelListResponse fetchChannels();
 
     void deleteChannel(Long id);
 
-    ChannelList updateChannelInfo(ChannelListUpdateRequest dto);
+    ChannelListUpdateResponse updateChannelInfo(ChannelListUpdateRequest dto);
 
     void updateChannelOrder(List<ChannelListOrderUpdateRequest> list);
 

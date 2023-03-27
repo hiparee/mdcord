@@ -1,6 +1,5 @@
 package com.lemon.mdcord.controller;
 
-import com.lemon.mdcord.dto.channel.list.ChannelListOrderUpdateRequest;
 import com.lemon.mdcord.dto.channel.list.*;
 import com.lemon.mdcord.service.channel.ChannelListService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,7 +21,7 @@ public class ChannelController {
     @Operation(summary = "채널 등록", description = "채널 등록 API")
     @PostMapping("/channels")
     public ChannelListCreateResponse createChannelList(@RequestBody @Valid final ChannelListCreateRequest dto) {
-        return new ChannelListCreateResponse(channelListService.createChannel(dto));
+        return channelListService.createChannel(dto);
     }
 
     @Operation(summary = "채널 목록 조회", description = "채널 목록 조회 API")
@@ -40,7 +39,7 @@ public class ChannelController {
     @Operation(summary = "채널 수정", description = "채널 수정 API")
     @PutMapping("/channels")
     public ChannelListUpdateResponse updateChannelList(@RequestBody @Valid ChannelListUpdateRequest dto) {
-        return new ChannelListUpdateResponse(channelListService.updateChannelInfo(dto));
+        return channelListService.updateChannelInfo(dto);
     }
 
     @Operation(summary = "채널 순서 변경", description = "채널 순서 변경 API")

@@ -7,15 +7,11 @@ import com.lemon.mdcord.common.security.jwt.JwtProvider;
 import com.lemon.mdcord.domain.channel.ChannelList;
 import com.lemon.mdcord.domain.channel.ChannelMember;
 import com.lemon.mdcord.domain.member.Member;
-import com.lemon.mdcord.dto.member.MemberCreateRequest;
-import com.lemon.mdcord.dto.member.MemberLoginRequest;
-import com.lemon.mdcord.dto.member.MemberPasswordEncoder;
-import com.lemon.mdcord.dto.member.MemberUpdateRequest;
+import com.lemon.mdcord.dto.member.*;
 import com.lemon.mdcord.repository.ChannelListRepository;
 import com.lemon.mdcord.repository.ChannelMemberRepository;
 import com.lemon.mdcord.repository.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -51,16 +47,16 @@ public class JpaMemberService implements MemberService {
     }
 
     @Override
-    public Member memberLogin(final MemberLoginRequest dto, HttpServletResponse response) {
+    public MemberLoginResponse memberLogin(final MemberLoginRequest dto, HttpServletResponse response) {
         Member member = memberRepository.findMemberByIdAndUseYn(dto.getMemberId(), LOGIN_USE_YN).orElseThrow(() -> new MemberNotFoundException(dto.getMemberId()));
         member.checkPassword(dto.getPassword(), memberPasswordEncoder);
         this.createToken(member, response);
 
-        return member;
+        return new MemberLoginResponse(member);
     }
 
     @Override
-    public Member createMember(final MemberCreateRequest dto) {
+    public MemberCreateResponse createMember(final MemberCreateRequest dto) {
         Optional<Member> checkDuplicated = memberRepository.findById(dto.getMemberId());
 
         if(checkDuplicated.isPresent()) {
@@ -89,11 +85,11 @@ public class JpaMemberService implements MemberService {
                 .build();
         channelMemberRepository.save(channelMember);
 
-        return savedMember;
+        return new MemberCreateResponse(savedMember);
     }
 
     @Override
-    public Member updateUser(final MemberUpdateRequest dto) {
+    public MemberUpdateResponse updateUser(final MemberUpdateRequest dto) {
         Member member = getMemberById(dto.getMemberId());
 
         String currentMemberId = getAuthentication().getName();
@@ -105,7 +101,7 @@ public class JpaMemberService implements MemberService {
                 currentMemberId
         );
 
-        return member;
+        return new MemberUpdateResponse(member);
     }
 
     @Override
