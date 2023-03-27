@@ -1,9 +1,7 @@
 package com.lemon.mdcord.service.member;
 
 import com.lemon.mdcord.domain.member.Member;
-import com.lemon.mdcord.dto.member.MemberCreateRequest;
-import com.lemon.mdcord.dto.member.MemberLoginRequest;
-import com.lemon.mdcord.dto.member.MemberUpdateRequest;
+import com.lemon.mdcord.dto.member.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -11,11 +9,11 @@ import java.util.List;
 
 public interface MemberService {
 
-    Member createMember(MemberCreateRequest dto);
+    MemberCreateResponse createMember(MemberCreateRequest dto);
 
-    Member memberLogin(MemberLoginRequest dto, HttpServletResponse response);
+    MemberLoginResponse memberLogin(MemberLoginRequest dto, HttpServletResponse response);
 
-    Member updateUser(MemberUpdateRequest dto);
+    MemberUpdateResponse updateUser(MemberUpdateRequest dto);
 
     List<Member> getMemberList();
 
