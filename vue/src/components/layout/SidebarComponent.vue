@@ -147,7 +147,7 @@
           </div>
         </li>
         <hr class="my-3" />
-        <li class="mb-2" v-if="pageType === 'A'">
+        <li class="mb-2">
           <button
             class="btn btn-toggle align-items-center rounded collapsed"
             data-bs-toggle="collapse"
