@@ -29,13 +29,49 @@
                   <i class="bi bi-pencil-fill" style="color: #eeeeee"></i>
                 </div>
                 <div class="profile-banner"></div>
-                <div class="position-relative">
+                <div
+                  class="profile-box"
+                  :class="[
+                    updateMode === true ? 'update-mode' : '',
+                    props.memberInfo.iconFileId !== updateMemberInfo.iconFileId
+                      ? 'updating'
+                      : '',
+                  ]"
+                >
                   <div
                     class="profile-update-button-image"
                     :style="{
-                      background: `url(${imageUrl()}) 0% 0% / contain no-repeat`,
+                      background: `url(${getImageUrl(
+                        `profile/${userProfileIcon(
+                          updateMemberInfo.iconFileId,
+                        )}.png`,
+                      )}) 0% 0% / contain no-repeat`,
                     }"
                   ></div>
+                  <div
+                    class="profile-update-text"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                  >
+                    <p>프로필 편집</p>
+                  </div>
+                  <ul class="dropdown-menu">
+                    <template v-for="(image, index) in 50" :key="index">
+                      <li @click="selectProfileImage(image)" :title="image">
+                        <a class="dropdown-item" href="#">
+                          <img
+                            :src="
+                              getImageUrl(
+                                `profile/${userProfileIcon(image)}.png`,
+                              )
+                            "
+                            width="50"
+                            height="50"
+                          />
+                        </a>
+                      </li>
+                    </template>
+                  </ul>
                 </div>
               </div>
               <form class="profile-update-form" @submit.prevent="submitForm">
@@ -52,27 +88,51 @@
                     v-model="updateMemberInfo.name"
                   />
                 </div>
-                <div class="mb-3 update-input-box">
+                <div v-if="!updateMode" class="mb-3 update-input-box">
                   <label class="d-block"> 아이디</label>
-                  <input
-                    class="mt-1 custom-input"
-                    type="text"
-                    placeholder="아이디를 입력해주세요."
-                    required
-                    :readonly="!updateMode"
-                    v-model="updateMemberInfo.memberId"
-                  />
-                  <!--            type="email"-->
+                  <div
+                    class="mt-1 p-0"
+                    style="
+                      background-color: #1e1f22;
+                      pointer-events: none;
+                      font-size: 17px;
+                    "
+                  >
+                    {{ props.memberInfo.memberId }}
+                  </div>
                 </div>
-                <div v-if="updateMode" class="mb-3 update-input-box">
+                <div
+                  v-if="updateMode"
+                  class="mb-3 update-input-box position-relative"
+                >
                   <label class="d-block"> 비밀번호</label>
                   <input
                     v-model="password"
                     class="mt-1 custom-input"
-                    type="password"
+                    :type="showPassword === true ? 'text' : 'password'"
                     placeholder="변경할 비밀번호를 입력해주세요."
                     autocomplete="new-password"
                   />
+                  <div
+                    class="position-absolute"
+                    style="
+                      right: 10px;
+                      top: 30px;
+                      cursor: pointer;
+                      width: 17px;
+                      height: 20px;
+                    "
+                    @click.stop="showPassword = !showPassword"
+                  >
+                    <i
+                      class="bi position-absolute"
+                      :class="
+                        showPassword === true
+                          ? 'bi-eye-fill'
+                          : 'bi-eye-slash-fill'
+                      "
+                    ></i>
+                  </div>
                 </div>
                 <div class="update-input-box mb-3">
                   <label class="d-block"> 역할</label>
@@ -146,10 +206,10 @@
 
 <script setup>
 import SpinnerComponent from '@/components/common/SpinnerComponent.vue';
-import { onBeforeUpdate, ref } from 'vue';
+import { onBeforeUpdate, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toast-notification';
-import { userProfileIcon, userType } from '@/utils/common';
+import { getImageUrl, userProfileIcon, userType } from '@/utils/common';
 import { fetchUpdateMember } from '@/api/user';
 
 const router = useRouter();
@@ -159,8 +219,22 @@ const loading = ref(false);
 const $toast = useToast({
   duration: 1000,
 });
-
 const updateMode = ref(false); // 값이 false 이면 사용자 정보 조회 모드
+const showPassword = ref(false); // 비밀번호 보이기/가리기 기능
+const imageList = ref([]); // assets 디렉토리에 있는 프로필 이미지 파일 저장
+
+onMounted(() => {
+  // const images = require.context('@/assets/images/profile/', true);
+  const images = import.meta.glob(
+    '@/assets/images/profile/*.{png,jpg,jpeg,svg}',
+  );
+  imageList.value = Object.keys(images).map(key =>
+    key
+      .split('/')
+      .pop()
+      .replace(/\.[^/.]+$/, ''),
+  );
+});
 
 const props = defineProps({
   showUpdateUserModal: {
@@ -170,33 +244,34 @@ const props = defineProps({
   memberInfo: {
     type: Object,
     required: true,
+    default: () => {
+      return {
+        memberId: '',
+        name: '',
+        role: '',
+        useYn: '',
+        iconFileId: '',
+      };
+    },
   },
 });
 const emits = defineEmits([
   'reloadFetchMembers',
   'update:showUpdateUserModal',
-  'submitUpdateModal',
+  'submitUpdateMemberInfo',
 ]);
 
 // form values
 const updateMemberInfo = ref({
-  memberId: '',
   name: '',
   role: '',
   useYn: '',
   iconFileId: '',
 });
-
 const password = ref('');
-// 타입 셀렉트 박스 show/hide 여부
-const selectBoxShow = ref(false);
 
 onBeforeUpdate(() => {
-  updateMemberInfo.value.memberId = props.memberInfo.memberId;
-  updateMemberInfo.value.name = props.memberInfo.name;
-  updateMemberInfo.value.useYn = props.memberInfo.useYn;
-  updateMemberInfo.value.role = props.memberInfo.role;
-  updateMemberInfo.value.iconFileId = props.memberInfo.iconFileId;
+  initInputForm();
 });
 
 const logMessage = ref('');
@@ -215,12 +290,15 @@ const clickEditButton = () => {
   initInputForm();
 };
 
+const selectProfileImage = image => {
+  updateMemberInfo.value.iconFileId = image;
+};
+
 const submitForm = async () => {
   loading.value = true;
   /**
    * 사용자 수정 API 호출 시 password, iconFileId는 null 가능, 나머지는 not null
    * {
-   *   "memberId": "lemon",
    *   "name": "사용자",
    *   "password": "password1234",
    *   "iconFileId": 1,
@@ -229,23 +307,21 @@ const submitForm = async () => {
    * }
    * */
   const payload = {
-    memberId: updateMemberInfo.value.memberId,
-    name: updateMemberInfo.value.name,
+    ...updateMemberInfo.value,
     password: password.value,
-    useYn: updateMemberInfo.value.useYn,
-    role: updateMemberInfo.value.role,
   };
   try {
-    const { data } = await fetchUpdateMember(payload);
+    const { data } = await fetchUpdateMember(
+      props.memberInfo.memberId,
+      payload,
+    );
     if (Object.prototype.hasOwnProperty.call(data, 'errorMessage')) {
       let detailErrrorType = '';
       if (data.details && data.details.split(' ').length === 1) {
         // TODO 에러처리
-        /*data.details === 'memberId'
-          ? (detailErrrorType = '아이디 - ')
-          : data.details === 'name'
+        data.details === 'name'
           ? (detailErrrorType = '이름 - ')
-          : (detailErrrorType = '비밀번호 - ');*/
+          : (detailErrrorType = '비밀번호 - ');
       }
       logMessage.value = detailErrrorType + data.errorMessage;
     } else {
@@ -263,11 +339,7 @@ const submitForm = async () => {
 };
 
 const formValid = () => {
-  if (
-    !updateMemberInfo.value.memberId ||
-    !updateMemberInfo.value.name ||
-    !updateMemberInfo.value.role
-  ) {
+  if (!updateMemberInfo.value.name || !updateMemberInfo.value.role) {
     return false;
   }
 };
@@ -275,19 +347,13 @@ const formValid = () => {
 // input form 초기화
 const initInputForm = () => {
   logMessage.value = '';
+  showPassword.value = false;
   updateMemberInfo.value.memberId = props.memberInfo.memberId;
   updateMemberInfo.value.name = props.memberInfo.name;
   updateMemberInfo.value.role = props.memberInfo.role;
-};
-
-// 추후 대리님이 추가하신 공통함수 적용
-const imageUrl = () => {
-  return new URL(
-    `../assets/images/profile/${userProfileIcon(
-      props.memberInfo.iconFileId,
-    )}.png`,
-    import.meta.url,
-  ).href;
+  updateMemberInfo.value.useYn = props.memberInfo.useYn;
+  updateMemberInfo.value.iconFileId = props.memberInfo.iconFileId;
+  password.value = '';
 };
 </script>
 
@@ -311,140 +377,25 @@ const imageUrl = () => {
 .modal {
   --bs-modal-width: 500px;
 }
-/* 프로필 상단 영역 */
-.profile-banner {
-  min-height: 116px;
-  border-radius: 4px 4px 0 0;
-  background-color: #1e1f22;
+.updating .profile-update-button-image {
+  animation: avatar-animation 3s ease infinite;
 }
-/* 프로필 편집 버튼 */
-.profile-update-button {
-  top: 14px;
-  right: 16px;
-  cursor: pointer;
-  position: absolute;
+@keyframes avatar-animation {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(1turn);
+    transform: rotate(1turn);
+  }
+}
+.dropdown-menu.show {
+  flex-wrap: wrap;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 5px;
-  border-radius: 50%;
+  padding: 0.5rem 0.1rem;
 }
-.profile-update-button-image {
-  width: 120px;
-  height: 120px;
-  position: absolute;
-  top: -80px;
-  left: 22px;
-  border-radius: 6%;
-}
-/* 프로필 수정 Form */
-.profile-update-form {
-  display: flex;
-  flex-direction: column;
-  background-color: #1e1f22;
-  position: relative;
-  border-radius: 8px;
-  overflow: hidden;
-  padding: 1.2em;
-  color: white;
-  margin: 1rem;
-}
-.update-input-box label {
-  font-size: 13px;
-  color: #bcbcbd;
-}
-.update-input-box .custom-input {
-  font-size: 17px;
-  background-color: #313338;
-}
-.update-input-box .custom-input[readonly] {
-  background-color: #1e1f22;
-  padding: 0;
-  height: auto;
-  cursor: default;
-}
-/* 사용자 역할 Box */
-.role-box {
-  display: flex;
-  align-items: center;
-  box-sizing: border-box;
-  width: fit-content;
-  height: 22px;
-  margin: 0 4px 4px 0;
-  padding: 4px;
-  background: #161616;
-  border-radius: 4px;
-}
-.role-circle {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  width: 10px;
-  height: 10px;
-  padding: 0;
-  margin: 0 4px;
-  background-color: #c4c9ce;
-  border-radius: 50%;
-  forced-color-adjust: none;
-}
-/* 닫기 및 수정하기 버튼 영역 */
-.update-button-container {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  border-radius: 0px 0px 4px 4px;
-  background-color: rgb(16, 25, 16);
-  padding: 16px;
-}
-.custom-cancel-btn {
-  background-color: transparent;
-  border: none;
-  width: auto;
-  height: 32px;
-  min-width: 60px;
-  min-height: 32px;
-  color: #fdfdfd;
-  margin-right: 12px;
-}
-.custom-cancel-btn:hover {
-  text-decoration: underline;
-}
-.update-confirm-btn {
-  width: auto;
-  min-width: 60px;
-  min-height: 32px;
-  background-color: #5865f2;
-  transition: background-color 0.17s ease, color 0.17s ease;
-  outline: 0;
-  border: none;
-  border-radius: 3px;
-  color: #fdfdfd;
-}
-.update-confirm-btn.disabled {
-  background-color: #5865f2;
-}
-.update-confirm-btn:hover {
-  background-color: #4752c4;
-  color: #ffffff;
-}
-
-/* 사용자 역할 선택 select box custom styling*/
-.form-select {
-  background-image: url('/src/assets/images/expand.svg');
-  background-color: #313338;
-  color: #f3f4f5;
-  border: 1px solid #313338;
-  cursor: pointer;
-}
-.form-select:focus {
-  border: 1px solid #313338;
-  box-shadow: none;
-}
-.form-select option {
-  background-color: #313338;
-  color: #f3f4f5;
-  cursor: pointer;
+.dropdown-menu {
+  --bs-dropdown-link-active-bg: #e9ecef;
 }
 </style>
