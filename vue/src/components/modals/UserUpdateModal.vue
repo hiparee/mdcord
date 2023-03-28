@@ -283,7 +283,7 @@ const initInputForm = () => {
 // 추후 대리님이 추가하신 공통함수 적용
 const imageUrl = () => {
   return new URL(
-    `../assets/images/profile/${userProfileIcon(
+    `../../assets/images/profile/${userProfileIcon(
       props.memberInfo.iconFileId,
     )}.png`,
     import.meta.url,
