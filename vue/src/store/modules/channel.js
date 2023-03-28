@@ -56,7 +56,10 @@ export const useChannelStore = defineStore(
       channelList.value = channelTreeData;
 
       // 접속시 Server list중 첫번째 server를 deafult 선택해주도록
-      if (accessedChannelInfo.value.serverId == null) {
+      if (
+        accessedChannelInfo.value.serverId == null &&
+        serverData.length !== 0
+      ) {
         accessedChannelInfo.value.serverId = serverList.value[0].id;
       }
     };
