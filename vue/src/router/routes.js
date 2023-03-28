@@ -63,9 +63,8 @@ const router = createRouter({
           path: 'member',
           component: UserListView,
         },
-        /* TODO :: adm/ 경로 빼주기 */
         {
-          path: 'adm/channel',
+          path: 'channel',
           component: ChannelView,
         },
       ],
