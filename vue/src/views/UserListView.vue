@@ -150,9 +150,9 @@ import {
   userUseYn,
 } from '@/utils/common';
 import SearchBarComponent from '@/components/common/SearchBarComponent.vue';
-import UserRegisterModal from '@/components/UserRegisterModal.vue';
+import UserRegisterModal from '@/components/modals/UserRegisterModal.vue';
 import SpinnerComponent from '@/components/common/SpinnerComponent.vue';
-import UserUpdateModal from '@/components/UserUpdateModal.vue';
+import UserUpdateModal from '@/components/modals/UserUpdateModal.vue';
 
 const members = ref([]);
 const totalCount = ref(0);
