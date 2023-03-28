@@ -48,7 +48,7 @@ public class WebSecurityConfig {
             .and()
                 .authorizeRequests()
                     .antMatchers("/api/members/signin").permitAll()
-                    .antMatchers("/api/members/**", "/api/channels/**").authenticated()
+                    .antMatchers("/api/members/**", "/api/channels/**", "/attach-file/**").authenticated()
             .and()
                 .exceptionHandling()
                     // .accessDeniedHandler(jwtAccessDeniedHandler)

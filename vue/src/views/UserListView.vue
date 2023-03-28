@@ -202,7 +202,6 @@ const memberInfo = ref({});
 
 defineEmits(['update:showUpdateUserModal', 'submitUpdateMemberInfo']);
 const openUpdateUserModal = member => {
-  console.log(member);
   showUpdateUserModal.value = true;
   memberInfo.value = { ...member };
 };
