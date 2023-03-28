@@ -202,6 +202,7 @@
                 <span> <i class="bi bi-box-arrow-right"></i></span>
               </button>
               <button
+                v-if="userStore.userInfo.role === 'ADMIN'"
                 type="button"
                 class="btn btn-outline-secondary bottom-button"
                 @click.stop="router.push('/settings')"
