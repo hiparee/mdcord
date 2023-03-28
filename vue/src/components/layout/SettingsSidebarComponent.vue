@@ -40,7 +40,7 @@
           </div>
           <div class="nav-item" role="listitem">
             <router-link
-              to="/settings/adm/channel"
+              to="/settings/channel"
               class="nav-link active"
               aria-current="page"
               replace
