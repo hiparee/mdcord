@@ -22,19 +22,26 @@
             aria-labelledby="navbarDarkDropdownMenuLink"
             class="dropdown-menu dropdown-menu-dark"
           >
-            <!-- <li>
-              <a class="dropdown-item" href="#" @click="emitEvent()"
-                >서버추가</a
+            <li>
+              <a
+                class="dropdown-item"
+                href="#"
+                @click="showEditServerListModal = true"
+                >설정</a
               >
-            </li> -->
-            <!-- <li><hr class="dropdown-divider bg-light" /></li> -->
+            </li>
+            <li><hr class="dropdown-divider bg-light" /></li>
             <li
               v-for="server in store.getServerList"
               :key="server.id"
               style="cursor: pointer"
             >
               <!-- 서버명 -->
-              <span class="dropdown-item" @click="serverChange(server.id)">
+              <span
+                v-if="server.useYn === 'Y'"
+                class="dropdown-item"
+                @click="serverChange(server.id)"
+              >
                 <span class="text-light"> {{ server.name }}</span>
               </span>
             </li>
@@ -107,7 +114,7 @@
       <div style="width: 100%">
         <div>
           <div>
-            <vue-draggable
+            <VueDraggable
               :list="channelList"
               class="draggable-list"
               group="my-group"
@@ -152,7 +159,7 @@
                   </div>
                 </div>
               </div>
-            </vue-draggable>
+            </VueDraggable>
           </div>
         </div>
       </div>
@@ -164,6 +171,11 @@
     권한설정
     <button>버튼클릭</button>
   </div>
+  <edit-server-list
+    :showEditServerListModal="showEditServerListModal"
+    :serverList="store.getServerList"
+    @update:showEditServerListModal="showEditServerListModal = false"
+  />
 </template>
 
 <script setup>
@@ -171,12 +183,14 @@ import { useChannelStore } from '@/store/modules/channel';
 import { computed, getCurrentInstance, onBeforeMount, ref } from 'vue';
 import { fetchEditChannelName } from '@/api/channel';
 import VueContextMenu from 'vue-simple-context-menu';
+import EditServerList from '@/components/modals/EditServerListModal.vue';
 
 const vm = getCurrentInstance();
 
 const store = useChannelStore();
 const serverListValue = ref([]);
 const channelListValue = ref([]);
+const showEditServerListModal = ref(false);
 const channelList = ref([]);
 const channelName = ref([]);
 const active = ref('채널목록');
@@ -299,10 +313,6 @@ const onDragStart = event => {};
 #sidebar-wrapper {
   position: relative;
 }
-
-/*.bi-pencil{*/
-
-/*}*/
 .bi-pencil:hover {
   color: green;
 }
