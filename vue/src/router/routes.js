@@ -50,6 +50,13 @@ const router = createRouter({
       name: 'settings',
       meta: { requiresAuth: true },
       component: SettingsView,
+      beforeEnter: (to, from, next) => {
+        if (useUserStore().userInfo.role === 'USER') {
+          next('/');
+        } else {
+          next();
+        }
+      },
       redirect: '/settings/member',
       children: [
         {
