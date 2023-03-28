@@ -36,7 +36,11 @@
                 style="cursor: pointer"
               >
                 <!-- 서버명 -->
-                <span class="dropdown-item" @click="serverChange(server.id)">
+                <span
+                  v-if="server.useYn === 'Y'"
+                  class="dropdown-item"
+                  @click="serverChange(server.id)"
+                >
                   <span class="text-light"> {{ server.name }}</span>
                 </span>
               </li>
