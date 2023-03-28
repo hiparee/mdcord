@@ -49,7 +49,8 @@ const fetchMembers = () => {
 
 /**
  * 사용자 정보 수정
- * @param {string} memberId 아이디,
+ * @param {string} memberId 아이디(경로 매개변수),
+ * @param {object} options 옵션 객체 (요청 매개변수),
  * @param {string} name 이름,
  * @param {string} password 비밀번호,
  * @param {string} useYn 활성여부,
@@ -62,8 +63,8 @@ const fetchMembers = () => {
  *   "useYn": "Y"
  * }
  * */
-const fetchUpdateMember = payload => {
-  return user.put(`${URL_PREFIX}`, payload);
+const fetchUpdateMember = (memberId, payload) => {
+  return user.put(`${URL_PREFIX}/${memberId}`, payload);
 };
 
 /**
