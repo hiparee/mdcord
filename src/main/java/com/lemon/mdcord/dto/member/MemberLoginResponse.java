@@ -15,12 +15,14 @@ public class MemberLoginResponse {
     private Integer iconFileId;
     @NotBlank
     private String useYn;
+    private String role;
 
     public MemberLoginResponse(Member member) {
         this.memberId = member.getId();
         this.name = member.getName();
         this.iconFileId = member.getIconFileId();
         this.useYn = member.getUseYn();
+        this.role = member.getMemberRole().getValue();
     }
 
 }
