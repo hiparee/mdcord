@@ -76,7 +76,7 @@
     <!--    채널목록-->
     <div style="display: inline-flex; width: 100%">
       <div
-        style="min-width: 250px; max-width: 300px; min-height: 500px"
+        style="min-width: 250px; max-width: 200px; min-height: 500px"
         v-if="active === '채널목록' && getChannelListValue"
         class="list-group list-group-flush channel-list"
       >
@@ -130,7 +130,11 @@
                 v-for="(element, index) in channelList"
                 :key="element.name"
                 class="list-item"
-                style="margin-bottom: 8px; background-color: #2b2d31"
+                style="
+                  margin-bottom: 8px;
+                  background-color: #2b2d31;
+                  max-width: 600px;
+                "
                 @mousedown="onDragStart(element)"
                 @mouseup="onDragStart(element)"
               >

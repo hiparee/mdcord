@@ -11,10 +11,11 @@
         role="dialog"
         tabindex="-1"
         @mousedown="closeModal()"
+        style="overflow: hidden"
       >
         <div
           class="modal-dialog modal-dialog-centered"
-          style="max-width: 1000px !important"
+          style="max-width: 600px !important"
         >
           <div
             class="modal-content"
@@ -22,7 +23,7 @@
             @mousedown.stop
           >
             <div class="modal-body p-0">
-              <form class="profile-update-form" @submit.prevent="submitForm">
+              <form class="profile-update-form" @submit.prevent>
                 <div style="display: flex; padding: 10px">
                   <span style="flex: 1 0 0%; color: #f2f3f5; font-size: 20px"
                     >서버명</span
@@ -31,14 +32,14 @@
                     <i
                       v-if="editMode === false"
                       class="bi-plus-lg"
-                      style="position: absolute; left: -50px"
+                      style="position: absolute; left: -50px; bottom: 1px"
                       @click="editMode = true"
                     ></i>
                     <i
                       v-else
-                      class="bi-check"
-                      style="position: absolute; left: -50px"
-                      @click="saveEdit()"
+                      class="bi-check-lg"
+                      style="position: absolute; left: -50px; bottom: 1px"
+                      @click="addServer()"
                     ></i>
                   </div>
                 </div>
@@ -60,30 +61,70 @@
                 </div>
                 <hr />
                 <div
-                  v-for="(server, index) in store.getServerList"
-                  :key="server.id"
-                  class="mb-3 update-input-box"
+                  class="table-custom-scrollbar"
+                  style="overflow-y: scroll !important; max-height: 400px"
                 >
-                  <div style="display: flex; padding: 10px">
-                    <span style="flex: 1 0; color: #cfcfcf">
-                      {{ server.name }}
-                    </span>
-                    <div class="custom-checkbox bi-check">
-                      <input
-                        v-model="inputChecked"
-                        :value="server.id"
-                        style="
-                          position: absolute;
-                          z-index: 5;
-                          width: 65%;
-                          height: 100%;
-                          opacity: 0;
-                          right: 15px;
-                        "
-                        type="checkbox"
-                        @click="changeChannelStatus(server)"
-                      />
-                      <label class="custom-checkbox-label"></label>
+                  <div
+                    v-for="server in store.getServerList"
+                    :key="server.id"
+                    class="mb-3 update-input-box"
+                  >
+                    <div class="custon-server-list">
+                      <div style="flex: 1 0; color: #cfcfcf">
+                        <span
+                          v-if="server.id !== editServerId"
+                          style="margin-right: 5px"
+                          >{{ server.name }}</span
+                        >
+                        <input
+                          v-model="editServerNameInput"
+                          style="
+                            color: #cfcfcf;
+                            background-color: #1e1f22;
+                            border-color: aliceblue;
+                            margin-right: 5px;
+                          "
+                          v-else
+                        />
+                        <i
+                          v-if="server.id !== editServerId"
+                          @click="editServerNameList(server)"
+                          class="bi-pencil-fill"
+                          style="font-size: x-small; display: inline-flex"
+                        ></i>
+                        <i
+                          v-else
+                          @click="changeServerName(server)"
+                          class="bi-check-lg"
+                        ></i>
+                        <i
+                          v-if="server.id === editServerId"
+                          @click="closeEditInput()"
+                          class="bi-x"
+                          style="
+                            font-size: large;
+                            bottom: -0.9px;
+                            position: relative;
+                          "
+                        ></i>
+                      </div>
+                      <div class="custom-checkbox bi-check">
+                        <input
+                          v-model="inputChecked"
+                          :value="server.id"
+                          style="
+                            position: absolute;
+                            z-index: 5;
+                            width: 65%;
+                            height: 100%;
+                            opacity: 0;
+                            right: 15px;
+                          "
+                          type="checkbox"
+                          @click="changeChannelStatus(server)"
+                        />
+                        <label class="custom-checkbox-label"></label>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -120,10 +161,10 @@ const store = useChannelStore();
 const loading = ref(false);
 const inputChecked = ref([]);
 const newServerName = ref('');
-
+const editServerId = ref(null);
 // const editing = ref(false);
 const editMode = ref(false); // 값이 false 이면 사용자 정보 조회 모드
-
+const editServerNameInput = ref('');
 onBeforeMount(() => {
   for (const server of store.serverList) {
     if (server.useYn === 'Y') {
@@ -184,7 +225,7 @@ const closeModal = () => {
 };
 
 // 서버 추가
-const saveEdit = async () => {
+const addServer = async () => {
   if (newServerName.value !== '') {
     let newOrderList = store.serverList.map(server => server.channelOrder);
     newOrderList = Math.max(...newOrderList);
@@ -199,7 +240,7 @@ const saveEdit = async () => {
       const res = await fetchAddChanneList(params);
       const errorCode = res.data.httpStatus;
       if (errorCode === 400) {
-        alert(res.data.errorMessage);
+        useToast(res.data.errorMessage);
       } else {
         editMode.value = false;
         newServerName.value = '';
@@ -216,6 +257,35 @@ const saveEdit = async () => {
 const updateInput = event => {
   console.log(event);
   newServerName.value = event.target.value;
+};
+const editServerNameList = server => {
+  editServerId.value = server.id;
+};
+
+const changeServerName = async server => {
+  if (editServerNameInput.value !== '') {
+    const params = {
+      id: server.id,
+      useYn: server.useYn,
+      channelName: editServerNameInput.value,
+      channelOrder: server.channelOrder,
+    };
+    await fetchEditChannelName(params);
+    try {
+      await store.SET_CHANNEL_LIST();
+      editServerNameInput.value = '';
+      editServerId.value = null;
+    } catch (e) {
+      console.log(e);
+    }
+  } else {
+    editServerNameInput.value = '';
+    editServerId.value = null;
+  }
+};
+const closeEditInput = () => {
+  editServerId.value = null;
+  editServerNameInput.value = '';
 };
 </script>
 
@@ -244,34 +314,7 @@ const updateInput = event => {
   --bs-modal-width: 500px;
 }
 
-/* 프로필 상단 영역 */
-.profile-banner {
-  min-height: 116px;
-  border-radius: 4px 4px 0 0;
-  background-color: #1e1f22;
-}
-
-/* 프로필 편집 버튼 */
-.profile-update-button {
-  top: 14px;
-  right: 16px;
-  cursor: pointer;
-  position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 5px;
-  border-radius: 50%;
-}
-
-.profile-update-button-image {
-  width: 120px;
-  height: 120px;
-  position: absolute;
-  top: -80px;
-  left: 22px;
-  border-radius: 6%;
-}
+/* 프로필 상단 영역
 
 /* 프로필 수정 Form */
 .profile-update-form {
@@ -303,34 +346,6 @@ const updateInput = event => {
   cursor: default;
 }
 
-/* 사용자 역할 Box */
-.role-box {
-  display: flex;
-  align-items: center;
-  box-sizing: border-box;
-  width: fit-content;
-  height: 22px;
-  margin: 0 4px 4px 0;
-  padding: 4px;
-  background: #161616;
-  border-radius: 4px;
-}
-
-.role-circle {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  width: 10px;
-  height: 10px;
-  padding: 0;
-  margin: 0 4px;
-  background-color: #c4c9ce;
-  border-radius: 50%;
-  forced-color-adjust: none;
-}
-
 /* 닫기 및 수정하기 버튼 영역 */
 .update-button-container {
   display: flex;
@@ -355,109 +370,18 @@ const updateInput = event => {
 .custom-cancel-btn:hover {
   text-decoration: underline;
 }
-
-.update-confirm-btn {
-  width: auto;
-  min-width: 60px;
-  min-height: 32px;
-  background-color: #5865f2;
-  transition: background-color 0.17s ease, color 0.17s ease;
-  outline: 0;
-  border: none;
-  border-radius: 3px;
-  color: #fdfdfd;
+.bi-plus-lg:hover {
+  color: gray;
+}
+.bi-pencil-fill:hover {
+  color: gray;
 }
 
-.update-confirm-btn.disabled {
-  background-color: #5865f2;
-}
-
-.update-confirm-btn:hover {
-  background-color: #4752c4;
-  color: #ffffff;
-}
-
-/* 사용자 역할 선택 select box custom styling*/
-.form-select {
-  background-image: url('/src/assets/images/expand.svg');
-  background-color: #313338;
-  color: #f3f4f5;
-  border: 1px solid #313338;
-  cursor: pointer;
-}
-
-.form-select:focus {
-  border: 1px solid #313338;
-  box-shadow: none;
-}
-
-.form-select option {
-  background-color: #313338;
-  color: #f3f4f5;
-  cursor: pointer;
-}
-
-.bi-pencil:hover {
-  color: green;
-}
-
-.bi-trash:hover {
+.bi-x:hover {
   color: red;
 }
-
-.edit-listName {
-  margin-right: 5px;
-  display: inline-flex;
-}
-
-.remove-list {
-  display: inline-flex;
-}
-
-.check-button {
+.bi-check-lg:hover {
   color: green;
-}
-
-.close-button {
-  color: red;
-}
-
-.plus-icon {
-  font-size: 22px;
-  cursor: pointer;
-  pointer-events: auto;
-}
-
-.plus-icon-sm {
-  font-size: 15px;
-  cursor: pointer;
-  pointer-events: auto;
-}
-
-.custom-tabBarItem {
-  padding-bottom: 16px;
-  margin-right: 16px;
-}
-
-.custom-tabbar {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-  -ms-flex-direction: row;
-  flex-direction: row;
-  padding-top: 6px;
-  margin-top: 0px;
-  margin-bottom: 16px;
-  border-bottom: 1px solid;
-  border-bottom-color: #3f4046;
-}
-
-.border-active {
-  color: #ffffff !important;
-  border-bottom: 2px solid;
-  border-bottom-color: #939bf5;
 }
 
 button.edit-button {
@@ -482,85 +406,12 @@ button.edit-button:active {
   background-color: rgba(0, 122, 255, 0.1);
   box-shadow: inset 0px 3px 5px rgba(0, 0, 0, 0.2);
 }
-
-/*아이콘 떨림 애니메이션*/
-.icon {
-  position: relative;
-  animation-name: shake;
-  animation-duration: 1s;
-  animation-iteration-count: infinite;
+.custon-server-list {
+  display: flex;
+  padding: 10px;
 }
 
-/*.icon:focus {*/
-
-/*}*/
-
-@keyframes shake {
-  0% {
-    transform: translate(0);
-  }
-  25% {
-    transform: translate(-1px, -1px) rotate(-1deg);
-  }
-  50% {
-    transform: translate(1px, 1px) rotate(1deg);
-  }
-  75% {
-    transform: translate(-1px, 1px) rotate(-1deg);
-  }
-  100% {
-    transform: translate(1px, -1px) rotate(1deg);
-  }
-}
-
-/*수정할 인풋 텍스트 커스텀 */
-.edit-input {
-  background: transparent;
-  border: inset;
-  color: white;
-}
-
-/*채널리스트 이동시 애니메이션 효과 */
-.flip-list-move {
-  transition: transform 0.5s;
-}
-
-.no-move {
-  transition: transform 0s;
-}
-
-.ghost {
-  opacity: 0.5;
-  background: #c8ebfb;
-}
-
-.list-group {
-  min-height: 20px;
-}
-
-.list-group-item {
-  cursor: move;
-}
-
-.list-group-item i {
-  cursor: pointer;
-}
-
-.deactivation-list {
-  text-decoration: line-through;
-}
-
-.custom-list {
-}
-
-.custom-button {
-  background-color: #5561f4ff !important;
-  color: #ffffff !important;
-  cursor: auto;
-  opacity: 1 !important;
-}
-
-.mb-2:hover {
+.custon-server-list:hover {
   background-color: #393c41;
   color: white;
   border-radius: 3px;
@@ -629,29 +480,14 @@ button.edit-button:active {
   left: 25px;
 }
 
-.hover-class {
-  color: #ffffff; /* 텍스트 색상 변경 */
-  background-color: #fdfdfd; /* 배경색 변경 */
-  cursor: pointer; /* 커서 모양 변경 */
+.table-custom-scrollbar::-webkit-scrollbar {
+  width: 3px;
 }
-
-.list-clicked {
-  background-color: #42434a !important;
+.table-custom-scrollbar:hover::-webkit-scrollbar-thumb {
+  background: #6c757d;
+  border-radius: 10px;
 }
-
-/* 마우스가 호버될 요소를 선택 */
-.high-channels:hover {
-  /* hover-class 스타일 적용 */
-  color: #fff;
-  background-color: #393c41;
-  cursor: pointer;
-}
-
-.channel-list {
-  width: 25%;
-  max-width: 15%;
-  background-color: #2b2d31;
-  margin-right: 5px;
-  padding: 10px;
+.table-custom-scrollbar::-webkit-scrollbar-track {
+  background: #2b2d31;
 }
 </style>
