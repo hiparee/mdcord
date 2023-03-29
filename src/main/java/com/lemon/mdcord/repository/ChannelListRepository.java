@@ -12,7 +12,7 @@ import java.util.Set;
 
 public interface ChannelListRepository extends JpaRepository<ChannelList, Long> {
 
-    Optional<ChannelList> findByNameAndParentIdAndUseYn(String name, Long parentId, String useYn);
+    Optional<ChannelList> findByNameAndParentId(String name, Long parentId);
     List<ChannelList> findByParentIdAndUseYn(Long parentId, String useYn);
     List<ChannelList> findByParentIdIn(Set<Long> channelIds);
     List<ChannelList> findByParentIdInAndUseYn(Set<Long> channelIds, String useYn);
