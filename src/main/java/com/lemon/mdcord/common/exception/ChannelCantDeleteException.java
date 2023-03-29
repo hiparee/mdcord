@@ -4,6 +4,8 @@ import org.springframework.http.HttpStatus;
 
 public class ChannelCantDeleteException extends AbstractException {
 
+    private static final long serialVersionUID = -1357844306092263953L;
+
     @Override
     public HttpStatus getHttpStatus() {
         return HttpStatus.OK;

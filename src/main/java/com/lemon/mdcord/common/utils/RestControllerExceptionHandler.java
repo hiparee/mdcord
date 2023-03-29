@@ -1,7 +1,7 @@
 package com.lemon.mdcord.common.utils;
 
 import com.lemon.mdcord.common.exception.AbstractException;
-import com.lemon.mdcord.common.exception.AttachFileException;
+import com.lemon.mdcord.common.exception.RegistAttachFileException;
 import com.lemon.mdcord.common.exception.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -52,7 +52,7 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
     /**
      * 이외 exception - response 응답 일원화
      */
-    @ExceptionHandler({Exception.class, AttachFileException.class})
+    @ExceptionHandler({Exception.class, RegistAttachFileException.class})
     private ResponseEntity<ErrorResponse> handleException(Exception e) {
         log.error("Error : {} \n " +
                   "HttpStatus : {} {}\n" +
