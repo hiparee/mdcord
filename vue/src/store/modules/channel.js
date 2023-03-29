@@ -12,7 +12,9 @@ export const useChannelStore = defineStore(
     const getChannelList = computed(() => channelList.value);
     const getServerList = computed(() => serverList.value);
     const getMemberList = computed(() => memberList.value);
-
+    const getAccessedChannelInfo = computed(
+      () => accessedChannelInfo.value.serverId,
+    );
     const SET_MEMBER_LIST = async () => {
       const { data } = await fetchChannelMemberList();
       memberList.value = {};
@@ -80,6 +82,7 @@ export const useChannelStore = defineStore(
       getChannelList,
       getServerList,
       getMemberList,
+      getAccessedChannelInfo,
       accessedChannelInfo,
       SET_ACCESSED_CHANNEL_INFO,
       SET_CHANNEL_LIST,
