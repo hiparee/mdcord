@@ -99,13 +99,18 @@ public class JpaAttachFileService implements AttachFileService {
         Set<Long> joinedRootChannelIds = channelMemberRepository.findByMemberId(currentMemberId).stream()
                 .map(o -> o.getChannelList().getId())
                 .collect(Collectors.toSet());
-        List<Long> joinedChannelIds = channelListRepository.findByParentIdIn(joinedRootChannelIds).stream()
+        Set<Long> joinedParentChannelIds = channelListRepository.findByParentIdIn(joinedRootChannelIds).stream()
                 .map(o -> o.getId())
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
+        Set<Long> joinedChannelIds = channelListRepository.findByParentIdIn(joinedParentChannelIds).stream()
+                .map(o -> o.getId())
+                .collect(Collectors.toSet());
         if(!joinedChannelIds.contains(channelId)) throw new InvalidChannelIdException(channelId);
     }
 
     private void validateImageFileInfo(String fileName) {
+        // TODO - 파일 네임 자체에 대한 검증이 필요함.
+
         String[] splitFileName = fileName.split("\\.");
         AttachFile attachFile = attachFileRepository.findByRealFileName(splitFileName[0]).orElseThrow(() -> new AttachFileNotFoundException(fileName));
         if(!FILE_EXTS.contains(attachFile.getFileExt())) throw new AttachFileNotMatchedImageFileExt(attachFile.getFileExt());
