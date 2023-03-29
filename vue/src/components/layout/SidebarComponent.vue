@@ -147,31 +147,6 @@
           </div>
         </li>
         <hr class="my-3" />
-        <li class="mb-2" v-if="pageType === 'A'">
-          <button
-            class="btn btn-toggle align-items-center rounded collapsed"
-            data-bs-toggle="collapse"
-            data-bs-target="#channel5"
-            aria-expanded="true"
-          >
-            관리자
-          </button>
-          <div class="collapse show" id="channel5">
-            <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-              <li>
-                <a
-                  href="javascript:;"
-                  @click="$router.push('/adm/user')"
-                  class="rounded"
-                  >사용자 관리</a
-                >
-              </li>
-              <li>
-                <a href="javascript:" class="rounded"></a>
-              </li>
-            </ul>
-          </div>
-        </li>
       </ul>
     </div>
 
