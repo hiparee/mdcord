@@ -32,13 +32,13 @@
                     <i
                       v-if="editMode === false"
                       class="bi-plus-lg"
-                      style="position: absolute; left: -50px"
+                      style="position: absolute; left: -50px; bottom: 1px"
                       @click="editMode = true"
                     ></i>
                     <i
                       v-else
-                      class="bi-check"
-                      style="position: absolute; left: -50px"
+                      class="bi-check-lg"
+                      style="position: absolute; left: -50px; bottom: 1px"
                       @click="addServer()"
                     ></i>
                   </div>
@@ -76,7 +76,16 @@
                           style="margin-right: 5px"
                           >{{ server.name }}</span
                         >
-                        <input v-model="editServerNameInput" v-else />
+                        <input
+                          v-model="editServerNameInput"
+                          style="
+                            color: #cfcfcf;
+                            background-color: #1e1f22;
+                            border-color: aliceblue;
+                            margin-right: 5px;
+                          "
+                          v-else
+                        />
                         <i
                           v-if="server.id !== editServerId"
                           @click="editServerNameList(server)"
@@ -90,7 +99,7 @@
                         ></i>
                         <i
                           v-if="server.id === editServerId"
-                          @click="editServerId = null"
+                          @click="closeEditInput()"
                           class="bi-x"
                           style="
                             font-size: large;
@@ -269,7 +278,14 @@ const changeServerName = async server => {
     } catch (e) {
       console.log(e);
     }
+  } else {
+    editServerNameInput.value = '';
+    editServerId.value = null;
   }
+};
+const closeEditInput = () => {
+  editServerId.value = null;
+  editServerNameInput.value = '';
 };
 </script>
 
@@ -354,7 +370,9 @@ const changeServerName = async server => {
 .custom-cancel-btn:hover {
   text-decoration: underline;
 }
-
+.bi-plus-lg:hover {
+  color: gray;
+}
 .bi-pencil-fill:hover {
   color: gray;
 }
