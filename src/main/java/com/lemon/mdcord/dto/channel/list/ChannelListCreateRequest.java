@@ -25,7 +25,7 @@ public class ChannelListCreateRequest {
     private Integer dept;
 
     @NotNull
-    @Positive
+    @Min(0) @Max(Integer.MAX_VALUE)
     @Schema(description = "채널 순서", example = "0")
     private Integer channelOrder;
 

@@ -61,8 +61,8 @@ public class JwtProvider {
      */
     public String createToken(String memberId, String MemberRole) {
         Date now = new Date();
-        long validityMiliSeconds = validitySeconds * 1000;
-        Date expiration = new Date(now.getTime() + validityMiliSeconds);
+        long validityMilliSeconds = validitySeconds * 1000;
+        Date expiration = new Date(now.getTime() + validityMilliSeconds);
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("member", memberId);
