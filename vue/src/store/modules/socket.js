@@ -1,15 +1,13 @@
-import { defineStore } from 'pinia';
-import { ref, computed, inject } from 'vue';
-import { useChannelStore, useUserStore, useChatStore } from '@/store/store';
-import { useToast } from 'vue-toast-notification';
-import { fetchChatlist, fetchMoreChatlist } from '@/api/chat.js';
-import { timeAgo } from '@/utils/chat.js';
+import { signOutUser } from '@/api/user';
+import { useChannelStore, useChatStore, useUserStore } from '@/store/store';
 import { userProfileIcon } from '@/utils/common.js';
 import { askNotificationPermission, notify } from '@/utils/notification.js';
-import { signOutUser } from '@/api/user';
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
+import { useToast } from 'vue-toast-notification';
 
-import dayjs from 'dayjs';
 import router from '@/router/routes';
+import dayjs from 'dayjs';
 
 export const webSocketStore = defineStore('socket', () => {
   // const dayjs = inject('dayjs');
@@ -51,6 +49,8 @@ export const webSocketStore = defineStore('socket', () => {
     websocket.value.onmessage = ({ data }) => {
       console.log('▶ websocket.value.onmessage', JSON.parse(data));
       const parseData = JSON.parse(data);
+      const accessedChannelId =
+        useChannelStore().accessedChannelInfo.channelId ?? '';
 
       if (parseData.messageType == 'ACCESS') {
         for (const [key, val] of Object.entries(parseData.messageInfo)) {
@@ -77,16 +77,28 @@ export const webSocketStore = defineStore('socket', () => {
         const chatId = parseData.chatId;
         const fileData = JSON.parse(parseData.fileList);
 
-        console.log('file', fileData);
-        console.log('chatId', chatId);
-        console.log('channelId', channelId);
+        // console.log('file', fileData);
+        // console.log('chatId', chatId);
+        // console.log('channelId', channelId);
+
+        const channelData = useChatStore().chatList.channels[channelId];
+
+        [...channelData].reverse().forEach(v => {
+          // console.log(v);
+          const targetData = v.find(e => e.chatId === chatId);
+          if (targetData) {
+            console.log('targetData ->', targetData);
+            targetData.attachFileList.push(...fileData);
+
+            return false;
+          }
+        });
       } else if (parseData.messageType == 'SEND') {
         console.log('수신데이터', parseData);
         const parseChannelId = parseData.channelId;
         const parseChannelName = parseData.channelName;
-        const selectedChannelId =
-          useChannelStore().accessedChannelInfo.channelId ?? '';
-        if (parseChannelId != selectedChannelId) {
+
+        if (parseChannelId != accessedChannelId) {
           const $toast = useToast({
             duration: 1500,
             position: 'bottom-right',
@@ -119,8 +131,8 @@ export const webSocketStore = defineStore('socket', () => {
             iconFileId: parseData.iconFileId,
             createDate: createDate,
             timeText: dayjs(createDate).format('YYYY. MM. DD A HH:mm:ss'),
-            timeAgo: timeAgo(createDate),
             dataLast: false,
+            attachFileList: [],
           },
         ];
 
@@ -182,7 +194,6 @@ export const webSocketStore = defineStore('socket', () => {
         fileYn: item.fileYn,
         iconFileId: userProfileIcon(item.memberIconId),
         timeText: dayjs(createDate).format('YYYY. MM. DD A HH:mm:ss'),
-        timeAgo: timeAgo(createDate),
       };
 
       if (!acc[chatKey]) {
