@@ -1,6 +1,6 @@
 package com.lemon.mdcord.service.chat;
 
-import com.lemon.mdcord.common.exception.AttachFileException;
+import com.lemon.mdcord.common.exception.RegistAttachFileException;
 import com.lemon.mdcord.common.exception.ChannelNotFoundException;
 import com.lemon.mdcord.common.exception.ChatNotFoundException;
 import com.lemon.mdcord.common.exception.MemberNotFoundException;
@@ -96,7 +96,7 @@ public class JpaChannelChatService implements ChannelChatService {
                 log.error("getClass : {}", e.getClass());
                 log.error("getLocalizedMessage : {}", e.getLocalizedMessage());
                 log.error("getMessage : {}", e.getMessage());
-                throw new AttachFileException(msg, targetDir);
+                throw new RegistAttachFileException(msg, targetDir);
             }
 
             String randomFileName = fileNameGenerator();
@@ -122,7 +122,7 @@ public class JpaChannelChatService implements ChannelChatService {
                 log.error("getClass : {}", e.getClass());
                 log.error("getLocalizedMessage : {}", e.getLocalizedMessage());
                 log.error("getMessage : {}", e.getMessage());
-                throw new AttachFileException(msg, targetDir);
+                throw new RegistAttachFileException(msg, targetDir);
             }
         }
         return result;

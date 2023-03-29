@@ -1,6 +1,6 @@
 package com.lemon.mdcord.service.member;
 
-import com.lemon.mdcord.common.exception.ChannelNotFoundException;
+import com.lemon.mdcord.common.exception.InvalidChannelIdException;
 import com.lemon.mdcord.common.exception.MemberDuplicatedException;
 import com.lemon.mdcord.common.exception.MemberNotFoundException;
 import com.lemon.mdcord.common.security.jwt.JwtProvider;
@@ -75,14 +75,18 @@ public class JpaMemberService implements MemberService {
 
         Member savedMember = memberRepository.save(member);
 
-        long rootChannelId = dto.getChannelId();
-        ChannelList rootChannelList = channelListRepository.findByIdAndParentId(rootChannelId, 0L).orElseThrow(() -> new ChannelNotFoundException(rootChannelId));
-        ChannelMember channelMember = ChannelMember.builder()
-                .member(savedMember)
-                .channelList(rootChannelList)
-                .createBy(currentMemberId)
-                .build();
-        channelMemberRepository.save(channelMember);
+        List<Long> rootChannelIds = dto.getChannelIds();
+        List<ChannelList> channelList = channelListRepository.findByIdInAndParentId(rootChannelIds, 0L);
+        if(dto.getChannelIds().size() > channelList.size()) throw new InvalidChannelIdException(dto.getChannelIds());
+
+        for(ChannelList rootChannelList : channelList) {
+            ChannelMember channelMember = ChannelMember.builder()
+                    .member(savedMember)
+                    .channelList(rootChannelList)
+                    .createBy(currentMemberId)
+                    .build();
+            channelMemberRepository.save(channelMember);
+        }
 
         return new MemberCreateResponse(savedMember);
     }

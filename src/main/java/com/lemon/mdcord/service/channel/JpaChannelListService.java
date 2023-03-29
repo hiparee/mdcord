@@ -28,8 +28,8 @@ public class JpaChannelListService implements ChannelListService {
 
     private final ChannelListRepository channelListRepository;
     private final ChannelMemberRepository channelMemberRepository;
-    private final String USE_Y = "Y";
-    private final String USE_N = "N";
+    private static final String USE_Y = "Y";
+    private static final String USE_N = "N";
 
     @Override
     public ChannelListCreateResponse createChannel(final ChannelListCreateRequest dto) {
