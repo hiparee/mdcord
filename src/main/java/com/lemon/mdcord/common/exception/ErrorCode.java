@@ -17,7 +17,10 @@ public enum ErrorCode {
     CHANNEL_ALREADY_DISABLED("이미 사용 불가능한 채널입니다.", HttpStatus.BAD_REQUEST.value()),
     CHAT_NOT_FOUND("해당 채팅을 찾을 수 없습니다.", HttpStatus.NOT_FOUND.value()),
     PASSWORD_INVALID("크기가 8에서 20 사이여야 합니다.", HttpStatus.BAD_REQUEST.value()),
-    CHANNEL_MEMBER_ALREADY_EXIST("해당 채널에 유저가 이미 등록되어있습니다.", HttpStatus.BAD_REQUEST.value());
+    CHANNEL_MEMBER_ALREADY_EXIST("해당 채널에 유저가 이미 등록되어있습니다.", HttpStatus.BAD_REQUEST.value()),
+    ATTACH_FILE_NOT_FOUND("해당 파일을 찾을 수 없습니다.", HttpStatus.NOT_FOUND.value()),
+    ATTACH_FILE_NOT_MATCHED_IMAGE_FILE_EXT("해당 파일 확장자는 이미지 파일 확장자가 아닙니다.", HttpStatus.BAD_REQUEST.value()),
+    CHANNEL_ID_INVALID("올바르지 않은 채널 ID가 존재합니다.", HttpStatus.BAD_REQUEST.value());
 
     private final String message;
     private final int status;

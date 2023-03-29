@@ -5,8 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -27,8 +28,8 @@ public class MemberCreateRequest {
     @Schema(description = "비밀번호", example = "password1234", minLength = 8, maxLength = 20)
     private String password;
 
-    @NotNull
-    @Schema(description = "가입 채널", example = "1")
-    private Long channelId;
+    @NotEmpty
+    @Schema(description = "가입 채널 목록", example = "[1, 2, 3]")
+    private List<Long> channelIds;
 
 }
