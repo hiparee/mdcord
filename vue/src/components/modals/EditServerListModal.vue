@@ -3,30 +3,60 @@
     <div v-if="showEditServerListModal">
       <div class="modal-backdrop fade show"></div>
       <div
-        @mousedown="closeModal()"
-        class="modal modal-lg fade show d-block"
         id="updateModal"
-        tabindex="-1"
-        aria-labelledby="updateModalLabel"
         aria-hidden="true"
-        role="dialog"
+        aria-labelledby="updateModalLabel"
+        class="modal modal-lg fade show d-block"
         data-bs-backdrop="true"
+        role="dialog"
+        tabindex="-1"
+        @mousedown="closeModal()"
       >
         <div
           class="modal-dialog modal-dialog-centered"
           style="max-width: 1000px !important"
         >
           <div
-            @mousedown.stop
             class="modal-content"
             style="background-color: #313338"
+            @mousedown.stop
           >
             <div class="modal-body p-0">
               <form class="profile-update-form" @submit.prevent="submitForm">
                 <div style="display: flex; padding: 10px">
-                  <span style="flex: 1 0; color: #f2f3f5; font-size: 20px"
+                  <span style="flex: 1 0 0%; color: #f2f3f5; font-size: 20px"
                     >서버명</span
                   >
+                  <div style="position: relative; display: flex">
+                    <i
+                      v-if="editMode === false"
+                      class="bi-plus-lg"
+                      style="position: absolute; left: -50px"
+                      @click="editMode = true"
+                    ></i>
+                    <i
+                      v-else
+                      class="bi-check"
+                      style="position: absolute; left: -50px"
+                      @click="saveEdit()"
+                    ></i>
+                  </div>
+                </div>
+
+                <div v-if="editMode" style="display: flex; padding: 10px">
+                  <div>
+                    <input
+                      @click.prevent
+                      :value="newServerName"
+                      @input="updateInput($event)"
+                      placeholder="서버 이름"
+                      style="
+                        color: #cfcfcf;
+                        background-color: #1e1f22;
+                        border-color: aliceblue;
+                      "
+                    />
+                  </div>
                 </div>
                 <hr />
                 <div
@@ -60,11 +90,11 @@
               </form>
               <div class="update-button-container">
                 <button
-                  type="button"
-                  class="'btn custom-cancel-btn"
                   :style="{
                     'pointer-events': loading === true ? 'none' : '',
                   }"
+                  class="'btn custom-cancel-btn"
+                  type="button"
                   @click="closeModal()"
                 >
                   <div type="button">닫기</div>
@@ -83,14 +113,15 @@ import { onBeforeMount, onBeforeUpdate, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toast-notification';
 import { useChannelStore } from '@/store/modules/channel';
-import { fetchEditChannelName } from '@/api/channel';
+import { fetchAddChanneList, fetchEditChannelName } from '@/api/channel';
 
 const router = useRouter();
 const store = useChannelStore();
 const loading = ref(false);
 const inputChecked = ref([]);
-const listClickd = ref(false);
-const listId = ref(null);
+const newServerName = ref('');
+
+// const editing = ref(false);
 const editMode = ref(false); // 값이 false 이면 사용자 정보 조회 모드
 
 onBeforeMount(() => {
@@ -147,135 +178,79 @@ const emits = defineEmits([
   'submitUpdateModal',
 ]);
 
-// form values
-const updateMemberInfo = ref({
-  memberId: '',
-  name: '',
-  role: '',
-  useYn: '',
-  iconFileId: '',
-});
-
-const password = ref('');
-// 타입 셀렉트 박스 show/hide 여부
-const selectBoxShow = ref(false);
-
-// onBeforeUpdate(() => {
-//   updateMemberInfo.value.memberId = props.memberInfo.memberId;
-//   updateMemberInfo.value.name = props.memberInfo.name;
-//   updateMemberInfo.value.useYn = props.memberInfo.useYn;
-//   updateMemberInfo.value.role = props.memberInfo.role;
-//   updateMemberInfo.value.iconFileId = props.memberInfo.iconFileId;
-// });
-
-const logMessage = ref('');
-
 const closeModal = () => {
   emits('update:showEditServerListModal', false);
   editMode.value = false;
 };
 
-// 수정 버튼 DOM refs
-const nameInput = ref(null);
-// 수정 버튼 클릭 이벤트
-// const clickEditButton = () => {
-//   editMode.value = !editMode.value;
-//   nameInput.value.focus();
-//   initInputForm();
-// };
+// 서버 추가
+const saveEdit = async () => {
+  if (newServerName.value !== '') {
+    let newOrderList = store.serverList.map(server => server.channelOrder);
+    newOrderList = Math.max(...newOrderList);
 
-// const submitForm = async () => {
-//   loading.value = true;
-//   /**
-//    * 사용자 수정 API 호출 시 password, iconFileId는 null 가능, 나머지는 not null
-//    * {
-//    *   "memberId": "lemon",
-//    *   "name": "사용자",
-//    *   "password": "password1234",
-//    *   "iconFileId": 1,
-//    *   "useYn": "Y"
-//    *   "role": "USER"
-//    * }
-//    * */
-//   const payload = {
-//     memberId: updateMemberInfo.value.memberId,
-//     name: updateMemberInfo.value.name,
-//     password: password.value,
-//     useYn: updateMemberInfo.value.useYn,
-//     role: updateMemberInfo.value.role,
-//   };
-//   try {
-//     const { data } = await fetchUpdateMember(payload);
-//     if (Object.prototype.hasOwnProperty.call(data, 'errorMessage')) {
-//       let detailErrrorType = '';
-//       if (data.details && data.details.split(' ').length === 1) {
-//         // TODO 에러처리
-//         /*data.details === 'memberId'
-//           ? (detailErrrorType = '아이디 - ')
-//           : data.details === 'name'
-//           ? (detailErrrorType = '이름 - ')
-//           : (detailErrrorType = '비밀번호 - ');*/
-//       }
-//       logMessage.value = detailErrrorType + data.errorMessage;
-//     } else {
-//       editMode.value = false;
-//       $toast.success('사용자 정보 수정 완료');
-//       emits('submitUpdateMemberInfo', updateMemberInfo.value);
-//     }
-//   } catch (err) {
-//     console.log('error :::: ', err);
-//   } finally {
-//     setTimeout(() => {
-//       loading.value = false;
-//     }, 200);
-//   }
-// };
-
-// const formValid = () => {
-//   if (
-//     !updateMemberInfo.value.memberId ||
-//     !updateMemberInfo.value.name ||
-//     !updateMemberInfo.value.role
-//   ) {
-//     return false;
-//   }
-// };
-
-// input form 초기화
-// const initInputForm = () => {
-//   logMessage.value = '';
-//   updateMemberInfo.value.memberId = props.memberInfo.memberId;
-//   updateMemberInfo.value.name = props.memberInfo.name;
-//   updateMemberInfo.value.role = props.memberInfo.role;
-// };
+    const params = {
+      name: newServerName.value,
+      parentId: 0,
+      dept: 0,
+      channelOrder: newOrderList + 1,
+    };
+    try {
+      const res = await fetchAddChanneList(params);
+      const errorCode = res.data.httpStatus;
+      if (errorCode === 400) {
+        alert(res.data.errorMessage);
+      } else {
+        editMode.value = false;
+        newServerName.value = '';
+        inputChecked.value.push(res.data.id);
+        await store.SET_CHANNEL_LIST();
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  } else {
+    editMode.value = false;
+  }
+};
+const updateInput = event => {
+  console.log(event);
+  newServerName.value = event.target.value;
+};
 </script>
 
 <style scoped>
 [class~='error'] {
   color: red;
 }
+
 /* modal tansition 태그 styling */
 .v-enter-from,
 .v-leave-to {
   opacity: 0;
 }
+
 .v-enter-active,
 .v-leave-active {
   transition: all 0.5s ease;
 }
+
 .v-enter-to,
 .v-leave-from {
   opacity: 1;
 }
+
 .modal {
   --bs-modal-width: 500px;
 }
+
 /* 프로필 상단 영역 */
 .profile-banner {
   min-height: 116px;
   border-radius: 4px 4px 0 0;
   background-color: #1e1f22;
 }
+
 /* 프로필 편집 버튼 */
 .profile-update-button {
   top: 14px;
@@ -288,6 +263,7 @@ const nameInput = ref(null);
   padding: 5px;
   border-radius: 50%;
 }
+
 .profile-update-button-image {
   width: 120px;
   height: 120px;
@@ -296,6 +272,7 @@ const nameInput = ref(null);
   left: 22px;
   border-radius: 6%;
 }
+
 /* 프로필 수정 Form */
 .profile-update-form {
   display: flex;
@@ -308,20 +285,24 @@ const nameInput = ref(null);
   color: white;
   margin: 1rem;
 }
+
 .update-input-box label {
   font-size: 13px;
   color: #bcbcbd;
 }
+
 .update-input-box .custom-input {
   font-size: 17px;
   background-color: #313338;
 }
+
 .update-input-box .custom-input[readonly] {
   background-color: #1e1f22;
   padding: 0;
   height: auto;
   cursor: default;
 }
+
 /* 사용자 역할 Box */
 .role-box {
   display: flex;
@@ -334,6 +315,7 @@ const nameInput = ref(null);
   background: #161616;
   border-radius: 4px;
 }
+
 .role-circle {
   display: flex;
   flex-shrink: 0;
@@ -348,6 +330,7 @@ const nameInput = ref(null);
   border-radius: 50%;
   forced-color-adjust: none;
 }
+
 /* 닫기 및 수정하기 버튼 영역 */
 .update-button-container {
   display: flex;
@@ -357,6 +340,7 @@ const nameInput = ref(null);
   background-color: rgb(16, 25, 16);
   padding: 16px;
 }
+
 .custom-cancel-btn {
   background-color: transparent;
   border: none;
@@ -367,9 +351,11 @@ const nameInput = ref(null);
   color: #fdfdfd;
   margin-right: 12px;
 }
+
 .custom-cancel-btn:hover {
   text-decoration: underline;
 }
+
 .update-confirm-btn {
   width: auto;
   min-width: 60px;
@@ -381,9 +367,11 @@ const nameInput = ref(null);
   border-radius: 3px;
   color: #fdfdfd;
 }
+
 .update-confirm-btn.disabled {
   background-color: #5865f2;
 }
+
 .update-confirm-btn:hover {
   background-color: #4752c4;
   color: #ffffff;
@@ -397,15 +385,18 @@ const nameInput = ref(null);
   border: 1px solid #313338;
   cursor: pointer;
 }
+
 .form-select:focus {
   border: 1px solid #313338;
   box-shadow: none;
 }
+
 .form-select option {
   background-color: #313338;
   color: #f3f4f5;
   cursor: pointer;
 }
+
 .bi-pencil:hover {
   color: green;
 }
