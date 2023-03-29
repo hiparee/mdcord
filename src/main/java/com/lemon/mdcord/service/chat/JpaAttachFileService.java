@@ -106,7 +106,8 @@ public class JpaAttachFileService implements AttachFileService {
     }
 
     private void validateImageFileInfo(String fileName) {
-        AttachFile attachFile = attachFileRepository.findByRealFileName(fileName).orElseThrow(() -> new AttachFileNotFoundException(fileName));
+        String[] splitFileName = fileName.split("\\.");
+        AttachFile attachFile = attachFileRepository.findByRealFileName(splitFileName[0]).orElseThrow(() -> new AttachFileNotFoundException(fileName));
         if(!FILE_EXTS.contains(attachFile.getFileExt())) throw new AttachFileNotMatchedImageFileExt(attachFile.getFileExt());
     }
 
