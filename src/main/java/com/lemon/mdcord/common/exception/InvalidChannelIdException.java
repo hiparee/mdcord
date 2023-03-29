@@ -22,4 +22,8 @@ public class InvalidChannelIdException extends AbstractException {
         super("channel ID list : " + channelIds + " are invalid.");
     }
 
+    public InvalidChannelIdException(Long channelId) {
+        super("channel ID : " + channelId + " is invalid.");
+    }
+
 }

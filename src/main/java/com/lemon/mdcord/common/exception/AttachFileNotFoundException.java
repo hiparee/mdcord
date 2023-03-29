@@ -20,4 +20,8 @@ public class AttachFileNotFoundException extends AbstractException {
     public AttachFileNotFoundException(String fileName) {
         super("Attach file not found with this file name " + fileName + ".");
     }
+
+    public AttachFileNotFoundException(Long attchFileId) {
+        super("Attach file not found with this file id " + attchFileId + ".");
+    }
 }
