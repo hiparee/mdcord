@@ -161,6 +161,12 @@
               </div>
             </div>
           </div>
+
+          <!-- <img
+            src="http://localhost:9000/channels/6/attach-file/V1BjqC0Fhr.png"
+            style="width: 100px; height: 100px"
+          /> -->
+
           <!-- 첨부파일 리스트 영역 끝 -->
           <div class="d-flex" style="flex-direction: row; width: 100%">
             <textarea
