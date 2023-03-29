@@ -73,4 +73,14 @@ public class SwaggerConfig {
                 .build();
     }
 
+    @Bean
+    public GroupedOpenApi attachFileOpenApi() {
+        String[] paths = {"/channels/**/attach-file/**", "/channels/**/image-file/**"};
+
+        return GroupedOpenApi.builder()
+                .group("첨부 파일 관련 API(CDN 서버 대용)")
+                .pathsToMatch(paths)
+                .build();
+    }
+
 }
