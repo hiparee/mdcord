@@ -83,7 +83,7 @@ public class JpaChannelMemberService implements ChannelMemberService {
         channelMemberRepository.changeMemberState(memberId, state);
     }
 
-    private static Authentication getAuthentication() {
+    private Authentication getAuthentication() {
         return SecurityContextHolder.getContext().getAuthentication();
     }
 }
