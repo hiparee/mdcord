@@ -69,7 +69,11 @@
                     :key="server.id"
                     class="mb-3 update-input-box"
                   >
-                    <div class="custon-server-list">
+                    <div
+                      class="custom-server-list"
+                      @mouseover="hoverList($event, server.id)"
+                      @mouseleave="hoverList($event, server.id)"
+                    >
                       <div style="flex: 1 0; color: #cfcfcf">
                         <span
                           v-if="server.id !== editServerId"
@@ -77,7 +81,8 @@
                           >{{ server.name }}</span
                         >
                         <input
-                          v-model="editServerNameInput"
+                          :value="editServerName"
+                          @input="editServerNameInput($event)"
                           style="
                             color: #cfcfcf;
                             background-color: #1e1f22;
@@ -89,7 +94,10 @@
                         <i
                           v-if="server.id !== editServerId"
                           @click="editServerNameList(server)"
-                          class="bi-pencil-fill"
+                          :class="{
+                            [hoverClass]:
+                              isHovered && server.id === hoverListId,
+                          }"
                           style="font-size: x-small; display: inline-flex"
                         ></i>
                         <i
@@ -158,13 +166,28 @@ import { fetchAddChanneList, fetchEditChannelName } from '@/api/channel';
 
 const router = useRouter();
 const store = useChannelStore();
+const emits = defineEmits(['update:showEditServerListModal']);
+defineProps({
+  showEditServerListModal: {
+    type: Boolean,
+    default: false,
+  },
+  serverList: {
+    type: Object,
+    required: true,
+  },
+});
 const loading = ref(false);
 const inputChecked = ref([]);
 const newServerName = ref('');
 const editServerId = ref(null);
 // const editing = ref(false);
 const editMode = ref(false); // 값이 false 이면 사용자 정보 조회 모드
-const editServerNameInput = ref('');
+const editServerName = ref('');
+
+const hoverClass = ref('bi-pencil-fill');
+const isHovered = ref(false);
+const hoverListId = ref(null);
 onBeforeMount(() => {
   for (const server of store.serverList) {
     if (server.useYn === 'Y') {
@@ -173,11 +196,8 @@ onBeforeMount(() => {
   }
 });
 const changeChannelStatus = async server => {
-  console.log(server);
   if (inputChecked.value.includes(server.id)) {
-    console.log('del');
     inputChecked.value = inputChecked.value.filter(i => i !== server.id);
-    console.log('now', inputChecked.value);
   } else {
     inputChecked.value.push(server.id);
   }
@@ -203,21 +223,6 @@ const changeChannelStatus = async server => {
       console.log(e);
     });
 };
-const props = defineProps({
-  showEditServerListModal: {
-    type: Boolean,
-    default: false,
-  },
-  serverList: {
-    type: Object,
-    required: true,
-  },
-});
-const emits = defineEmits([
-  'reloadFetchMembers',
-  'update:showUpdateUserModal',
-  'submitUpdateModal',
-]);
 
 const closeModal = () => {
   emits('update:showEditServerListModal', false);
@@ -255,37 +260,48 @@ const addServer = async () => {
   }
 };
 const updateInput = event => {
-  console.log(event);
   newServerName.value = event.target.value;
 };
 const editServerNameList = server => {
   editServerId.value = server.id;
+  editServerName.value = server.name;
 };
 
 const changeServerName = async server => {
-  if (editServerNameInput.value !== '') {
+  if (editServerName.value !== '') {
     const params = {
       id: server.id,
       useYn: server.useYn,
-      channelName: editServerNameInput.value,
+      channelName: editServerName.value,
       channelOrder: server.channelOrder,
     };
     await fetchEditChannelName(params);
     try {
       await store.SET_CHANNEL_LIST();
-      editServerNameInput.value = '';
+      editServerName.value = '';
       editServerId.value = null;
     } catch (e) {
       console.log(e);
     }
   } else {
-    editServerNameInput.value = '';
+    editServerName.value = '';
     editServerId.value = null;
   }
 };
 const closeEditInput = () => {
   editServerId.value = null;
-  editServerNameInput.value = '';
+  editServerName.value = '';
+};
+const hoverList = (event, id) => {
+  hoverListId.value = id;
+  if (event.type === 'mouseover') {
+    isHovered.value = true;
+  } else {
+    isHovered.value = false;
+  }
+};
+const editServerNameInput = event => {
+  editServerName.value = event.target.value;
 };
 </script>
 
@@ -406,12 +422,12 @@ button.edit-button:active {
   background-color: rgba(0, 122, 255, 0.1);
   box-shadow: inset 0px 3px 5px rgba(0, 0, 0, 0.2);
 }
-.custon-server-list {
+.custom-server-list {
   display: flex;
   padding: 10px;
 }
 
-.custon-server-list:hover {
+.custom-server-list:hover {
   background-color: #393c41;
   color: white;
   border-radius: 3px;
