@@ -58,7 +58,6 @@ public class JpaMemberService implements MemberService {
     @Override
     public MemberCreateResponse createMember(final MemberCreateRequest dto) {
         Optional<Member> checkDuplicated = memberRepository.findById(dto.getMemberId());
-
         if(checkDuplicated.isPresent()) {
             throw new MemberDuplicatedException(dto.getMemberId());
         }
@@ -76,8 +75,8 @@ public class JpaMemberService implements MemberService {
 
         Member savedMember = memberRepository.save(member);
 
-        long rootChannelId = -1l;
-        ChannelList rootChannelList = channelListRepository.findById(rootChannelId).orElseThrow(() -> new ChannelNotFoundException(rootChannelId));
+        long rootChannelId = dto.getChannelId();
+        ChannelList rootChannelList = channelListRepository.findByIdAndParentId(rootChannelId, 0L).orElseThrow(() -> new ChannelNotFoundException(rootChannelId));
         ChannelMember channelMember = ChannelMember.builder()
                 .member(savedMember)
                 .channelList(rootChannelList)
