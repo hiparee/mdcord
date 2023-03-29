@@ -109,8 +109,7 @@ public class JpaAttachFileService implements AttachFileService {
     }
 
     private void validateImageFileInfo(String fileName) {
-        // TODO - 파일 네임 자체에 대한 검증이 필요함.
-
+        if(fileName.matches("/[a-z0-9]*.[a-z]")) throw new AttachFileNotFoundException(fileName);
         String[] splitFileName = fileName.split("\\.");
         AttachFile attachFile = attachFileRepository.findByRealFileName(splitFileName[0]).orElseThrow(() -> new AttachFileNotFoundException(fileName));
         if(!FILE_EXTS.contains(attachFile.getFileExt())) throw new AttachFileNotMatchedImageFileExt(attachFile.getFileExt());
