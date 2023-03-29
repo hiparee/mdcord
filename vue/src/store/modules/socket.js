@@ -6,6 +6,7 @@ import { fetchChatlist, fetchMoreChatlist } from '@/api/chat.js';
 import { timeAgo } from '@/utils/chat.js';
 import { userProfileIcon } from '@/utils/common.js';
 import { askNotificationPermission, notify } from '@/utils/notification.js';
+import { signOutUser } from '@/api/user';
 
 import dayjs from 'dayjs';
 import router from '@/router/routes';
@@ -26,12 +27,25 @@ export const webSocketStore = defineStore('socket', () => {
 
     websocket.value.onclose = async event => {
       console.log('%c# [WebSocket] : close', 'color:red');
-      useToast({
-        duration: 5000,
-        position: 'bottom-right',
-        queue: true,
-        pauseOnHover: true,
-      }).error(`<div>연결이 종료되었습니다. 다시 로그인을 해주세요</div>`);
+
+      if (Object.entries(useUserStore().userInfo).length == 0) {
+        useToast({
+          duration: 5000,
+          position: 'bottom-right',
+          queue: true,
+          pauseOnHover: true,
+        }).error(`<div>로그아웃 되었습니다.</div>`);
+      } else {
+        useToast({
+          duration: 5000,
+          position: 'bottom-right',
+          queue: true,
+          pauseOnHover: true,
+        }).error(`<div>연결이 종료되었습니다. 다시 로그인을 해주세요</div>`);
+        await signOutUser();
+        useUserStore().SET_SIGN_OUT();
+        await router.replace('/');
+      }
     };
 
     websocket.value.onmessage = ({ data }) => {

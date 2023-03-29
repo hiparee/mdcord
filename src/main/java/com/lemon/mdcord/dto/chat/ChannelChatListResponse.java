@@ -1,9 +1,12 @@
 package com.lemon.mdcord.dto.chat;
 
+import com.lemon.mdcord.domain.chat.AttachFile;
 import com.lemon.mdcord.domain.chat.ChannelChat;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 public class ChannelChatListResponse {
@@ -18,6 +21,7 @@ public class ChannelChatListResponse {
     private String fileYn;
     private String fixYn;
     private Long replyChatId;
+    private List<ChatAttachFileResponse> attachFileList = new ArrayList<>();
     private LocalDateTime createDate;
     private String createBy;
     private LocalDateTime updateDate;
@@ -36,6 +40,11 @@ public class ChannelChatListResponse {
         this.fileYn = cc.getFileYn();
         this.fixYn = cc.getFixYn();
         this.replyChatId = cc.getReplyChatId();
+        if(cc.getAttachFiles().size() > 0) {
+            for(AttachFile af : cc.getAttachFiles()) {
+                this.attachFileList.add(new ChatAttachFileResponse(af));
+            }
+        }
         this.createDate = cc.getCreateDate();
         this.createBy = cc.getCreateBy();
         this.updateDate = cc.getUpdateDate();

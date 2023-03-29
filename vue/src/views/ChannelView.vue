@@ -76,7 +76,8 @@
     <!--    채널목록-->
     <div style="display: inline-flex; width: 100%">
       <div
-        v-if="active === '채널목록'"
+        style="min-width: 250px; max-width: 300px; min-height: 500px"
+        v-if="active === '채널목록' && getChannelListValue"
         class="list-group list-group-flush channel-list"
       >
         <ul id="sidebar" class="list-unstyled ps-0">
@@ -108,6 +109,9 @@
           element-id="myFirstMenu"
           @option-clicked="optionClicked"
         ></VueContextMenu>
+      </div>
+      <div v-else style="min-width: 250px; max-width: 500px">
+        채널을 추가해주세요
       </div>
       <!--    <ul-->
       <!--      채널목록-->
@@ -202,12 +206,22 @@ const channelNumber = ref(null);
 const serverChange = serverId => {
   store.SET_ACCESSED_CHANNEL_INFO('serverId', serverId);
   store.SET_ACCESSED_CHANNEL_INFO('channelId', null);
+  channelList.value = [];
+  channelNumber.value = null;
 };
 const getServername = computed(() => {
   return store.getServerList.find(server => {
     return store.accessedChannelInfo.serverId == server.id;
   })?.name;
 });
+const getChannelListValue = computed(() => {
+  const data = channelListValue.value.map(item => item.parentId);
+  return data.includes(store.getAccessedChannelInfo);
+  // return data[0];
+});
+console.log(getChannelListValue);
+console.log('serverId', store.getAccessedChannelInfo);
+
 // 활성화된 채널 구분
 const channelListNumber = channel => {
   inputChecked.value = [];
