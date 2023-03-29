@@ -1,7 +1,6 @@
 package com.lemon.mdcord.domain.channel;
 
 import com.lemon.mdcord.domain.BaseEntity;
-import com.lemon.mdcord.domain.chat.ChannelChat;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -56,12 +55,6 @@ public class ChannelList extends BaseEntity {
 
     @OneToMany(mappedBy = "parentId")
     private List<ChannelList> child = new ArrayList<>();
-
-    @OneToMany(mappedBy = "channelList")
-    private List<ChannelChat> channelChats;
-
-    @OneToMany(mappedBy = "channelList")
-    private List<ChannelMember> channelMembers;
 
     @Builder
     public ChannelList(String name, Long parentId, Integer dept, Integer channelOrder, String createBy) {
