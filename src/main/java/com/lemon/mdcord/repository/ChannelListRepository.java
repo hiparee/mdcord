@@ -19,6 +19,7 @@ public interface ChannelListRepository extends JpaRepository<ChannelList, Long> 
     List<ChannelList> findByIdIn(Set<Long> channelIds);
     List<ChannelList> findByIdInAndUseYn(Set<Long> channelIds, String useYn);
     Optional<ChannelList> findByIdAndParentId(Long channelId, Long parentId);
+    List<ChannelList> findByIdInAndParentId(List<Long> channelId, Long parentId);
 
     @Modifying
     @Query("update ChannelList cl set cl.channelOrder = cl.channelOrder +1 where cl.channelOrder >= :order")
