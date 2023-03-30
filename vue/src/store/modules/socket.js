@@ -175,6 +175,7 @@ export const webSocketStore = defineStore('socket', () => {
         useChatStore().lastChat[parseChannelId] = {
           chatId: parseData.chatId,
           fileYn: parseData.fileYn,
+          memberId: parseData.memberId,
         };
 
         if (parseData.fileYn == 'Y') {

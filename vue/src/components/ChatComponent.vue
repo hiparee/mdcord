@@ -108,6 +108,10 @@
                         :data-chat-id="chat.chatId"
                       ></p>
 
+                      <!-- <div v-if="isMatchYoutubeUrl(chat.content)"> -->
+                      <div v-html="renderYoutubeIframe(chat.content)"></div>
+                      <!-- </div> -->
+
                       <div
                         class="chat-file-list-wrap"
                         v-if="chat.attachFileList.length > 0"
@@ -131,9 +135,11 @@
                               <div>
                                 <img
                                   class="img-thumbnail m-3"
-                                  :src="`/src/assets/images/ext/${file.fileExt.substring(
-                                    1,
-                                  )}.png`"
+                                  :src="
+                                    getImageUrl(
+                                      `ext/${file.fileExt.substring(1)}.png`,
+                                    )
+                                  "
                                   style="width: 70px"
                                   @click="
                                     attachFileDown(viteAppApiUrl, file.id)
@@ -198,7 +204,7 @@
                   <img
                     v-else
                     class="img-thumbnail"
-                    :src="`/src/assets/images/ext/${file.ext}.png`"
+                    :src="getImageUrl(`ext/${file.ext}.png`)"
                     style="width: 70px"
                   />
                 </div>
@@ -499,10 +505,29 @@ const renderMsgHtml = text => {
     '<a href="$&" target="_blank">$&</a>',
   );
 
-  let makeHtml = `${replaceUrlText}`;
-  // let makeHtml = `<div class='msg-inner'>${replaceUrlText}</div>`;
+  // let makeHtml = `${replaceUrlText}`;
+  let makeHtml = `<div class='msg-inner'>${replaceUrlText}</div>`;
   // makeHtml += '<div class="more-btn"><span>더보기</span></div>';
   return makeHtml;
+};
+
+const renderYoutubeIframe = text => {
+  const youtubeUrl =
+    /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
+  return text.match(youtubeUrl) ? text.replace(youtubeUrl, youtubeParser) : '';
+};
+
+const youtubeParser = (url, ...groups) => {
+  const container = `
+    <div class="video-container mr-3 ml-3">
+      <iframe width="560" height="315" src="https://www.youtube.com/embed/#ID#" title="YouTube video player"
+        frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen></iframe>
+    </div>`;
+
+  return groups && groups[6].length == 11
+    ? container.replace('#ID#', groups[6])
+    : url;
 };
 
 onMounted(() => {
@@ -631,7 +656,12 @@ watch(
     console.log('watch !!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
     console.log(newValue);
 
-    if (newValue && newValue.fileYn == 'Y' && fileList.value.length > 0) {
+    if (
+      newValue &&
+      newValue.memberId == userInfo.memberId &&
+      newValue.fileYn == 'Y' &&
+      fileList.value.length > 0
+    ) {
       console.log('upload 할 파일', fileList);
       const chatId = newValue.chatId;
       let formData = new FormData();
@@ -719,6 +749,7 @@ watch(
   display: flex;
   flex-direction: column;
   align-items: end;
+  overflow: hidden;
 }
 
 .drag-enter-active,
