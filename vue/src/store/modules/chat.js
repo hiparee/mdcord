@@ -34,13 +34,13 @@ export const useChatStore = defineStore('chat', () => {
 
     channels[channelId] = [];
     return new Promise(resolve => {
-      setTimeout(() => {
-        // console.log('데이터 적재');
-        channels[channelId] = newChannelData
-          .concat(channels[channelId] || [])
-          .reverse();
-        resolve();
-      }, 500);
+      // setTimeout(() => {
+      // console.log('데이터 적재');
+      channels[channelId] = newChannelData
+        .concat(channels[channelId] || [])
+        .reverse();
+      resolve();
+      // }, 500);
     });
   };
 
@@ -66,15 +66,16 @@ export const useChatStore = defineStore('chat', () => {
     console.log(newChannelData);
 
     return new Promise(resolve => {
-      setTimeout(() => {
-        channels[channelId] = newChannelData.concat(channels[channelId]);
-        resolve();
-      }, 500);
+      // setTimeout(() => {
+      channels[channelId] = newChannelData.concat(channels[channelId]);
+      resolve();
+      // }, 500);
     });
   };
 
   const processChatData = data => {
     const dataLast = data.last;
+
     return data.content.reduce((acc, item) => {
       const createDate = dayjs(item.createDate).format('YYYY-MM-DD HH:mm:ss');
       const ymdhm = dayjs(item.createDate).format('YYYYMMDDHHmm');
@@ -89,8 +90,8 @@ export const useChatStore = defineStore('chat', () => {
         iconFileId: userProfileIcon(item.memberIconId),
         createDate: createDate,
         timeText: dayjs(createDate).format('YYYY. MM. DD A HH:mm:ss'),
-        timeAgo: timeAgo(createDate),
         dataLast: dataLast,
+        attachFileList: item.attachFileList,
       };
 
       if (!acc[chatKey]) {
