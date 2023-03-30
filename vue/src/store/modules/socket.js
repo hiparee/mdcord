@@ -40,9 +40,8 @@ export const webSocketStore = defineStore('socket', () => {
           queue: true,
           pauseOnHover: true,
         }).error(`<div>연결이 종료되었습니다. 다시 로그인을 해주세요</div>`);
-        await signOutUser();
-        useUserStore().SET_SIGN_OUT();
-        await router.replace('/');
+        useChannelStore().CLEAR_CHANNEL_SESSION();
+        router.replace('/');
       }
     };
 
