@@ -135,9 +135,11 @@
                               <div>
                                 <img
                                   class="img-thumbnail m-3"
-                                  :src="`/src/assets/images/ext/${file.fileExt.substring(
-                                    1,
-                                  )}.png`"
+                                  :src="
+                                    getImageUrl(
+                                      `ext/${file.fileExt.substring(1)}.png`,
+                                    )
+                                  "
                                   style="width: 70px"
                                   @click="
                                     attachFileDown(viteAppApiUrl, file.id)
@@ -202,7 +204,7 @@
                   <img
                     v-else
                     class="img-thumbnail"
-                    :src="getImageUrl(`ext/${userProfileIcon(file.ext)}.png`)"
+                    :src="getImageUrl(`ext/${file.ext}.png`)"
                     style="width: 70px"
                   />
                 </div>
