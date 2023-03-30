@@ -24,20 +24,7 @@
       />
 
       <div>
-        <h2
-          class="all-user-title"
-          style="
-            box-sizing: border-box;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            overflow: hidden;
-            text-transform: uppercase;
-            font-size: 14px;
-            line-height: 16px;
-            letter-spacing: 0.02em;
-            margin-top: 10px;
-          "
-        >
+        <h2 class="all-user-title">
           모든 사용자 — {{ isLoading === true ? 0 : searchedTotalCount }}명
         </h2>
       </div>
@@ -54,15 +41,7 @@
       <template v-else>
         <div class="overflow-auto position-relative" style="padding-top: 40px">
           <div class="member-table-fixed-header"></div>
-          <div
-            class="member-table-wrapper table-custom-scrollbar"
-            style="
-              overflow-x: hidden;
-              overflow-y: auto;
-              height: 100%;
-              padding-right: 5px;
-            "
-          >
+          <div class="member-table-wrapper table-custom-scrollbar">
             <table class="table align-middle member-table mb-0">
               <colgroup>
                 <col style="width: 7%" />
@@ -205,7 +184,7 @@ const openUpdateUserModal = member => {
   showUpdateUserModal.value = true;
   memberInfo.value = { ...member };
 };
-const closeUpdateUserModal = member => {
+const closeUpdateUserModal = () => {
   showUpdateUserModal.value = false;
 };
 const updateMemberInfo = async payload => {
@@ -215,6 +194,17 @@ const updateMemberInfo = async payload => {
 </script>
 
 <style scoped>
+.all-user-title {
+  box-sizing: border-box;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  text-transform: uppercase;
+  font-size: 14px;
+  line-height: 16px;
+  letter-spacing: 0.02em;
+  margin-top: 10px;
+}
 .add-member-btn {
   background-color: #248046;
   color: white;
@@ -237,7 +227,13 @@ const updateMemberInfo = async payload => {
   flex: 1 1 auto;
   height: 100%;
 }
-
+/* 사용자 목록 table */
+.member-table-wrapper {
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: 100%;
+  padding-right: 5px;
+}
 /* 사용자 목록 table styling*/
 .member-table-fixed-header {
   border-top: 1px solid #3b3f2c;
