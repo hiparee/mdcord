@@ -153,7 +153,7 @@ public class JpaChannelListService implements ChannelListService {
         return channelListRepository.findById(id).orElseThrow(() -> new ChannelNotFoundException(id));
     }
 
-    private static Authentication getAuthentication() {
+    private Authentication getAuthentication() {
         return SecurityContextHolder.getContext().getAuthentication();
     }
 

@@ -107,8 +107,56 @@
                         :title="JSON.stringify(chat)"
                         :data-chat-id="chat.chatId"
                       ></p>
-                      <!-- @mousedown.right="mousedown"
-                        @contextmenu.prevent -->
+
+                      <div
+                        class="chat-file-list-wrap"
+                        v-if="chat.attachFileList.length > 0"
+                      >
+                        <div
+                          class="file-item"
+                          v-for="(file, index) in chat.attachFileList"
+                          :key="index"
+                        >
+                          <div class="file-img">
+                            <img
+                              v-if="getIsImage(file.fileExt)"
+                              :src="`${viteAppApiUrl}/channels/${accessedChannelId}/image-file/${file.realFileName}${file.fileExt}`"
+                              class="img-thumbnail"
+                              alt="삭제되었거나 존재하지않는 이미지입니다"
+                              @click="attachFileDown(viteAppApiUrl, file.id)"
+                              v-on:load="chatScrollSetting"
+                            />
+
+                            <template v-else>
+                              <div>
+                                <img
+                                  class="img-thumbnail m-3"
+                                  :src="`/src/assets/images/ext/${file.fileExt.substring(
+                                    1,
+                                  )}.png`"
+                                  style="width: 70px"
+                                  @click="
+                                    attachFileDown(viteAppApiUrl, file.id)
+                                  "
+                                  v-on:load="chatScrollSetting"
+                                />
+                                <span class="file-name p-2">{{
+                                  file.originFileName
+                                }}</span>
+                              </div>
+                            </template>
+                          </div>
+                          <!-- <span class="file-name">{{
+                            file.originFileName
+                          }}</span> -->
+                          <!-- <button
+                            class="file-delete"
+                            @click="fileDelete(index)"
+                          >
+                            <i class="bi bi-trash3-fill text-danger"></i>
+                          </button> -->
+                        </div>
+                      </div>
                     </template>
                     <!-- <template v-for="(msg, index) in chat.content" :key="index">
                         <p class="msg" v-html="renderMsgHtml(msg)"></p>
@@ -118,7 +166,7 @@
                       class="small m-3 mb-3 mt-0 text-muted"
                       :title="`${chatAry[0].timeText}`"
                     >
-                      {{ chatAry[0].timeAgo }}
+                      {{ $dayjs().to(chatAry[0].createDate) }}
                     </p>
                   </div>
                 </div>
@@ -135,7 +183,7 @@
         >
           <!-- 첨부파일 리스트 영역 -->
           <div class="m-0">
-            <div class="file-list-wrap">
+            <div class="upload-file-list-wrap">
               <div
                 class="file-item"
                 v-for="(file, index) in fileList"
@@ -155,7 +203,7 @@
                   />
                 </div>
                 <span class="file-name">{{ file.name }}</span>
-                <button class="file-delete">
+                <button class="file-delete" @click="fileDelete(index)">
                   <i class="bi bi-trash3-fill text-danger"></i>
                 </button>
               </div>
@@ -227,6 +275,7 @@ import {
   nextTick,
   watch,
   onMounted,
+  onUnmounted,
   computed,
   inject,
   onBeforeMount,
@@ -244,6 +293,7 @@ import { timeAgo } from '../utils/chat.js';
 import { getImageUrl, userProfileIcon } from '../utils/common.js';
 import NavbarTitleComponent from '@/components/layout/NavbarTitleComponent.vue';
 import { useRoute } from 'vue-router';
+
 const route = useRoute();
 const dayjs = inject('dayjs');
 const userInfo = useUserStore().userInfo;
@@ -257,12 +307,6 @@ const message = ref('');
 const fileList = ref([]);
 const fileDragOverStatus = ref(false);
 const mouseDown = ref(false);
-// const props = defineProps({
-//   isLoading: {
-//     type: Boolean,
-//     default: true,
-//   },
-// });
 const isLoading = ref(true);
 const moreLoading = ref(false);
 const accessedChannelId = computed(
@@ -293,6 +337,9 @@ const accessedMemberList = computed(() => {
     return memberList;
   }
 });
+const viteAppApiUrl = computed(() => {
+  return import.meta.env.VITE_APP_API_URL;
+});
 const getDividerText = (index, createDate) => {
   const nowDate = dayjs().format('YYYYMMDD');
   const divDate = dayjs(createDate).format('YYYYMMDD');
@@ -302,16 +349,6 @@ const getDividerText = (index, createDate) => {
   } else {
     return dayjs(createDate).format('YYYY년 M월 D일');
   }
-};
-
-const mousedown = e => {
-  const context = refContextMenu.value;
-  console.log(e);
-  console.log(e.target.getAttribute('data-chat-id'));
-  console.log(e.clientX, e.clientY);
-  console.log(context.style.top);
-  context.style.top = e.clientY + 'px';
-  context.style.left = e.clientX + 'px';
 };
 
 const onInput = () => {
@@ -406,6 +443,15 @@ const addFiles = async files => {
   }
 };
 
+const fileDelete = index => {
+  // fileList.value.
+};
+
+const getIsImage = ext => {
+  const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.svg'];
+  return imageExtensions.includes(ext.toLowerCase());
+};
+
 const readAndCompressImage = async (file, quality) => {
   const image = await createImageBitmap(file);
 
@@ -461,9 +507,6 @@ const renderMsgHtml = text => {
 
 onMounted(() => {
   refMessage.value.addEventListener('input', onInput);
-  setInterval(() => {
-    updateChatListTimeAgo();
-  }, 5000);
 });
 
 window.addEventListener('mousedown', () => {
@@ -519,17 +562,6 @@ const handleScroll = async () => {
   }
 };
 
-const updateChatListTimeAgo = () => {
-  if (accessedChannelData.value) {
-    for (let i = 0; i < accessedChannelData.value.length; i++) {
-      accessedChannelData.value[i] = accessedChannelData.value[i].map(chat => {
-        chat.timeAgo = timeAgo(chat.createDate);
-        return chat;
-      });
-    }
-  }
-};
-
 const setChatList = async () => {
   isLoading.value = true;
 
@@ -556,6 +588,12 @@ const setChatTitle = () => {
 };
 const setChannelMemberList = () => {
   channelStore.SET_MEMBER_LIST();
+};
+
+const attachFileDown = (url, id) => {
+  const path = `${url}/channels/${accessedChannelId.value}/attach-file/${id}`;
+
+  window.open(path);
 };
 
 onBeforeMount(() => {
@@ -593,7 +631,7 @@ watch(
     console.log('watch !!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
     console.log(newValue);
 
-    if (newValue && newValue.fileYn == 'Y') {
+    if (newValue && newValue.fileYn == 'Y' && fileList.value.length > 0) {
       console.log('upload 할 파일', fileList);
       const chatId = newValue.chatId;
       let formData = new FormData();
@@ -605,9 +643,9 @@ watch(
       formData.append('chatId', newValue.chatId);
 
       formData.append('channelId', accessedChannelId.value);
-      console.log(formData);
+      // console.log(formData);
       const response = await fetchMultiFileUpload(formData);
-      console.log('파일업로드 완료', response.data);
+      // console.log('파일업로드 완료', response.data);
 
       //소켓 send
       const data = {
@@ -720,7 +758,63 @@ watch(
   }
 }
 
-.file-list-wrap {
+.flex-row-reverse .chat-file-list-wrap {
+  text-align: right;
+}
+.chat-file-list-wrap {
+  margin: 5px 15px;
+  margin-bottom: 10px;
+  display: flex;
+
+  & .file-item:not(:last-child) {
+    margin-right: 20px;
+  }
+  & .file-item {
+    overflow: hidden;
+    position: relative;
+    display: inline-block;
+    background: #222222;
+    border-radius: 10px;
+    text-align: center;
+    max-height: 200px;
+    max-width: 200px;
+
+    & .file-img {
+      cursor: pointer;
+      display: inline-block;
+      width: 100%;
+      height: 100%;
+      & .img-thumbnail {
+        width: 100%;
+        border: 0;
+        padding: 0;
+      }
+    }
+
+    & button.file-delete {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      width: 30px;
+      height: 30px;
+      display: inline-block;
+      text-align: center;
+      border-radius: 4px;
+      background: #666666;
+      border: 1px solid #333333;
+    }
+
+    & .file-name {
+      color: #f1f1f1;
+      max-width: 200px;
+      display: inline-block;
+      // text-overflow: ellipsis;
+      // white-space: nowrap;
+      // overflow: hidden;
+    }
+  }
+}
+.upload-file-list-wrap {
   & .file-item {
     position: relative;
     display: inline-block;

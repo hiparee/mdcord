@@ -1,15 +1,13 @@
-import { defineStore } from 'pinia';
-import { ref, computed, inject } from 'vue';
-import { useChannelStore, useUserStore, useChatStore } from '@/store/store';
-import { useToast } from 'vue-toast-notification';
-import { fetchChatlist, fetchMoreChatlist } from '@/api/chat.js';
-import { timeAgo } from '@/utils/chat.js';
+import { signOutUser } from '@/api/user';
+import { useChannelStore, useChatStore, useUserStore } from '@/store/store';
 import { userProfileIcon } from '@/utils/common.js';
 import { askNotificationPermission, notify } from '@/utils/notification.js';
-import { signOutUser } from '@/api/user';
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
+import { useToast } from 'vue-toast-notification';
 
-import dayjs from 'dayjs';
 import router from '@/router/routes';
+import dayjs from 'dayjs';
 
 export const webSocketStore = defineStore('socket', () => {
   // const dayjs = inject('dayjs');
@@ -42,15 +40,16 @@ export const webSocketStore = defineStore('socket', () => {
           queue: true,
           pauseOnHover: true,
         }).error(`<div>연결이 종료되었습니다. 다시 로그인을 해주세요</div>`);
-        await signOutUser();
-        useUserStore().SET_SIGN_OUT();
-        await router.replace('/');
+        useChannelStore().CLEAR_CHANNEL_SESSION();
+        router.replace('/');
       }
     };
 
     websocket.value.onmessage = ({ data }) => {
       console.log('▶ websocket.value.onmessage', JSON.parse(data));
       const parseData = JSON.parse(data);
+      const accessedChannelId =
+        useChannelStore().accessedChannelInfo.channelId ?? '';
 
       if (parseData.messageType == 'ACCESS') {
         for (const [key, val] of Object.entries(parseData.messageInfo)) {
@@ -77,16 +76,28 @@ export const webSocketStore = defineStore('socket', () => {
         const chatId = parseData.chatId;
         const fileData = JSON.parse(parseData.fileList);
 
-        console.log('file', fileData);
-        console.log('chatId', chatId);
-        console.log('channelId', channelId);
+        // console.log('file', fileData);
+        // console.log('chatId', chatId);
+        // console.log('channelId', channelId);
+
+        const channelData = useChatStore().chatList.channels[channelId];
+
+        [...channelData].reverse().forEach(v => {
+          // console.log(v);
+          const targetData = v.find(e => e.chatId === chatId);
+          if (targetData) {
+            console.log('targetData ->', targetData);
+            targetData.attachFileList.push(...fileData);
+
+            return false;
+          }
+        });
       } else if (parseData.messageType == 'SEND') {
         console.log('수신데이터', parseData);
         const parseChannelId = parseData.channelId;
         const parseChannelName = parseData.channelName;
-        const selectedChannelId =
-          useChannelStore().accessedChannelInfo.channelId ?? '';
-        if (parseChannelId != selectedChannelId) {
+
+        if (parseChannelId != accessedChannelId) {
           const $toast = useToast({
             duration: 1500,
             position: 'bottom-right',
@@ -119,8 +130,8 @@ export const webSocketStore = defineStore('socket', () => {
             iconFileId: parseData.iconFileId,
             createDate: createDate,
             timeText: dayjs(createDate).format('YYYY. MM. DD A HH:mm:ss'),
-            timeAgo: timeAgo(createDate),
             dataLast: false,
+            attachFileList: [],
           },
         ];
 
@@ -130,28 +141,33 @@ export const webSocketStore = defineStore('socket', () => {
           return;
         }
 
-        const lastIndex = data.length - 1;
-        const lastArray = data[lastIndex];
-        const lastItem = lastArray[lastArray.length - 1];
+        if (data.length > 0) {
+          const lastIndex = data.length - 1;
+          const lastArray = data[lastIndex];
+          const lastItem = lastArray[lastArray.length - 1];
 
-        console.log('lastItem', lastItem);
+          console.log('lastItem', lastItem);
 
-        const newCreateDate = dayjs(parseData.createDate).format(
-          'YYYY-MM-DD HH:mm',
-        );
-        const lastCreateDate = dayjs(lastItem.createDate).format(
-          'YYYY-MM-DD HH:mm',
-        );
-
-        // 이전 채팅 친 사용자와 같고 시:분까지 동일한 경우
-        if (
-          newCreateDate == lastCreateDate &&
-          parseData.memberId == lastItem.memberId
-        ) {
-          useChatStore().chatList.channels[parseChannelId][lastIndex].push(
-            ...pushData,
+          const newCreateDate = dayjs(parseData.createDate).format(
+            'YYYY-MM-DD HH:mm',
           );
+          const lastCreateDate = dayjs(lastItem.createDate).format(
+            'YYYY-MM-DD HH:mm',
+          );
+
+          // 이전 채팅 친 사용자와 같고 시:분까지 동일한 경우
+          if (
+            newCreateDate == lastCreateDate &&
+            parseData.memberId == lastItem.memberId
+          ) {
+            useChatStore().chatList.channels[parseChannelId][lastIndex].push(
+              ...pushData,
+            );
+          } else {
+            useChatStore().chatList.channels[parseChannelId].push(pushData);
+          }
         } else {
+          pushData[0].dataLast = true;
           useChatStore().chatList.channels[parseChannelId].push(pushData);
         }
 
@@ -182,7 +198,6 @@ export const webSocketStore = defineStore('socket', () => {
         fileYn: item.fileYn,
         iconFileId: userProfileIcon(item.memberIconId),
         timeText: dayjs(createDate).format('YYYY. MM. DD A HH:mm:ss'),
-        timeAgo: timeAgo(createDate),
       };
 
       if (!acc[chatKey]) {

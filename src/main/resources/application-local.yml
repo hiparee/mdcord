@@ -22,7 +22,7 @@ springdoc:
 
 spring:
   datasource:
-    url: jdbc:mariadb://172.16.10.121:3306/mdcord # 추후 개발용 DB가 새로 생성될 시 변경 필요
+    url: jdbc:mariadb://172.16.10.121:3306/mdcord-dev
     username: root
     password: '#3wnffkdl#'
     driver-class-name: org.mariadb.jdbc.Driver

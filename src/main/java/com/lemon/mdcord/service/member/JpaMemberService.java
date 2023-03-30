@@ -126,7 +126,7 @@ public class JpaMemberService implements MemberService {
         return randomIconFileId;
     }
 
-    private static Authentication getAuthentication() {
+    private Authentication getAuthentication() {
         return SecurityContextHolder.getContext().getAuthentication();
     }
 
