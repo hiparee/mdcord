@@ -1,17 +1,18 @@
-import { createWebHistory, createRouter } from 'vue-router';
-import ErrorView from '@/views/ErrorView.vue';
-import ContentsView from '@/views/ContentsView.vue';
-import MainView from '@/views/MainView.vue';
-import LoginView from '@/views/LoginView.vue';
 import {
   useChannelStore,
   useUserStore,
   webSocketStore,
 } from '@/store/store.js';
-import { useToast } from 'vue-toast-notification';
+import ChannelView from '@/views/ChannelView.vue';
+import ContentsView from '@/views/ContentsView.vue';
+import ErrorView from '@/views/ErrorView.vue';
+import LoginView from '@/views/LoginView.vue';
+import MainView from '@/views/MainView.vue';
 import SettingsView from '@/views/SettingsView.vue';
 import UserListView from '@/views/UserListView.vue';
-import ChannelView from '@/views/ChannelView.vue';
+import { createRouter, createWebHistory } from 'vue-router';
+import { useToast } from 'vue-toast-notification';
+import { signOutUser } from '@/api/user';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -89,7 +90,10 @@ router.beforeEach(async (to, from, next) => {
     } catch (error) {
       console.log(error);
       useToast().error('로그인정보 만료');
-      next({ name: 'login' });
+      useUserStore().SET_SIGN_OUT();
+      next({ name: '/' });
+
+      return false;
     }
   }
   next();
