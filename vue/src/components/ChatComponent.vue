@@ -202,7 +202,7 @@
                   <img
                     v-else
                     class="img-thumbnail"
-                    :src="`/src/assets/images/ext/${file.ext}.png`"
+                    :src="getImageUrl(`ext/${userProfileIcon(file.ext)}.png`)"
                     style="width: 70px"
                   />
                 </div>
