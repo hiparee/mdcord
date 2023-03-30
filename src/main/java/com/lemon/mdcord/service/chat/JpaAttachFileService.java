@@ -41,8 +41,6 @@ public class JpaAttachFileService implements AttachFileService {
         validateImageFileInfo(fileName);
 
         String filePath = getFilePath(channelId);
-        log.debug("current project path : {}", ROOT_PATH);
-        log.debug("file path : {}", filePath);
 
         byte[] imageBytes = null;
         try {
@@ -57,6 +55,11 @@ public class JpaAttachFileService implements AttachFileService {
             log.error("getCause : {}", e.getCause());
         }
 
+        if(imageBytes == null) {
+            log.error("current project path : {}", ROOT_PATH);
+            log.error("file path : {}", filePath);
+        }
+
         return imageBytes;
     }
 
@@ -68,8 +71,6 @@ public class JpaAttachFileService implements AttachFileService {
 
         String realFileName = attachFile.getRealFileName() + attachFile.getFileExt();
         String filePath = getFilePath(channelId);
-        log.debug("current project path : {}", ROOT_PATH);
-        log.debug("file path : {}", filePath);
 
         byte[] imageBytes = null;
         try {
@@ -82,6 +83,11 @@ public class JpaAttachFileService implements AttachFileService {
             log.error("getLocalizedMessage : {}", e.getLocalizedMessage());
             log.error("getMessage : {}", e.getMessage());
             log.error("getCause : {}", e.getCause());
+        }
+
+        if(imageBytes == null) {
+            log.error("current project path : {}", ROOT_PATH);
+            log.error("file path : {}", filePath);
         }
 
         String originFileName = attachFile.getOriginFileName();
