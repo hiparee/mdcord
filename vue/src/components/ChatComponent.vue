@@ -656,7 +656,12 @@ watch(
     console.log('watch !!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
     console.log(newValue);
 
-    if (newValue && newValue.fileYn == 'Y' && fileList.value.length > 0) {
+    if (
+      newValue &&
+      newValue.memberId == userInfo.memberId &&
+      newValue.fileYn == 'Y' &&
+      fileList.value.length > 0
+    ) {
       console.log('upload 할 파일', fileList);
       const chatId = newValue.chatId;
       let formData = new FormData();
