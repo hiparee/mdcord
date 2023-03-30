@@ -97,7 +97,7 @@ public class JpaAttachFileService implements AttachFileService {
     }
 
     private String getFilePath(Long channelId) {
-        return UPPER_DIRECTORY + "\\" + channelId + "\\";
+        return UPPER_DIRECTORY + "/" + channelId + "/";
     }
 
     private void validateJoinedChannelList(Long channelId) {
