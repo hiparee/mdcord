@@ -40,9 +40,9 @@ export const webSocketStore = defineStore('socket', () => {
           queue: true,
           pauseOnHover: true,
         }).error(`<div>연결이 종료되었습니다. 다시 로그인을 해주세요</div>`);
-        await signOutUser();
-        useUserStore().SET_SIGN_OUT();
-        await router.replace('/');
+        useChannelStore().CLEAR_CHANNEL_SESSION();
+        useUserStore().userInfo = {};
+        router.replace('/');
       }
     };
 
@@ -142,34 +142,40 @@ export const webSocketStore = defineStore('socket', () => {
           return;
         }
 
-        const lastIndex = data.length - 1;
-        const lastArray = data[lastIndex];
-        const lastItem = lastArray[lastArray.length - 1];
+        if (data.length > 0) {
+          const lastIndex = data.length - 1;
+          const lastArray = data[lastIndex];
+          const lastItem = lastArray[lastArray.length - 1];
 
-        console.log('lastItem', lastItem);
+          console.log('lastItem', lastItem);
 
-        const newCreateDate = dayjs(parseData.createDate).format(
-          'YYYY-MM-DD HH:mm',
-        );
-        const lastCreateDate = dayjs(lastItem.createDate).format(
-          'YYYY-MM-DD HH:mm',
-        );
-
-        // 이전 채팅 친 사용자와 같고 시:분까지 동일한 경우
-        if (
-          newCreateDate == lastCreateDate &&
-          parseData.memberId == lastItem.memberId
-        ) {
-          useChatStore().chatList.channels[parseChannelId][lastIndex].push(
-            ...pushData,
+          const newCreateDate = dayjs(parseData.createDate).format(
+            'YYYY-MM-DD HH:mm',
           );
+          const lastCreateDate = dayjs(lastItem.createDate).format(
+            'YYYY-MM-DD HH:mm',
+          );
+
+          // 이전 채팅 친 사용자와 같고 시:분까지 동일한 경우
+          if (
+            newCreateDate == lastCreateDate &&
+            parseData.memberId == lastItem.memberId
+          ) {
+            useChatStore().chatList.channels[parseChannelId][lastIndex].push(
+              ...pushData,
+            );
+          } else {
+            useChatStore().chatList.channels[parseChannelId].push(pushData);
+          }
         } else {
+          pushData[0].dataLast = true;
           useChatStore().chatList.channels[parseChannelId].push(pushData);
         }
 
         useChatStore().lastChat[parseChannelId] = {
           chatId: parseData.chatId,
           fileYn: parseData.fileYn,
+          memberId: parseData.memberId,
         };
 
         if (parseData.fileYn == 'Y') {
