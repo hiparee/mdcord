@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,6 +50,7 @@ public class MemberController {
     public List<MemberListResponse> getMemberList() {
         return memberService.getMemberList().stream()
                 .map(MemberListResponse::new)
+                .sorted(Comparator.comparing(MemberListResponse::getCreateDate).reversed())
                 .collect(Collectors.toList());
     }
 
