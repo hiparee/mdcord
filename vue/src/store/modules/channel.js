@@ -1,7 +1,10 @@
-import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
 import { fetchChannelList, fetchChannelMemberList } from '@/api/channel.js';
+import router from '@/router/routes';
+import { useUserStore } from '@/store/store';
 import { makeChannelTree } from '@/utils/channel.js';
+import { defineStore } from 'pinia';
+import { computed, ref } from 'vue';
+import { useToast } from 'vue-toast-notification';
 
 export const useChannelStore = defineStore(
   'channel',
@@ -43,26 +46,40 @@ export const useChannelStore = defineStore(
     };
 
     const SET_CHANNEL_LIST = async () => {
-      const res = await fetchChannelList();
-      const data = res.data.channelLists;
-      const serverData = [];
-      const channelData = [];
+      try {
+        const res = await fetchChannelList();
+        const data = res.data.channelLists;
+        const serverData = [];
+        const channelData = [];
 
-      data.forEach(item => {
-        item.dept == 0 ? serverData.push(item) : channelData.push(item);
-      });
+        data.forEach(item => {
+          item.dept == 0 ? serverData.push(item) : channelData.push(item);
+        });
 
-      const channelTreeData = makeChannelTree(channelData);
+        const channelTreeData = makeChannelTree(channelData);
 
-      serverList.value = serverData;
-      channelList.value = channelTreeData;
+        serverList.value = serverData;
+        channelList.value = channelTreeData;
 
-      // 접속시 Server list중 첫번째 server를 deafult 선택해주도록
-      if (
-        accessedChannelInfo.value.serverId == null &&
-        serverData.length !== 0
-      ) {
-        accessedChannelInfo.value.serverId = serverList.value[0].id;
+        // 접속시 Server list중 첫번째 server를 deafult 선택해주도록
+        if (
+          accessedChannelInfo.value.serverId == null &&
+          serverData.length !== 0
+        ) {
+          accessedChannelInfo.value.serverId = serverList.value[0].id;
+        }
+      } catch (error) {
+        useToast({
+          duration: 5000,
+          position: 'bottom-right',
+          queue: true,
+          pauseOnHover: true,
+        }).error(
+          `<div>접근가능한 채널이 없습니다. 관리자에게 문의하세요</div>`,
+        );
+        CLEAR_CHANNEL_SESSION();
+        useUserStore().userInfo = {};
+        router.replace('/');
       }
     };
 

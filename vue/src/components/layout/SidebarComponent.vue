@@ -146,7 +146,6 @@
             </ul>
           </div>
         </li>
-        <hr class="my-3" />
       </ul>
     </div>
 
