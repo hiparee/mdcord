@@ -383,3 +383,40 @@
   color: #f3f4f5;
   cursor: pointer;
 }
+/* 사용자 계정 등록 시 선택된 서버 목록 영역 */
+.server-section {
+  display: flex;
+  flex-direction: row;
+  margin-top: 0.55rem;
+  max-height: 58px;
+  flex-wrap: wrap;
+  overflow: auto;
+}
+.server-section .role-box {
+  min-height: 22px;
+  height: 100%;
+  padding: 0px 4px;
+}
+.role-box .server-name-text {
+  height: auto;
+  max-width: 200px;
+  margin-right: 4px;
+  font-size: 14px;
+  line-height: 16px;
+}
+.bi-x::before {
+  line-height: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+/* 서버 목록 영역 스크롤바 styling */
+.server-section::-webkit-scrollbar {
+  width: 3px;
+}
+.server-section::-webkit-scrollbar-thumb {
+  background: #6c757d;
+  border-radius: 10px;
+}
+.server-section::-webkit-scrollbar-track {
+  background: #2b2d31;
+}

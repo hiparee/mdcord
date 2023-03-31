@@ -64,6 +64,50 @@
                   required
                 />
               </div>
+
+              <div class="mb-2">
+                <label class="d-block">
+                  서버 선택
+                  <span style="font-size: 0.8rem"> (다중 선택 가능)</span>
+                </label>
+                <div>
+                  <select
+                    class="form-select"
+                    style="background-color: #1e1f22"
+                    aria-label="Default select example"
+                    v-model="selectedServer"
+                  >
+                    <option value="0" selected disabled>선택</option>
+                    <option
+                      v-for="(item, index) in filterActiveServerList"
+                      :key="index"
+                      :value="item.id"
+                      :disabled="
+                        selectedServerIdList.some(
+                          selectedServerId => selectedServerId === item.id,
+                        )
+                      "
+                    >
+                      {{ item.name }}
+                    </option>
+                  </select>
+                </div>
+                <div class="server-section">
+                  <div
+                    v-for="(data, index) in selectedServerList"
+                    :key="index"
+                    class="role-box mr-2"
+                  >
+                    <div class="server-name-text">
+                      {{ data.name }}
+                    </div>
+                    <span
+                      class="bi-x"
+                      @click.stop="removeSelectedServer(data.id)"
+                    ></span>
+                  </div>
+                </div>
+              </div>
               <span class="text-danger">{{ logMessage }}</span>
               <button
                 type="submit"
@@ -81,26 +125,17 @@
           </form>
         </div>
       </div>
-      <!--        <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            data-bs-dismiss="modal"
-          >
-            Close
-          </button>
-          <button type="button" class="btn btn-primary">Save changes</button>
-        </div>-->
     </div>
   </div>
 </template>
 
 <script setup>
 import SpinnerComponent from '@/components/common/SpinnerComponent.vue';
-import { ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { signupUser } from '@/api/user';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toast-notification';
+import { useChannelStore } from '@/store/modules/channel';
 
 const router = useRouter();
 
@@ -110,6 +145,42 @@ const loading = ref(false);
 const memberId = ref('');
 const name = ref('');
 const password = ref('');
+
+const selectedServer = ref(0); // 셀렉트박스에서 선택된 value
+const selectedServerList = ref([]); // 선택된 서버의 데이터 객체를 담을 리스트
+/*
+ *  선택된 서버의 아이디를 담을 리스트
+ *  ==> API에 담길 데이터
+ * */
+const selectedServerIdList = ref([]);
+// store에 있는 서버 리스트에서 활성화된 서버 필터링
+const filterActiveServerList = computed(() => {
+  return useChannelStore().serverList.filter(item => item.useYn === 'Y');
+});
+// 서버 셀렉트박스에 대한 감시자
+watch(selectedServer, newValue => {
+  const index = filterActiveServerList.value.findIndex(
+    option => option.id === newValue,
+  );
+  if (index > -1) {
+    selectedServerIdList.value.push(selectedServer.value);
+    selectedServerList.value.push({
+      ...filterActiveServerList.value[index],
+    });
+  }
+});
+
+const removeSelectedServer = removeId => {
+  if (selectedServer.value === removeId) {
+    selectedServer.value = 0;
+  }
+  selectedServerIdList.value = selectedServerIdList.value.filter(
+    item => item !== removeId,
+  );
+  selectedServerList.value = selectedServerList.value.filter(
+    item => item.id !== removeId,
+  );
+};
 
 const logMessage = ref('');
 
@@ -133,6 +204,7 @@ const submitForm = async () => {
     memberId: memberId.value,
     name: name.value,
     password: password.value,
+    channelIds: selectedServerIdList.value,
   };
   try {
     const { data } = await signupUser(payload);
@@ -143,7 +215,9 @@ const submitForm = async () => {
           ? (detailErrrorType = '아이디 - ')
           : data.details === 'name'
           ? (detailErrrorType = '이름 - ')
-          : (detailErrrorType = '비밀번호 - ');
+          : data.details === 'password'
+          ? (detailErrrorType = '비밀번호 - ')
+          : (detailErrrorType = '서버 선택 - ');
       }
       logMessage.value = detailErrrorType + data.errorMessage;
     } else {
@@ -160,7 +234,12 @@ const submitForm = async () => {
 };
 
 const formValid = () => {
-  if (!memberId.value || !name.value || !password.value) {
+  if (
+    !memberId.value ||
+    !name.value ||
+    !password.value ||
+    selectedServerList.value.length === 0
+  ) {
     return false;
   }
 };
@@ -170,6 +249,9 @@ const initInputForm = () => {
   memberId.value = '';
   name.value = '';
   password.value = '';
+  selectedServer.value = 0;
+  selectedServerIdList.value = [];
+  selectedServerList.value = [];
 };
 </script>
 
