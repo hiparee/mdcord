@@ -239,6 +239,7 @@
               v-model="message"
               @keydown.enter="sendMessage"
               placeholder="메세지 보내기"
+              @paste="handlePaste"
             ></textarea>
             <!-- <a class="ms-1 text-muted" href="#!"
               ><i class="bi bi-paperclip fs-3 text-light"></i
@@ -441,6 +442,31 @@ const getFileExt = fileName => {
   return fileExt;
 };
 
+/**
+ *  채팅입력Box에 이미지 붙여넣기 이벤트 처리
+ */
+const handlePaste = async event => {
+  const items = (event.clipboardData || event.originalEvent.clipboardData)
+    .items;
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    const isImage = item.type.includes('image');
+
+    if (isImage) {
+      const blob = item.getAsFile();
+      const file = new File([blob], 'image.png', { type: 'image/png' });
+      const src = await readFiles(file, isImage);
+      file.src = src;
+      file.isImage = isImage;
+      file.ext = getFileExt(file.name);
+      // input file에 추가
+      console.log(file);
+
+      fileList.value.push(file);
+    }
+  }
+};
+
 const addFiles = async files => {
   for (let i = 0; i < files.length; i++) {
     const isImage = files[i].type.includes('image');
@@ -485,7 +511,7 @@ const readFiles = (files, isImage) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     if (isImage) {
-      const compressedDataURL = readAndCompressImage(files, 0.01); // 이미지 품질을 50%로 줄임
+      const compressedDataURL = readAndCompressImage(files, 0.5); // 이미지 품질을 50%로 줄임
       reader.onload = async e => {
         resolve(compressedDataURL);
       };
