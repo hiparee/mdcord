@@ -9,65 +9,67 @@
   ╔╦╗╔╦╗╔═╗╔═╗╦═╗╔╦╗
   ║║║ ║║║  ║ ║╠╦╝ ║║
   ╩ ╩═╩╝╚═╝╚═╝╩╚══╩╝
-  </pre
-              >
+              </pre>
 
-              <div class="form-outline form-white mb-3">
-                <input
-                  type="text"
-                  id="userId"
-                  v-model="id"
-                  class="form-control form-control-lg bg-dark text-white fs-6"
-                  placeholder="ID"
-                  autocomplete="off"
-                />
-              </div>
-
-              <div class="form-outline form-white mb-2">
-                <input
-                  type="password"
-                  id="password"
-                  v-model="password"
-                  @keyup.enter="submit()"
-                  class="form-control form-control-lg bg-dark text-white fs-6"
-                  placeholder="PASSWORD"
-                  autocomplete="new-password"
-                />
-              </div>
-
-              <div class="form-check form-switch mb-5">
-                <div style="float: right">
+              <form @submit.prevent="submit()">
+                <div class="form-outline form-white mb-3">
                   <input
-                    class="form-check-input"
-                    type="checkbox"
-                    id="saveIdCheck"
-                    v-model="saveIdCheck"
-                    @change="saveId()"
+                    type="text"
+                    id="userId"
+                    v-model="id"
+                    class="form-control form-control-lg bg-dark text-white fs-6"
+                    placeholder="ID"
+                    autocomplete="off"
                   />
-                  <label class="form-check-label" for="saveIdCheck"
-                    >로그인 아이디 저장</label
-                  >
                 </div>
-              </div>
 
-              <button
-                id="submitBtn"
-                class="btn btn-light btn-lg px-5 w-100"
-                type="submit"
-                @click="submit()"
-              >
-                Login
-              </button>
+                <div class="form-outline form-white mb-2">
+                  <input
+                    type="password"
+                    id="password"
+                    v-model="password"
+                    @keyup.enter="submit()"
+                    class="form-control form-control-lg bg-dark text-white fs-6"
+                    placeholder="PASSWORD"
+                    autocomplete="new-password"
+                  />
+                </div>
 
-              <hr />
-              <div class="d-flex justify-content-center text-center mt-4 pt-1">
-                <a href="#!" class="text-white"
-                  ><i class="bi bi-google mx-2 fs-3"></i
-                ></a>
-                <a href="#!" class="text-white"
-                  ><i class="bi bi-github mx-2 fs-3"></i
-                ></a>
-              </div>
+                <div class="form-check form-switch mb-5">
+                  <div style="float: right">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="saveIdCheck"
+                      v-model="saveIdCheck"
+                      @change="saveId()"
+                    />
+                    <label class="form-check-label" for="saveIdCheck"
+                      >로그인 아이디 저장</label
+                    >
+                  </div>
+                </div>
+
+                <button
+                  id="submitBtn"
+                  class="btn btn-light btn-lg px-5 w-100"
+                  type="submit"
+                >
+                  Login
+                </button>
+
+                <hr />
+                <div
+                  class="d-flex justify-content-center text-center mt-4 pt-1"
+                >
+                  <a href="#!" class="text-white"
+                    ><i class="bi bi-google mx-2 fs-3"></i
+                  ></a>
+                  <a href="#!" class="text-white"
+                    ><i class="bi bi-github mx-2 fs-3"></i
+                  ></a>
+                </div>
+              </form>
             </div>
 
             <div>
@@ -85,11 +87,10 @@
 
 <script setup>
 import { useRouter } from 'vue-router/dist/vue-router';
-import { onMounted, ref, inject } from 'vue';
+import { onMounted, ref } from 'vue';
 import { fetchLogin } from '../api/user.js';
 import { useToast } from 'vue-toast-notification';
 import { useUserStore } from '../store/modules/user';
-import { webSocketStore } from '@/store/store';
 
 const router = useRouter();
 const $toast = useToast({
