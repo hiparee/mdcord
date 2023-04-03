@@ -114,14 +114,7 @@
                     autocomplete="new-password"
                   />
                   <div
-                    class="position-absolute"
-                    style="
-                      right: 10px;
-                      top: 30px;
-                      cursor: pointer;
-                      width: 17px;
-                      height: 20px;
-                    "
+                    class="show-password-button"
                     @click.stop="showPassword = !showPassword"
                   >
                     <i
@@ -134,19 +127,15 @@
                     ></i>
                   </div>
                 </div>
-                <div class="update-input-box mb-3">
+                <div
+                  class="update-input-box"
+                  style="margin-bottom: 0.7rem !important"
+                >
                   <label class="d-block"> 역할</label>
 
                   <div v-if="!updateMode" class="role-box">
                     <span style="" class="role-circle"></span>
-                    <div
-                      style="
-                        max-width: 200px;
-                        margin-right: 4px;
-                        font-size: 14px;
-                        line-height: 16px;
-                      "
-                    >
+                    <div class="role-box-text">
                       {{ userType(updateMemberInfo.role) }}
                     </div>
                   </div>
@@ -161,7 +150,7 @@
                     </select>
                   </div>
                 </div>
-                <div v-if="!updateMode" class="update-input-box">
+                <div v-if="!updateMode" class="update-input-box mb-3">
                   <label class="d-block"> 등록일</label>
                   <div
                     class="mt-1 p-0"
@@ -170,9 +159,64 @@
                     {{ $dayjs(memberInfo.createDate).format('MM월 DD, YYYY') }}
                   </div>
                 </div>
+                <div class="update-input-box">
+                  <label class="d-block"> 계정 상태</label>
+
+                  <div v-if="!updateMode" class="role-box">
+                    <span
+                      class="role-circle"
+                      :style="{
+                        'background-color':
+                          updateMemberInfo.useYn === 'Y'
+                            ? '#23a55a'
+                            : '#DA373C',
+                      }"
+                    ></span>
+                    <div class="role-box-text">
+                      {{ userUseYn(updateMemberInfo.useYn) }}
+                    </div>
+                  </div>
+                  <div v-else>
+                    <select
+                      class="form-select"
+                      aria-label="Default select example"
+                      v-model="updateMemberInfo.useYn"
+                      :style="{
+                        'background-color':
+                          updateMemberInfo.useYn === 'N' ? '#DA373C' : '',
+                      }"
+                    >
+                      <option value="Y">활성</option>
+                      <option value="N">비활성</option>
+                    </select>
+                  </div>
+                </div>
                 <span class="text-danger">{{ logMessage }}</span>
               </form>
-              <div class="update-button-container">
+              <div
+                class="update-button-container"
+                :style="
+                  props.memberInfo.updateDate !== '' &&
+                  props.memberInfo.updateDate !== null &&
+                  !updateMode
+                    ? 'justify-content: space-between'
+                    : ''
+                "
+              >
+                <div
+                  v-if="
+                    props.memberInfo.updateDate !== '' &&
+                    props.memberInfo.updateDate !== null &&
+                    !updateMode
+                  "
+                  class="update-input-box"
+                  style="padding-left: 0.5rem"
+                >
+                  <label class="d-block" style="color: #787878">
+                    {{ $dayjs(memberInfo.updateDate).format('YY.MM.DD HH:mm') }}
+                    last updated
+                  </label>
+                </div>
                 <button
                   type="button"
                   class="'btn custom-cancel-btn"
@@ -209,7 +253,12 @@ import SpinnerComponent from '@/components/common/SpinnerComponent.vue';
 import { onBeforeUpdate, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toast-notification';
-import { getImageUrl, userProfileIcon, userType } from '@/utils/common';
+import {
+  getImageUrl,
+  userProfileIcon,
+  userType,
+  userUseYn,
+} from '@/utils/common';
 import { fetchUpdateMember } from '@/api/user';
 
 const router = useRouter();
@@ -390,6 +439,14 @@ const initInputForm = () => {
     transform: rotate(1turn);
   }
 }
+.show-password-button {
+  position: absolute;
+  right: 10px;
+  top: 30px;
+  cursor: pointer;
+  width: 17px;
+  height: 20px;
+}
 .dropdown-menu.show {
   flex-wrap: wrap;
   display: flex;
@@ -397,5 +454,11 @@ const initInputForm = () => {
 }
 .dropdown-menu {
   --bs-dropdown-link-active-bg: #e9ecef;
+}
+.role-box-text {
+  max-width: 200px;
+  margin-right: 4px;
+  font-size: 15px;
+  line-height: 16px;
 }
 </style>
