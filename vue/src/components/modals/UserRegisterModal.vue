@@ -53,16 +53,29 @@
                   required
                 />
               </div>
-              <div class="mb-2">
+              <div class="mb-2 position-relative">
                 <label class="d-block"> 비밀번호 </label>
                 <input
                   v-model="password"
                   class="mt-1 custom-input"
-                  type="password"
+                  :type="showPassword === true ? 'text' : 'password'"
                   placeholder="비밀번호를 입력해주세요."
                   autocomplete="off"
                   required
                 />
+                <div
+                  class="show-password-button"
+                  @click.stop="showPassword = !showPassword"
+                >
+                  <i
+                    class="bi position-absolute"
+                    :class="
+                      showPassword === true
+                        ? 'bi-eye-fill'
+                        : 'bi-eye-slash-fill'
+                    "
+                  ></i>
+                </div>
               </div>
 
               <div class="mb-2">
@@ -145,6 +158,7 @@ const loading = ref(false);
 const memberId = ref('');
 const name = ref('');
 const password = ref('');
+const showPassword = ref(false); // 비밀번호 보이기/가리기 기능
 
 const selectedServer = ref(0); // 셀렉트박스에서 선택된 value
 const selectedServerList = ref([]); // 선택된 서버의 데이터 객체를 담을 리스트
@@ -249,6 +263,7 @@ const initInputForm = () => {
   memberId.value = '';
   name.value = '';
   password.value = '';
+  showPassword.value = false;
   selectedServer.value = 0;
   selectedServerIdList.value = [];
   selectedServerList.value = [];
@@ -258,5 +273,14 @@ const initInputForm = () => {
 <style scoped>
 [class~='error'] {
   color: red;
+}
+
+.show-password-button {
+  position: absolute;
+  right: 10px;
+  top: 36px;
+  cursor: pointer;
+  width: 17px;
+  height: 20px;
 }
 </style>
