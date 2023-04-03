@@ -114,14 +114,7 @@
                     autocomplete="new-password"
                   />
                   <div
-                    class="position-absolute"
-                    style="
-                      right: 10px;
-                      top: 30px;
-                      cursor: pointer;
-                      width: 17px;
-                      height: 20px;
-                    "
+                    class="show-password-button"
                     @click.stop="showPassword = !showPassword"
                   >
                     <i
@@ -445,6 +438,14 @@ const initInputForm = () => {
     -webkit-transform: rotate(1turn);
     transform: rotate(1turn);
   }
+}
+.show-password-button {
+  position: absolute;
+  right: 10px;
+  top: 30px;
+  cursor: pointer;
+  width: 17px;
+  height: 20px;
 }
 .dropdown-menu.show {
   flex-wrap: wrap;
