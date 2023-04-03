@@ -25,8 +25,7 @@
             <li>
               <a
                 class="dropdown-item"
-                href="#"
-                @click="showEditServerListModal = true"
+                @click.prevent="showEditServerListModal = true"
                 >설정</a
               >
             </li>
