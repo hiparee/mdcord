@@ -15,9 +15,7 @@ export const useChannelStore = defineStore(
     const getChannelList = computed(() => channelList.value);
     const getServerList = computed(() => serverList.value);
     const getMemberList = computed(() => memberList.value);
-    const getAccessedChannelInfo = computed(
-      () => accessedChannelInfo.value.serverId,
-    );
+    const getAccessedChannelInfo = computed(() => accessedChannelInfo.value);
     const SET_MEMBER_LIST = async () => {
       const { data } = await fetchChannelMemberList();
       memberList.value = {};
