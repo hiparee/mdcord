@@ -3,13 +3,12 @@ package com.lemon.mdcord.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
-import com.lemon.mdcord.domain.chat.ChannelChat;
-import com.lemon.mdcord.dto.chat.ChatAttachFileResponse;
-import com.lemon.mdcord.dto.chat.ChatCreateRequest;
-import com.lemon.mdcord.dto.chat.MessageType;
+import com.lemon.mdcord.dto.socket.MessageType;
+import com.lemon.mdcord.dto.socket.SockectMessageRequest;
 import com.lemon.mdcord.repository.ChannelListRepository;
+import com.lemon.mdcord.service.MessageTypeFactory;
+import com.lemon.mdcord.service.MessageTypeInterface;
 import com.lemon.mdcord.service.channel.ChannelListService;
 import com.lemon.mdcord.service.channel.ChannelMemberService;
 import com.lemon.mdcord.service.chat.ChannelChatService;
@@ -22,6 +21,7 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -38,6 +38,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     private final ChannelMemberService channelMemberService;
     private final ChannelListService channelListService;
     private final ChannelListRepository channelListRepository;
+    private final MessageTypeFactory messageTypeFactory;
     private final ObjectMapper objectMapper;
 
     /**
@@ -72,16 +73,14 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     protected void handleTextMessage(WebSocketSession session, TextMessage message) {
         try {
             // DTO로 변환
-            ChatCreateRequest request = payloadToChatCreateRequest(message.getPayload());
+            SockectMessageRequest request = payloadToSockectMessageRequest(message.getPayload());
+            if(request.getMessageType() == null) {
+                log.error("message type : {}", request.getMessageType());
+                return;
+            }
 
             // 메시지 타입에 따른 처리 핸들링
-            TextMessage modifiedMessage = handleChannelChatByMessageType(request, message);
-
-            // 메시지 소켓 통신
-            List<WebSocketSession> webSocketSessions = channelMap.get(request.getChannelId());
-            for(WebSocketSession webSocketSession : webSocketSessions) {
-                webSocketSession.sendMessage(modifiedMessage);
-            }
+            handleSockectMessageByMessageType(request, message);
         } catch (Exception e) {
             log.error("getClass : {}", e.getClass());
             log.error("getLocalizedMessage : {}", e.getLocalizedMessage());
@@ -154,7 +153,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             TextMessage message = null;
             try {
                 Map<String, Object> memberAccessMap = new HashMap<>();
-                memberAccessMap.put("messageType", MessageType.ACCESS);
+                memberAccessMap.put("messageType", MessageType.ACCESS_SESSION);
                 Map<String, String> messageInfo = new HashMap<>();
                 messageInfo.put(memberId, state);
                 memberAccessMap.put("messageInfo", messageInfo);
@@ -194,35 +193,17 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
      * @return
      * @throws JsonProcessingException
      */
-    private TextMessage handleChannelChatByMessageType(ChatCreateRequest request, TextMessage message) throws JsonProcessingException {
+    private void handleSockectMessageByMessageType(SockectMessageRequest request, TextMessage message) throws IOException {
         String payload = message.getPayload();
         log.debug("payload : " + payload);
-        MessageType messageType = request.getMessageType();
+        String messageType = request.getMessageType().name();
 
         if(messageType == null) {
             log.error("message type : {}", messageType);
-            return message;
         }
 
-        if(messageType.equals(MessageType.SEND)) {
-            ChannelChat channelChat = channelChatService.createChannelChat(request);
-            return modifiedMessage(payload, channelChat);
-        }
-        else if(messageType.equals(MessageType.EDIT)) {
-            ChannelChat channelChat = channelChatService.changeChannelChatInfo(request);
-            return modifiedMessage(payload, channelChat);
-        }
-        else if(messageType.equals(MessageType.DELETE)) {
-            ChannelChat channelChat = channelChatService.deleteChannelChatInfo(request);
-            return modifiedMessage(payload, channelChat);
-        }
-        else if(messageType.equals(MessageType.FILE)) {
-            return modifiedMessage(payload, request.getFileList());
-        }
-        else {
-            log.error("message type : {}", messageType);
-            return message;
-        }
+        MessageTypeInterface messageTypeInterface = messageTypeFactory.getMessageTypeInterface(messageType);
+        messageTypeInterface.handleModifiedMessage(messageType, payload, channelMap);
     }
 
     /**
@@ -251,8 +232,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
      * @param payload
      * @return
      */
-    private ChatCreateRequest payloadToChatCreateRequest(String payload) {
-        return new Gson().fromJson(payload, ChatCreateRequest.class);
+    private SockectMessageRequest payloadToSockectMessageRequest(String payload) {
+        return new Gson().fromJson(payload, SockectMessageRequest.class);
     }
 
     /**
@@ -263,39 +244,5 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
      */
     private String getMemberId(WebSocketSession session) {
         return session.getUri().getQuery().split("=")[1];
-    }
-
-    /**
-     * message 정보에 채팅 ID, 생성일시 데이터 추가
-     * 
-     * @param payload
-     * @param channelChat
-     * @return
-     * @throws JsonProcessingException
-     */
-    private TextMessage modifiedMessage(String payload, ChannelChat channelChat) throws JsonProcessingException {
-        JsonNode jsonNode = objectMapper.readTree(payload);
-
-        ((ObjectNode)jsonNode).put("chatId", channelChat.getId());
-        ((ObjectNode)jsonNode).put("channelName", channelChat.getChannelList().getName());
-        ((ObjectNode)jsonNode).put("createDate", channelChat.getCreateDate().toString());
-
-        return new TextMessage(objectMapper.writeValueAsString(jsonNode));
-    }
-
-    /**
-     * message 정보에 첨부 파일 목록 추가
-     * 
-     * @param payload
-     * @param fileList
-     * @return
-     * @throws JsonProcessingException
-     */
-    private TextMessage modifiedMessage(String payload, List<ChatAttachFileResponse> fileList) throws JsonProcessingException {
-        JsonNode jsonNode = objectMapper.readTree(payload);
-
-        ((ObjectNode)jsonNode).put("fileList", new Gson().toJson(fileList));
-
-        return new TextMessage(objectMapper.writeValueAsString(jsonNode));
     }
 }

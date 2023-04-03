@@ -380,7 +380,7 @@ const sendMessage = event => {
     const fileYn = fileList.value.length > 0 ? 'Y' : 'N';
     const data = {
       fileYn,
-      messageType: 'SEND',
+      messageType: 'SEND_MESSAGE',
       channelId: accessedChannelId.value,
       memberId: userInfo.memberId,
       content: message.value,

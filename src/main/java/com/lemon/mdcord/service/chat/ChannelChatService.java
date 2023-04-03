@@ -3,7 +3,7 @@ package com.lemon.mdcord.service.chat;
 import com.lemon.mdcord.domain.chat.AttachFile;
 import com.lemon.mdcord.domain.chat.ChannelChat;
 import com.lemon.mdcord.dto.chat.ChannelChatListResponse;
-import com.lemon.mdcord.dto.chat.ChatCreateRequest;
+import com.lemon.mdcord.dto.socket.ChatCreateRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;

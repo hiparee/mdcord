@@ -1,19 +1,26 @@
 package com.lemon.mdcord.service.chat;
 
-import com.lemon.mdcord.common.exception.RegistAttachFileException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.gson.Gson;
 import com.lemon.mdcord.common.exception.ChannelNotFoundException;
 import com.lemon.mdcord.common.exception.ChatNotFoundException;
 import com.lemon.mdcord.common.exception.MemberNotFoundException;
+import com.lemon.mdcord.common.exception.RegistAttachFileException;
 import com.lemon.mdcord.domain.channel.ChannelList;
 import com.lemon.mdcord.domain.chat.AttachFile;
 import com.lemon.mdcord.domain.chat.ChannelChat;
 import com.lemon.mdcord.domain.member.Member;
 import com.lemon.mdcord.dto.chat.ChannelChatListResponse;
-import com.lemon.mdcord.dto.chat.ChatCreateRequest;
+import com.lemon.mdcord.dto.socket.ChatCreateRequest;
+import com.lemon.mdcord.dto.socket.MessageType;
 import com.lemon.mdcord.repository.AttachFileRepository;
 import com.lemon.mdcord.repository.ChannelChatRepository;
 import com.lemon.mdcord.repository.ChannelListRepository;
 import com.lemon.mdcord.repository.MemberRepository;
+import com.lemon.mdcord.service.MessageTypeInterface;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -23,7 +30,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,23 +41,55 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class JpaChannelChatService implements ChannelChatService {
+public class JpaChannelChatService implements ChannelChatService, MessageTypeInterface {
 
     private final ChannelChatRepository channelChatRepository;
     private final ChannelListRepository channelListRepository;
     private final MemberRepository memberRepository;
     private final AttachFileRepository attachFileRepository;
+    private final ObjectMapper objectMapper;
 
     // TODO - property 분리 필요
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     private static final int FILENAME_LENGTH = 10;
     private static final String UPPER_DIRECTORY = "attach-file";
+
+    @Override
+    public boolean support(String messageType) {
+        return MessageType.SEND_MESSAGE.name().equals(messageType)
+                || MessageType.EDIT_MESSAGE.name().equals(messageType)
+                || MessageType.DELETE_MESSAGE.name().equals(messageType);
+    }
+
+    @Override
+    public void handleModifiedMessage(String messageType, String payload, Map<Long, List<WebSocketSession>> channelMap) throws IOException {
+        ChatCreateRequest request = new Gson().fromJson(payload, ChatCreateRequest.class);
+
+        ChannelChat result = null;
+        if(MessageType.SEND_MESSAGE.name().equals(messageType)) {
+            result = this.createChannelChat(request);
+        }
+        else if(MessageType.EDIT_MESSAGE.name().equals(messageType)) {
+            result = this.changeChannelChatInfo(request);
+        }
+        else if(MessageType.DELETE_MESSAGE.name().equals(messageType)) {
+            result = this.deleteChannelChatInfo(request);
+        }
+
+        // 메시지 소켓 통신
+        List<WebSocketSession> webSocketSessions = channelMap.get(request.getChannelId());
+        TextMessage modifiedMessage = modifiedMessage(payload, result);
+        for(WebSocketSession webSocketSession : webSocketSessions) {
+            webSocketSession.sendMessage(modifiedMessage);
+        }
+    }
 
     @Override
     public ChannelChat createChannelChat(ChatCreateRequest request) {
@@ -201,6 +243,24 @@ public class JpaChannelChatService implements ChannelChatService {
             sb.append(CHARACTERS.charAt(randomIndex));
         }
         return sb.toString();
+    }
+
+    /**
+     * message 정보에 채팅 ID, 생성일시 데이터 추가
+     *
+     * @param payload
+     * @param channelChat
+     * @return
+     * @throws JsonProcessingException
+     */
+    private TextMessage modifiedMessage(String payload, ChannelChat channelChat) throws JsonProcessingException {
+        JsonNode jsonNode = objectMapper.readTree(payload);
+
+        ((ObjectNode)jsonNode).put("chatId", channelChat.getId());
+        ((ObjectNode)jsonNode).put("channelName", channelChat.getChannelList().getName());
+        ((ObjectNode)jsonNode).put("createDate", channelChat.getCreateDate().toString());
+
+        return new TextMessage(objectMapper.writeValueAsString(jsonNode));
     }
 
 }
