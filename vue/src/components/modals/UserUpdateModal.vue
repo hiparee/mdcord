@@ -172,7 +172,30 @@
                 </div>
                 <span class="text-danger">{{ logMessage }}</span>
               </form>
-              <div class="update-button-container">
+              <div
+                class="update-button-container"
+                :style="
+                  props.memberInfo.updateDate !== '' &&
+                  props.memberInfo.updateDate !== null &&
+                  !updateMode
+                    ? 'justify-content: space-between'
+                    : ''
+                "
+              >
+                <div
+                  v-if="
+                    props.memberInfo.updateDate !== '' &&
+                    props.memberInfo.updateDate !== null &&
+                    !updateMode
+                  "
+                  class="update-input-box"
+                  style="padding-left: 0.5rem"
+                >
+                  <label class="d-block" style="color: #787878">
+                    {{ $dayjs(memberInfo.updateDate).format('YY.MM.DD HH:MM') }}
+                    last updated
+                  </label>
+                </div>
                 <button
                   type="button"
                   class="'btn custom-cancel-btn"
