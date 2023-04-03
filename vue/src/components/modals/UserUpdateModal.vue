@@ -192,7 +192,7 @@
                   style="padding-left: 0.5rem"
                 >
                   <label class="d-block" style="color: #787878">
-                    {{ $dayjs(memberInfo.updateDate).format('YY.MM.DD HH:MM') }}
+                    {{ $dayjs(memberInfo.updateDate).format('YY.MM.DD HH:mm') }}
                     last updated
                   </label>
                 </div>
