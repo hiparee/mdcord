@@ -1,12 +1,21 @@
 package com.lemon.mdcord.service.chat;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.gson.Gson;
 import com.lemon.mdcord.common.exception.AttachFileNotFoundException;
 import com.lemon.mdcord.common.exception.AttachFileNotMatchedImageFileExt;
 import com.lemon.mdcord.common.exception.InvalidChannelIdException;
 import com.lemon.mdcord.domain.chat.AttachFile;
+import com.lemon.mdcord.dto.chat.ChatAttachFileResponse;
+import com.lemon.mdcord.dto.socket.ChatCreateRequest;
+import com.lemon.mdcord.dto.socket.MessageType;
 import com.lemon.mdcord.repository.AttachFileRepository;
 import com.lemon.mdcord.repository.ChannelListRepository;
 import com.lemon.mdcord.repository.ChannelMemberRepository;
+import com.lemon.mdcord.service.MessageTypeInterface;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
@@ -14,12 +23,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -27,14 +40,32 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class JpaAttachFileService implements AttachFileService {
+public class JpaAttachFileService implements AttachFileService, MessageTypeInterface {
 
     private final AttachFileRepository attachFileRepository;
     private final ChannelMemberRepository channelMemberRepository;
     private final ChannelListRepository channelListRepository;
+    private final ObjectMapper objectMapper;
     private static final String ROOT_PATH = System.getProperty("user.dir");
     private static final String UPPER_DIRECTORY = "attach-file";
     private static final List<String> FILE_EXTS = new ArrayList<>(List.of(".jpg", ".jpeg", ".png", ".gif", ".bmp", ".svg"));
+
+    @Override
+    public boolean support(String messageType) {
+        return MessageType.UPLOAD_FILE.name().equals(messageType);
+    }
+
+    @Override
+    public void handleModifiedMessage(String messageType, String payload, Map<Long, List<WebSocketSession>> channelMap) throws IOException {
+        ChatCreateRequest request = new Gson().fromJson(payload, ChatCreateRequest.class);
+
+        // 메시지 소켓 통신
+        List<WebSocketSession> webSocketSessions = channelMap.get(request.getChannelId());
+        TextMessage modifiedMessage = modifiedMessage(payload, request.getFileList());
+        for(WebSocketSession webSocketSession : webSocketSessions) {
+            webSocketSession.sendMessage(modifiedMessage);
+        }
+    }
 
     @Override
     public byte[] getImageFileInfo(Long channelId, String fileName) {
@@ -123,6 +154,22 @@ public class JpaAttachFileService implements AttachFileService {
 
     private Authentication getAuthentication() {
         return SecurityContextHolder.getContext().getAuthentication();
+    }
+
+    /**
+     * message 정보에 첨부 파일 목록 추가
+     *
+     * @param payload
+     * @param fileList
+     * @return
+     * @throws JsonProcessingException
+     */
+    private TextMessage modifiedMessage(String payload, List<ChatAttachFileResponse> fileList) throws JsonProcessingException {
+        JsonNode jsonNode = objectMapper.readTree(payload);
+
+        ((ObjectNode)jsonNode).put("fileList", new Gson().toJson(fileList));
+
+        return new TextMessage(objectMapper.writeValueAsString(jsonNode));
     }
 
 }

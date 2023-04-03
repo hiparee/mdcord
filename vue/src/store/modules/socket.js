@@ -95,7 +95,7 @@ export const webSocketStore = defineStore('socket', () => {
         });
       } else if (parseData.messageType == 'CREATE_CHANNEL') {
         console.log('dasdasdadasd');
-      } else if (parseData.messageType == 'SEND') {
+      } else if (parseData.messageType == 'SEND_MESSAGE') {
         console.log('수신데이터', parseData);
         const parseChannelId = parseData.channelId;
         const parseChannelName = parseData.channelName;

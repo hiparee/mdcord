@@ -1,5 +1,6 @@
-package com.lemon.mdcord.dto.chat;
+package com.lemon.mdcord.dto.socket;
 
+import com.lemon.mdcord.dto.chat.ChatAttachFileResponse;
 import lombok.Getter;
 
 import java.util.List;
