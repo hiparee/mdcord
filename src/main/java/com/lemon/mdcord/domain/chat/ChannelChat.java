@@ -3,7 +3,6 @@ package com.lemon.mdcord.domain.chat;
 import com.lemon.mdcord.domain.BaseEntity;
 import com.lemon.mdcord.domain.channel.ChannelList;
 import com.lemon.mdcord.domain.member.Member;
-import com.lemon.mdcord.dto.chat.ChatCreateRequest;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
