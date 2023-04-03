@@ -1,7 +1,6 @@
 <template>
   <Transition>
     <div v-if="showEditServerListModal">
-      <div class="modal-backdrop fade show"></div>
       <div
         id="updateModal"
         aria-hidden="true"
@@ -9,9 +8,9 @@
         class="modal modal-lg fade show d-block"
         data-bs-backdrop="true"
         role="dialog"
+        style="overflow: hidden"
         tabindex="-1"
         @mousedown="closeModal()"
-        style="overflow: hidden"
       >
         <div
           class="modal-dialog modal-dialog-centered"
@@ -47,15 +46,15 @@
                 <div v-if="editMode" style="display: flex; padding: 10px">
                   <div>
                     <input
-                      @click.prevent
                       :value="newServerName"
-                      @input="updateInput($event)"
                       placeholder="서버 이름"
                       style="
                         color: #cfcfcf;
                         background-color: #1e1f22;
                         border-color: aliceblue;
                       "
+                      @input="updateInput($event)"
+                      @click.prevent
                     />
                   </div>
                 </div>
@@ -71,8 +70,8 @@
                   >
                     <div
                       class="custom-server-list"
-                      @mouseover="hoverList($event, server.id)"
                       @mouseleave="hoverList($event, server.id)"
+                      @mouseover="hoverList($event, server.id)"
                     >
                       <div style="flex: 1 0; color: #cfcfcf">
                         <span
@@ -81,39 +80,39 @@
                           >{{ server.name }}</span
                         >
                         <input
+                          v-else
                           :value="editServerName"
-                          @input="editServerNameInput($event)"
                           style="
                             color: #cfcfcf;
                             background-color: #1e1f22;
                             border-color: aliceblue;
                             margin-right: 5px;
                           "
-                          v-else
+                          @input="editServerNameInput($event)"
                         />
                         <i
                           v-if="server.id !== editServerId"
-                          @click="editServerNameList(server)"
                           :class="{
                             [hoverClass]:
                               isHovered && server.id === hoverListId,
                           }"
                           style="font-size: x-small; display: inline-flex"
+                          @click="editServerNameList(server)"
                         ></i>
                         <i
                           v-else
-                          @click="changeServerName(server)"
                           class="bi-check-lg"
+                          @click="changeServerName(server)"
                         ></i>
                         <i
                           v-if="server.id === editServerId"
-                          @click="closeEditInput()"
                           class="bi-x"
                           style="
                             font-size: large;
                             bottom: -0.9px;
                             position: relative;
                           "
+                          @click="closeEditInput()"
                         ></i>
                       </div>
                       <div class="custom-checkbox bi-check">
@@ -386,9 +385,11 @@ const editServerNameInput = event => {
 .custom-cancel-btn:hover {
   text-decoration: underline;
 }
+
 .bi-plus-lg:hover {
   color: gray;
 }
+
 .bi-pencil-fill:hover {
   color: gray;
 }
@@ -396,6 +397,7 @@ const editServerNameInput = event => {
 .bi-x:hover {
   color: red;
 }
+
 .bi-check-lg:hover {
   color: green;
 }
@@ -422,6 +424,7 @@ button.edit-button:active {
   background-color: rgba(0, 122, 255, 0.1);
   box-shadow: inset 0px 3px 5px rgba(0, 0, 0, 0.2);
 }
+
 .custom-server-list {
   display: flex;
   padding: 10px;
@@ -499,10 +502,12 @@ button.edit-button:active {
 .table-custom-scrollbar::-webkit-scrollbar {
   width: 3px;
 }
+
 .table-custom-scrollbar:hover::-webkit-scrollbar-thumb {
   background: #6c757d;
   border-radius: 10px;
 }
+
 .table-custom-scrollbar::-webkit-scrollbar-track {
   background: #2b2d31;
 }
