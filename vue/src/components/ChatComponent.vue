@@ -52,11 +52,8 @@
             <template v-else>
               <template
                 v-if="
-                  (accessedChannelData && accessedChannelData.length == 0) ||
-                  (accessedChannelData &&
-                    accessedChannelData[0] &&
-                    accessedChannelData[0][0] &&
-                    accessedChannelData[0][0].dataLast)
+                  accessedChannelData?.[0]?.[0]?.dataLast ||
+                  !accessedChannelData?.length
                 "
               >
                 <div class="text-center text-white">
@@ -127,7 +124,6 @@
                               :src="`${viteAppApiUrl}/channels/${accessedChannelId}/image-file/${file.realFileName}${file.fileExt}`"
                               class="img-thumbnail"
                               alt="삭제되었거나 존재하지않는 이미지입니다"
-                              @click="attachFileDown(viteAppApiUrl, file.id)"
                               v-on:load="chatScrollSetting"
                             />
 
@@ -141,9 +137,6 @@
                                     )
                                   "
                                   style="width: 70px"
-                                  @click="
-                                    attachFileDown(viteAppApiUrl, file.id)
-                                  "
                                   v-on:load="chatScrollSetting"
                                 />
                                 <span class="file-name p-2">{{
@@ -155,12 +148,26 @@
                           <!-- <span class="file-name">{{
                             file.originFileName
                           }}</span> -->
-                          <!-- <button
-                            class="file-delete"
+                          <button
+                            class="file-delete tooltip-top"
                             @click="fileDelete(index)"
+                            data-tooltip="첨부 파일 삭제"
+                            @mouseover="showTooltip"
+                            @mouseleave="hideTooltip"
+                            style="display: none"
                           >
-                            <i class="bi bi-trash3-fill text-danger"></i>
-                          </button> -->
+                            <i class="bi bi-trash3-fill"></i>
+                          </button>
+                          <button
+                            class="file-down tooltip-top"
+                            style="display: none"
+                            data-tooltip="첨부 파일 다운로드"
+                            @mouseover="showTooltip"
+                            @mouseleave="hideTooltip"
+                            @click="attachFileDown(viteAppApiUrl, file.id)"
+                          >
+                            <i class="bi bi-download text-white"></i>
+                          </button>
                         </div>
                       </div>
                     </template>
@@ -513,7 +520,7 @@ const renderMsgHtml = text => {
 
 const renderYoutubeIframe = text => {
   const youtubeUrl =
-    /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
+    /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
   return text.match(youtubeUrl) ? text.replace(youtubeUrl, youtubeParser) : '';
 };
 
@@ -619,6 +626,16 @@ const attachFileDown = (url, id) => {
   const path = `${url}/channels/${accessedChannelId.value}/attach-file/${id}`;
 
   window.open(path);
+};
+
+const showTooltip = t => {
+  // 툴팁 표시
+  t.currentTarget.classList.add('tooltip-show');
+};
+
+const hideTooltip = t => {
+  // 툴팁 숨기기
+  t.currentTarget.classList.remove('tooltip-show');
 };
 
 onBeforeMount(() => {
@@ -792,6 +809,7 @@ watch(
 .flex-row-reverse .chat-file-list-wrap {
   text-align: right;
 }
+
 .chat-file-list-wrap {
   margin: 5px 15px;
   margin-bottom: 10px;
@@ -801,7 +819,6 @@ watch(
     margin-right: 20px;
   }
   & .file-item {
-    overflow: hidden;
     position: relative;
     display: inline-block;
     background: #222222;
@@ -810,8 +827,23 @@ watch(
     max-height: 200px;
     max-width: 200px;
 
+    &:hover {
+      & .file-img {
+        opacity: 0.8;
+        transition: 0.2s;
+      }
+      & .file-delete {
+        display: block !important;
+      }
+
+      & .file-down {
+        display: block !important;
+      }
+    }
+
     & .file-img {
-      cursor: pointer;
+      overflow: hidden;
+      // cursor: pointer;
       display: inline-block;
       width: 100%;
       height: 100%;
@@ -824,15 +856,46 @@ watch(
 
     & button.file-delete {
       position: absolute;
-      top: -10px;
-      right: -10px;
+      top: 0px;
+      right: -15px;
       width: 30px;
       height: 30px;
       display: inline-block;
       text-align: center;
-      border-radius: 4px;
-      background: #666666;
-      border: 1px solid #333333;
+      border-top-right-radius: 4px;
+      border-bottom-right-radius: 4px;
+      background: #56595f;
+      border: 0;
+
+      &:hover {
+        background: #b32d32;
+        transition: 0.2s;
+        & .bi {
+          color: #ffffff;
+        }
+      }
+
+      & .bi {
+        color: #e0e0e0;
+      }
+    }
+    & button.file-down {
+      position: absolute;
+      top: 0px;
+      right: 15px;
+      width: 30px;
+      height: 30px;
+      display: inline-block;
+      text-align: center;
+      border-top-left-radius: 4px;
+      border-bottom-left-radius: 4px;
+      background: #56595f;
+      border: 0;
+
+      &:hover {
+        background: #3c57a3;
+        transition: 0.2s;
+      }
     }
 
     & .file-name {
@@ -890,5 +953,24 @@ watch(
       overflow: hidden;
     }
   }
+}
+
+.tooltip-top {
+  position: relative;
+}
+.tooltip-show::before {
+  content: attr(data-tooltip);
+  width: max-content;
+  position: absolute;
+  top: -40px;
+  right: 0px;
+  background: #4a4a4a;
+  color: #dadada;
+  padding: 5px;
+  border-radius: 5px;
+  z-index: 9999;
+}
+.file-down.tooltip-show::before {
+  right: -30px;
 }
 </style>
