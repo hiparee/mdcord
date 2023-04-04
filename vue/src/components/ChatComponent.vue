@@ -318,6 +318,7 @@ import {
   watch,
 } from 'vue';
 import { useRoute } from 'vue-router';
+import { useToast } from 'vue-toast-notification';
 import { fetchMultiFileUpload } from '../api/chat.js';
 
 const route = useRoute();
@@ -473,11 +474,31 @@ const handlePaste = async event => {
       file.isImage = isImage;
       file.ext = getFileExt(file.name);
       // input file에 추가
-      console.log(file);
+      console.log(fileList.value);
+      console.log(file.size);
+      console.log(file.size, 1024 * 1024 * 0.1);
 
-      fileList.value.push(file);
+      return filesVaildate(file);
     }
   }
+};
+
+const filesVaildate = file => {
+  const toast = useToast({
+    duration: 300,
+    position: 'bottom',
+    queue: true,
+  });
+
+  if (file.size > 1024 * 1024 * 30) {
+    return toast.error(`파일당 용량은 30MB 이하만 가능합니다.`);
+  }
+
+  if (fileList.value.length >= 10) {
+    return toast.error(`최대 첨부파일 갯수는 10개입니다.`);
+  }
+
+  fileList.value.push(file);
 };
 
 const addFiles = async files => {
@@ -488,10 +509,7 @@ const addFiles = async files => {
     files[i].isImage = isImage;
     files[i].ext = getFileExt(files[i].name);
 
-    console.log(files[i]);
-
-    fileList.value.push(files[i]);
-    console.log(fileList.value);
+    return filesVaildate(files[i]);
   }
 };
 
@@ -860,6 +878,13 @@ watch(
   }
 }
 
+.flex-row .chat-file-list-wrap {
+  & .file-item {
+    margin-left: 0;
+    margin-right: 10px;
+  }
+}
+
 .flex-row-reverse .chat-file-list-wrap {
   text-align: right;
 }
@@ -867,12 +892,13 @@ watch(
 .chat-file-list-wrap {
   margin: 5px 15px;
   margin-bottom: 10px;
-  display: flex;
 
-  & .file-item:not(:last-child) {
-    margin-right: 20px;
-  }
+  // & .file-item:not(:last-child) {
+  //   margin-left: 20px;
+  // }
   & .file-item {
+    margin-left: 10px;
+    margin-right: 0;
     position: relative;
     display: inline-block;
     background: #222222;
