@@ -1408,7 +1408,7 @@ const btnClickEnventHandler = event => {
 const clickOutsideHandler = event => {
   if (
     event.target.id != 'emojiBtn' &&
-    !emojiListWrap.value.contains(event.target)
+    !emojiListWrap.value?.contains(event.target)
   ) {
     emit('emoji-toggle', false);
   }
