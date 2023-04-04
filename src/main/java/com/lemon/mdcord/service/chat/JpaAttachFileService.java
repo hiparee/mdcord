@@ -56,7 +56,7 @@ public class JpaAttachFileService implements AttachFileService, MessageTypeInter
     }
 
     @Override
-    public void handleModifiedMessage(String messageType, String payload, Map<Long, List<WebSocketSession>> channelMap) throws IOException {
+    public void handle(String messageType, String payload, Map<Long, List<WebSocketSession>> channelMap) throws IOException {
         ChatCreateRequest request = new Gson().fromJson(payload, ChatCreateRequest.class);
 
         // 메시지 소켓 통신

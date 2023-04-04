@@ -203,7 +203,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         }
 
         MessageTypeInterface messageTypeInterface = messageTypeFactory.getMessageTypeInterface(messageType);
-        messageTypeInterface.handleModifiedMessage(messageType, payload, channelMap);
+        messageTypeInterface.handle(messageType, payload, channelMap);
     }
 
     /**
