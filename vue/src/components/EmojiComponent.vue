@@ -1,5 +1,5 @@
 <template>
-  <div v-if="props.showToggle" class="emoji-list-wrap" ref="emojiListWrap">
+  <div v-show="props.showToggle" class="emoji-list-wrap" ref="emojiListWrap">
     <div class="emoji-list" v-on:click="btnClickEnventHandler">
       <button type="button" class="btn">😀</button>
       <button type="button" class="btn">😃</button>

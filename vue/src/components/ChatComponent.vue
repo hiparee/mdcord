@@ -905,7 +905,7 @@ watch(
     border-radius: 10px;
     text-align: center;
     max-height: 200px;
-    max-width: 200px;
+    max-width: 450px;
 
     &:hover {
       & .file-img {
