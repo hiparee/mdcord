@@ -563,11 +563,10 @@ const readFiles = (files, isImage) => {
 };
 
 /**
- *
  * @param {*} text
  *  message 내용에서
- *  1. URL을 찾아서 적절한 HTML 하이퍼링크로 변환하는 메서드를 작성
- *  2. msg-inner 클래스를 가지는 div로 감싸기
+ *  1. html 태그 치환
+ *  2. URL을 찾아서 적절한 HTML 하이퍼링크로 변환하는 메서드를 작성
  */
 const renderMsgHtml = text => {
   const map = {
@@ -592,10 +591,10 @@ const renderMsgHtml = text => {
     '<a href="$&" target="_blank" data-url-render>$&</a>',
   );
 
-  let makeHtml = replaceUrlText;
+  // let makeHtml = replaceUrlText;
   // // let makeHtml = `<div class='msg-inner'>${replaceUrlText}</div>`;
   // makeHtml += '<div class="more-btn"><span>더보기</span></div>';
-  return makeHtml;
+  return replaceUrlText;
 };
 
 const renderYoutubeIframe = text => {
