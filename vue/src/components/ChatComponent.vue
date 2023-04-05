@@ -45,7 +45,7 @@
 
             <!-- 스켈레톤 -->
             <template v-if="isLoading">
-              <Skeleton />
+              <skeleton-component></skeleton-component>
             </template>
 
             <!-- data list -->
@@ -229,26 +229,39 @@
           /> -->
 
           <!-- 첨부파일 리스트 영역 끝 -->
-          <div class="d-flex" style="flex-direction: row; width: 100%">
+          <div
+            class="textarea-message-wrap d-flex"
+            style="flex-direction: row; width: 100%"
+          >
+            <!-- EmojiComponent 영역 -->
+            <emoji-component
+              :showToggle="emojiToggle"
+              @emoji-click="appendEmoji"
+              @emoji-toggle="closeEmojiList"
+            ></emoji-component>
+
             <textarea
               type="text"
               class="form-control shadow-none text-light form-control-lg bg-dark border-0"
               id="refMessage"
               ref="refMessage"
-              @input="onInput"
-              v-model="message"
-              @keydown.enter="sendMessage"
               placeholder="메세지 보내기"
+              v-model="message"
+              @input="onInput"
               @paste="handlePaste"
+              @keydown.enter="sendMessage"
             ></textarea>
-            <!-- <a class="ms-1 text-muted" href="#!"
-              ><i class="bi bi-paperclip fs-3 text-light"></i
-            ></a>
-            <a class="ms-3 text-muted" href="#!"
-              ><i class="bi bi-emoji-smile fs-4 text-light"></i
-            ></a> -->
-            <span class="ms-3" href="#!" @click="sendMessage()"
-              ><i class="bi bi-send-fill fs-4 text-light"></i
+
+            <span
+              id="emojiBtn"
+              class="ms-2 scale h2"
+              @mouseover="changeEmojiIcon"
+              @click="emojiToggle = !emojiToggle"
+            >
+              🙂
+            </span>
+            <span id="sendMessageBtn" class="ms-2 scale" @click="sendMessage"
+              ><i class="bi bi-send-fill fs-3 text-light"></i
             ></span>
           </div>
         </div>
@@ -284,29 +297,29 @@
   </div>
 </template>
 <script setup>
-import {
-  ref,
-  nextTick,
-  watch,
-  onMounted,
-  onUnmounted,
-  computed,
-  inject,
-  onBeforeMount,
-} from 'vue';
+import EmojiComponent from '@/components/EmojiComponent.vue';
+import NavbarTitleComponent from '@/components/layout/NavbarTitleComponent.vue';
+import SkeletonComponent from '@/components/SkeletonComponent.vue';
 import {
   useChannelStore,
-  useUserStore,
   useChatStore,
+  useUserStore,
   webSocketStore,
 } from '@/store/store';
-import Skeleton from '../components/SkeletonComponent.vue';
+import { getImageUrl, userProfileIcon } from '@/utils/common.js';
+import { getRandomEmojiIcon } from '@/utils/emoji.js';
+import {
+  computed,
+  inject,
+  nextTick,
+  onBeforeMount,
+  onMounted,
+  ref,
+  watch,
+} from 'vue';
+import { useRoute } from 'vue-router';
 import { useToast } from 'vue-toast-notification';
 import { fetchMultiFileUpload } from '../api/chat.js';
-import { timeAgo } from '../utils/chat.js';
-import { getImageUrl, userProfileIcon } from '../utils/common.js';
-import NavbarTitleComponent from '@/components/layout/NavbarTitleComponent.vue';
-import { useRoute } from 'vue-router';
 
 const route = useRoute();
 const dayjs = inject('dayjs');
@@ -316,13 +329,14 @@ const chatStore = useChatStore();
 const socketStore = webSocketStore();
 const listBox = ref(null);
 const refMessage = ref(null);
-const refContextMenu = ref(null);
 const message = ref('');
 const fileList = ref([]);
 const fileDragOverStatus = ref(false);
 const mouseDown = ref(false);
 const isLoading = ref(true);
 const moreLoading = ref(false);
+const emojiToggle = ref(false);
+
 const accessedChannelId = computed(
   () => channelStore.accessedChannelInfo.channelId,
 );
@@ -460,11 +474,31 @@ const handlePaste = async event => {
       file.isImage = isImage;
       file.ext = getFileExt(file.name);
       // input file에 추가
-      console.log(file);
+      console.log(fileList.value);
+      console.log(file.size);
+      console.log(file.size, 1024 * 1024 * 0.1);
 
-      fileList.value.push(file);
+      return filesVaildate(file);
     }
   }
+};
+
+const filesVaildate = file => {
+  const toast = useToast({
+    duration: 300,
+    position: 'bottom',
+    queue: true,
+  });
+
+  if (file.size > 1024 * 1024 * 30) {
+    return toast.error(`파일당 용량은 30MB 이하만 가능합니다.`);
+  }
+
+  if (fileList.value.length >= 10) {
+    return toast.error(`최대 첨부파일 갯수는 10개입니다.`);
+  }
+
+  fileList.value.push(file);
 };
 
 const addFiles = async files => {
@@ -475,10 +509,7 @@ const addFiles = async files => {
     files[i].isImage = isImage;
     files[i].ext = getFileExt(files[i].name);
 
-    console.log(files[i]);
-
-    fileList.value.push(files[i]);
-    console.log(fileList.value);
+    return filesVaildate(files[i]);
   }
 };
 
@@ -664,6 +695,19 @@ const hideTooltip = t => {
   t.currentTarget.classList.remove('tooltip-show');
 };
 
+const changeEmojiIcon = t => {
+  t.target.innerText = getRandomEmojiIcon();
+};
+
+const appendEmoji = text => {
+  message.value += text;
+  document.getElementById('refMessage').focus();
+};
+
+const closeEmojiList = flag => {
+  emojiToggle.value = flag;
+};
+
 onBeforeMount(() => {
   // console.log('onBeforeMount 호출');
   setChannelMemberList();
@@ -743,7 +787,9 @@ watch(
 <style scoped lang="scss">
 #refMessage {
   overflow: hidden;
+  resize: none;
   height: 76px;
+  padding-right: 90px;
   background-color: #383a40 !important;
 }
 .profile-img {
@@ -832,6 +878,13 @@ watch(
   }
 }
 
+.flex-row .chat-file-list-wrap {
+  & .file-item {
+    margin-left: 0;
+    margin-right: 10px;
+  }
+}
+
 .flex-row-reverse .chat-file-list-wrap {
   text-align: right;
 }
@@ -839,19 +892,20 @@ watch(
 .chat-file-list-wrap {
   margin: 5px 15px;
   margin-bottom: 10px;
-  display: flex;
 
-  & .file-item:not(:last-child) {
-    margin-right: 20px;
-  }
+  // & .file-item:not(:last-child) {
+  //   margin-left: 20px;
+  // }
   & .file-item {
+    margin-left: 10px;
+    margin-right: 0;
     position: relative;
     display: inline-block;
     background: #222222;
     border-radius: 10px;
     text-align: center;
     max-height: 200px;
-    max-width: 200px;
+    max-width: 450px;
 
     &:hover {
       & .file-img {
@@ -998,5 +1052,29 @@ watch(
 }
 .file-down.tooltip-show::before {
   right: -30px;
+}
+
+.textarea-message-wrap {
+  position: relative;
+}
+.textarea-message-wrap .scale {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.textarea-message-wrap .scale:hover {
+  transform: scale(1.2);
+}
+#emojiBtn {
+  right: 55px;
+}
+#emojiBtn:hover i {
+  color: #ffcc4d !important;
+}
+
+#sendMessageBtn:hover i {
+  color: #4ba7e0 !important;
 }
 </style>
