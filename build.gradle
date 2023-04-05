@@ -37,6 +37,8 @@ dependencies {
 	implementation 'com.google.code.gson:gson:2.10.1'
     // thumbnail
     implementation 'net.coobird:thumbnailator:0.4.19'
+    implementation 'com.twelvemonkeys.imageio:imageio-jpeg:3.9.4'
+    implementation 'com.twelvemonkeys.imageio:imageio-tiff:3.9.4'
 
     compileOnly 'org.projectlombok:lombok'
 

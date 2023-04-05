@@ -29,7 +29,7 @@ public class AttachFileController {
     
     @Operation(summary = "파일 다운로드", description = "파일 다운로드 API")
     @GetMapping(value = "/channels/{channelId}/attach-file/{attachFileId}")
-    public ResponseEntity<ByteArrayResource> getImage(
+    public ResponseEntity<ByteArrayResource> getFile(
             @PathVariable("channelId") Long channelId,
             @PathVariable("attachFileId") Long attachFileId) throws UnsupportedEncodingException {
         Pair<byte[], String> data = attachFileService.getAttachFile(channelId, attachFileId);

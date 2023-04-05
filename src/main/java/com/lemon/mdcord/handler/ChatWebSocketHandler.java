@@ -1,4 +1,4 @@
-package com.lemon.mdcord.controller;
+package com.lemon.mdcord.handler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -11,7 +11,6 @@ import com.lemon.mdcord.service.MessageTypeFactory;
 import com.lemon.mdcord.service.MessageTypeInterface;
 import com.lemon.mdcord.service.channel.ChannelListService;
 import com.lemon.mdcord.service.channel.ChannelMemberService;
-import com.lemon.mdcord.service.chat.ChannelChatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -34,7 +33,6 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     private static Map<Long, List<WebSocketSession>> channelMap = new ConcurrentHashMap<>();
     // 모든 세션 접속자 상태
     private static List<WebSocketSession> memberStateList = new ArrayList<>();
-    private final ChannelChatService channelChatService;
     private final ChannelMemberService channelMemberService;
     private final ChannelListService channelListService;
     private final ChannelListRepository channelListRepository;
@@ -196,14 +194,14 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     private void handleSockectMessageByMessageType(SockectMessageRequest request, TextMessage message) throws IOException {
         String payload = message.getPayload();
         log.debug("payload : " + payload);
-        String messageType = request.getMessageType().name();
 
+        MessageType messageType = request.getMessageType();
         if(messageType == null) {
             log.error("message type : {}", messageType);
         }
 
-        MessageTypeInterface messageTypeInterface = messageTypeFactory.getMessageTypeInterface(messageType);
-        messageTypeInterface.handle(messageType, payload, channelMap);
+        MessageTypeInterface messageTypeInterface = messageTypeFactory.getMessageTypeInterface(messageType.name());
+        messageTypeInterface.handle(messageType.name(), payload, channelMap);
     }
 
     /**
