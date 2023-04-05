@@ -104,6 +104,13 @@
                         :title="JSON.stringify(chat)"
                         :data-chat-id="chat.chatId"
                       ></p>
+                      <!-- <p
+                        class="msg"
+                        :title="JSON.stringify(chat)"
+                        :data-chat-id="chat.chatId"
+                      >
+                        {{ chat.content }}
+                      </p> -->
 
                       <!-- <div v-if="isMatchYoutubeUrl(chat.content)"> -->
                       <div v-html="renderYoutubeIframe(chat.content)"></div>
@@ -563,14 +570,30 @@ const readFiles = (files, isImage) => {
  *  2. msg-inner 클래스를 가지는 div로 감싸기
  */
 const renderMsgHtml = text => {
-  const urlRegex = /https?:\/\/[^\s]+/g;
+  const map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;',
+  };
+
+  text = text.replace(/[&<>"']/g, function (m) {
+    return map[m];
+  });
+
+  console.log(text);
+
+  // const urlRegex = /https?:\/\/[^\s]+/g;
+  // const urlRegex = /^http[s]?:\/\/([\S]{3,})/gi;ss
+  const urlRegex = /https?:\/\/(?!.*&gt;)[^\s]+/g;
   const replaceUrlText = text.replace(
     urlRegex,
-    '<a href="$&" target="_blank">$&</a>',
+    '<a href="$&" target="_blank" data-url-render>$&</a>',
   );
 
-  // let makeHtml = `${replaceUrlText}`;
-  let makeHtml = `<div class='msg-inner'>${replaceUrlText}</div>`;
+  let makeHtml = replaceUrlText;
+  // // let makeHtml = `<div class='msg-inner'>${replaceUrlText}</div>`;
   // makeHtml += '<div class="more-btn"><span>더보기</span></div>';
   return makeHtml;
 };
@@ -766,7 +789,7 @@ watch(
 
       //소켓 send
       const data = {
-        messageType: 'FILE',
+        messageType: 'UPLOAD_FILE',
         fileList: response.data,
         channelId: accessedChannelId.value,
         chatId: chatId,
