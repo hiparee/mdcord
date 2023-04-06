@@ -452,6 +452,7 @@ const onDrop = event => {
   event.preventDefault();
 
   const files = event.dataTransfer.files;
+
   addFiles(files);
 };
 
@@ -509,14 +510,15 @@ const filesVaildate = file => {
 };
 
 const addFiles = async files => {
-  for (let i = 0; i < files.length; i++) {
-    const isImage = files[i].type.includes('image');
-    const src = await readFiles(files[i], isImage);
-    files[i].src = src;
-    files[i].isImage = isImage;
-    files[i].ext = getFileExt(files[i].name);
+  for (let file of files) {
+    console.log(file);
+    const isImage = file.type.includes('image');
+    const src = await readFiles(file, isImage);
+    file.src = src;
+    file.isImage = isImage;
+    file.ext = getFileExt(file.name);
 
-    return filesVaildate(files[i]);
+    filesVaildate(file);
   }
 };
 
@@ -580,8 +582,6 @@ const renderMsgHtml = text => {
   text = text.replace(/[&<>"']/g, function (m) {
     return map[m];
   });
-
-  console.log(text);
 
   // const urlRegex = /https?:\/\/[^\s]+/g;
   // const urlRegex = /^http[s]?:\/\/([\S]{3,})/gi;ss
