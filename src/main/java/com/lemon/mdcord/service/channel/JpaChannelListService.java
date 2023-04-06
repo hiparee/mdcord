@@ -99,14 +99,11 @@ public class JpaChannelListService implements ChannelListService, MessageTypeInt
         Optional<ChannelList> checkDuplicated = channelListRepository.findByNameAndParentId(dto.getName(), dto.getParentId());
         if(checkDuplicated.isPresent()) throw new ChannelListDuplicatedException(dto.getName());
 
-        int channelOrder = dto.getChannelOrder() == null ? 1 : dto.getChannelOrder();
-        channelListRepository.increaseChannelOrderGreaterThanEqual(channelOrder);
-
         ChannelList channelList = ChannelList.builder()
                 .name(dto.getName())
                 .parentId(dto.getParentId())
                 .dept(dto.getDept())
-                .channelOrder(channelOrder)
+                .channelOrder(dto.getChannelOrder())
                 .createBy(getAuthentication().getName())
                 .build();
 
