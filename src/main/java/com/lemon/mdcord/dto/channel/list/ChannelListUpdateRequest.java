@@ -8,6 +8,5 @@ public class ChannelListUpdateRequest {
     private Long id;
     private String useYn;
     private String channelName;
-    private Integer channelOrder;
 
 }
