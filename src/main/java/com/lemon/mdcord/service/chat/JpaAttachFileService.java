@@ -93,7 +93,6 @@ public class JpaAttachFileService implements AttachFileService, MessageTypeInter
             setThumbnailOptions(bi.getWidth(), bi.getHeight(), fileExt, os, imageBytes);
         }
         catch(Exception e) {
-            e.printStackTrace();
             log.error("channel ID : {}, file name : {}", channelId, fileName);
             log.error("getClass : {}", e.getClass());
             log.error("getLocalizedMessage : {}", e.getLocalizedMessage());
