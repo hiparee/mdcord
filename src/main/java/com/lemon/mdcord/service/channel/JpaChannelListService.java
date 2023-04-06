@@ -146,8 +146,8 @@ public class JpaChannelListService implements ChannelListService, MessageTypeInt
     public ChannelListUpdateResponse updateChannelInfo(ChannelListUpdateRequest dto) {
         ChannelList channel = getTargetChannel(dto.getId());
         channel.updateChannelInfo(
-                dto.getChannelName(), dto.getChannelOrder(),
-                dto.getUseYn(), getAuthentication().getName()
+                dto.getChannelName(), dto.getUseYn()
+                , getAuthentication().getName()
         );
 
         return new ChannelListUpdateResponse(channel);
