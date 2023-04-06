@@ -52,7 +52,7 @@ export const webSocketStore = defineStore('socket', () => {
       const accessedChannelId =
         useChannelStore().accessedChannelInfo.channelId ?? '';
 
-      if (parseData.messageType == 'ACCESS') {
+      if (parseData.messageType == 'ACCESS_SESSION') {
         for (const [key, val] of Object.entries(parseData.messageInfo)) {
           // console.log(`${key} is ${val}`);
           const memberList = useChannelStore().memberList;
@@ -72,7 +72,7 @@ export const webSocketStore = defineStore('socket', () => {
             // });
           });
         }
-      } else if (parseData.messageType == 'FILE') {
+      } else if (parseData.messageType == 'UPLOAD_FILE') {
         const channelId = parseData.channelId;
         const chatId = parseData.chatId;
         const fileData = JSON.parse(parseData.fileList);

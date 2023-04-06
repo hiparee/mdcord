@@ -27,10 +27,18 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    // Utility (String, Array, ...)
     implementation 'org.apache.commons:commons-lang3:3.12.0'
+    // swagger-ui
     implementation 'org.springdoc:springdoc-openapi-ui:1.6.14'
+    // jwt
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    // gson
 	implementation 'com.google.code.gson:gson:2.10.1'
+    // thumbnail
+    implementation 'net.coobird:thumbnailator:0.4.19'
+    implementation 'com.twelvemonkeys.imageio:imageio-jpeg:3.9.4'
+    implementation 'com.twelvemonkeys.imageio:imageio-tiff:3.9.4'
 
     compileOnly 'org.projectlombok:lombok'
 
@@ -138,7 +146,7 @@ task deleteVueBuildFiles(type: Delete) {
  * npmInstall task는 node plugin에서 제공하는 task입니다.
  */
 task npmBuild(type: NpmTask, dependsOn: ['deleteVueBuildFiles', 'npmInstall']) {
-    args = ["run", "build"]
+    args = ["run", "staging"]
 }
 
 /**

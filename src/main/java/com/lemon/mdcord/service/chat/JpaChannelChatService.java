@@ -69,7 +69,7 @@ public class JpaChannelChatService implements ChannelChatService, MessageTypeInt
     }
 
     @Override
-    public void handleModifiedMessage(String messageType, String payload, Map<Long, List<WebSocketSession>> channelMap) throws IOException {
+    public void handle(String messageType, String payload, Map<Long, List<WebSocketSession>> channelMap) throws IOException {
         ChatCreateRequest request = new Gson().fromJson(payload, ChatCreateRequest.class);
 
         ChannelChat result = null;
