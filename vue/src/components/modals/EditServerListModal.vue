@@ -171,10 +171,6 @@ defineProps({
     type: Boolean,
     default: false,
   },
-  serverList: {
-    type: Object,
-    required: true,
-  },
 });
 const loading = ref(false);
 const inputChecked = ref([]);
