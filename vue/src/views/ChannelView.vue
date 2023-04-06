@@ -30,7 +30,7 @@
               <hr class="dropdown-divider bg-light" />
             </li>
             <li
-              v-for="server in serverLi"
+              v-for="server in serverList"
               :key="server.id"
               style="cursor: pointer"
             >
@@ -76,12 +76,15 @@
       <div style="display: inline-flex; width: 100%">
         <!-- 상위 채널이 존재할때    -->
         <div
-          v-if="text.length !== 0"
+          v-if="getSelectHighChannel.length !== 0"
           class="list-group list-group-flush channel-list"
           style="min-width: 200px; max-width: 200px; min-height: 500px"
         >
-          <ul id="sidebar" class="list-unstyled ps-0">
-            <template v-for="(channel, index) in text" :key="index">
+          <ul id="sidebar" class="list-unstyled ps-0" style="flex: 1">
+            <template
+              v-for="(channel, index) in getSelectHighChannel"
+              :key="index"
+            >
               <li
                 v-if="channel.parentId === selectServerInfo.id"
                 class="mb-2 nav-item"
@@ -99,19 +102,14 @@
                 </button>
               </li>
             </template>
-            <button
-              class="btn border-0"
-              style="
-                color: #f2f3f5;
-                margin-top: 250px;
-                width: 100%;
-                background-color: #5764f0;
-              "
-              @click="openModal('catagory')"
-            >
-              카테고리 추가
-            </button>
           </ul>
+          <button
+            class="btn border-0"
+            style="color: #f2f3f5; width: 100%; background-color: #5764f0"
+            @click="openModal('catagory')"
+          >
+            카테고리 추가
+          </button>
           <VueContextMenu
             ref="vueSimpleContextMenu"
             :options="menuOptions"
@@ -148,7 +146,7 @@
           <div>
             <div>
               <VueDraggable
-                :list="channelLi"
+                :list="channelList"
                 class="draggable-list"
                 group="my-group"
                 @choose="changeBackgroundColor"
@@ -156,7 +154,7 @@
                 @unchoose="revertBackgroundColor"
               >
                 <div
-                  v-for="(element, index) in text1"
+                  v-for="(element, index) in getSelectLowChannel"
                   :key="element.name"
                   class="list-item"
                   style="
@@ -265,7 +263,6 @@
     </div>
   </div>
   <edit-server-list
-    :serverList="serverLi"
     :showEditServerListModal="showEditServerListModal"
     @update:showEditServerListModal="showEditServerListModal = false"
   />
@@ -274,14 +271,14 @@
     :modalType="modalType"
     :open="modalType !== ''"
     :serverId="selectServerInfo.id"
-    @selectNewChannel="channelListNumber(text0)"
+    @selectNewChannel="channelListNumber(getSelectHighChannelInfo, 'N')"
     @update:showAddModal="modalType = ''"
   />
 </template>
 
 <script setup>
 import { useChannelStore } from '@/store/modules/channel';
-import { computed, getCurrentInstance, onBeforeMount, ref, watch } from 'vue';
+import { computed, getCurrentInstance, ref } from 'vue';
 import { fetchEditChannelName } from '@/api/channel';
 import VueContextMenu from 'vue-simple-context-menu';
 import EditServerList from '@/components/modals/EditServerListModal.vue';
@@ -290,10 +287,10 @@ import { channel } from '@/api';
 
 const vm = getCurrentInstance();
 const store = useChannelStore();
-const serverLi = computed(() => {
+const serverList = computed(() => {
   return [...store.getServerList];
 });
-const channelLi = computed(() => {
+const channelList = computed(() => {
   return [...store.getChannelList];
 });
 // 선택한 서버정보
@@ -301,30 +298,29 @@ const selectServerInfo = ref({});
 const selectChannelInfo = ref([]);
 
 // 선택한 서버의 상위채널목록
-const text = computed(() =>
-  channelLi.value.filter(i => i.parentId === selectServerInfo.value.id),
+const getSelectHighChannel = computed(() =>
+  channelList.value.filter(i => i.parentId === selectServerInfo.value.id),
 );
 //선택한 상위채널의 하위채널 목록
-const text1 = computed(() =>
-  text.value
+const getSelectLowChannel = computed(() =>
+  getSelectHighChannel.value
     .filter(channel => channel.id === channelNumber.value)
     .map(channel => channel.subChannel)
     .flat(),
 );
-const text0 = computed(() =>
-  text.value.filter(channel => channel.id === channelNumber.value),
+// 선택한 상위채널 정보
+const getSelectHighChannelInfo = computed(() =>
+  getSelectHighChannel.value.filter(b => b.id === channelNumber.value),
 );
 
 // 선택한 서버 값 가져오기
 const selectServer = server => {
   selectChannelInfo.value = [];
+  channelNumber.value = null;
   selectServerInfo.value = server;
 };
 
-const channelListValue = ref([]);
 const showEditServerListModal = ref(false);
-const channelList = ref([]);
-const channelName = ref([]);
 const active = ref('채널목록');
 const inputChecked = ref([]);
 const listClickd = ref(false);
@@ -382,28 +378,21 @@ const closeEditInput = () => {
 };
 
 // 활성화된 채널 구분
-const channelListNumber = channel => {
-  console.log(channel);
-  console.log(text1);
-  console.log('text.value', text1.value);
-  console.log(text0.value);
-
+const channelListNumber = (channel, type) => {
   if (channel.id) {
     inputChecked.value = [];
     channelNumber.value = channel.id;
-    channelList.value = channelListValue.value.filter(
-      i => i.dept !== 1 && i.parentId === channelNumber.value,
-    );
-    for (const sub of channel.subChannel) {
-      if (sub.useYn === 'Y') {
-        console.log(sub.id);
-        inputChecked.value.push(sub.id);
-      }
-    }
+    inputChecked.value = getSelectLowChannel.value
+      .filter(i => i.useYn === 'Y')
+      .map(i => i.id);
+  } else if (type === 'N') {
+    inputChecked.value = [];
+    inputChecked.value = getSelectLowChannel.value
+      .filter(i => i.useYn === 'Y')
+      .map(i => i.id);
   } else {
     channelNumber.value = channel;
     inputChecked.value = [];
-    channelList.value = [];
   }
 };
 // 채널 활성/비활성 로직
@@ -435,22 +424,6 @@ const changeChannelStatus = async channel => {
       console.log(e);
     });
 };
-// 스토어에서 가져온 서버,채널리스트
-onBeforeMount(() => {
-  for (const channel of store.getChannelList) {
-    channelListValue.value.push(channel);
-    channelName.value.push(channel.name);
-
-    for (const sub of channel.subChannel) {
-      channelListValue.value.push(sub);
-    }
-  }
-  console.log('channel', channelListValue.value);
-
-  console.log('channelName', channelName.value);
-
-  console.log('channelList', channelListValue.value);
-});
 
 // 컨텍스트 메뉴
 const menuOptions = ref([
@@ -472,13 +445,10 @@ const menuOptions = ref([
   },
 ]);
 const handleClick = (event, item) => {
-  console.log('vm', vm.refs);
-  console.log(vm.refs.vueSimpleContextMenu.showMenu);
   vm.refs.vueSimpleContextMenu.showMenu(event, item);
 };
 const optionClicked = event => {
   event.preventDefault();
-  console.log(event);
 };
 const changeBackgroundColor = event => {
   listId.value = event.oldIndex;
