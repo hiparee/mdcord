@@ -104,6 +104,13 @@
                         :title="JSON.stringify(chat)"
                         :data-chat-id="chat.chatId"
                       ></p>
+                      <!-- <p
+                        class="msg"
+                        :title="JSON.stringify(chat)"
+                        :data-chat-id="chat.chatId"
+                      >
+                        {{ chat.content }}
+                      </p> -->
 
                       <!-- <div v-if="isMatchYoutubeUrl(chat.content)"> -->
                       <div v-html="renderYoutubeIframe(chat.content)"></div>
@@ -445,6 +452,7 @@ const onDrop = event => {
   event.preventDefault();
 
   const files = event.dataTransfer.files;
+
   addFiles(files);
 };
 
@@ -502,14 +510,15 @@ const filesVaildate = file => {
 };
 
 const addFiles = async files => {
-  for (let i = 0; i < files.length; i++) {
-    const isImage = files[i].type.includes('image');
-    const src = await readFiles(files[i], isImage);
-    files[i].src = src;
-    files[i].isImage = isImage;
-    files[i].ext = getFileExt(files[i].name);
+  for (let file of files) {
+    console.log(file);
+    const isImage = file.type.includes('image');
+    const src = await readFiles(file, isImage);
+    file.src = src;
+    file.isImage = isImage;
+    file.ext = getFileExt(file.name);
 
-    return filesVaildate(files[i]);
+    filesVaildate(file);
   }
 };
 
@@ -556,23 +565,36 @@ const readFiles = (files, isImage) => {
 };
 
 /**
- *
  * @param {*} text
  *  message 내용에서
- *  1. URL을 찾아서 적절한 HTML 하이퍼링크로 변환하는 메서드를 작성
- *  2. msg-inner 클래스를 가지는 div로 감싸기
+ *  1. html 태그 치환
+ *  2. URL을 찾아서 적절한 HTML 하이퍼링크로 변환하는 메서드를 작성
  */
 const renderMsgHtml = text => {
-  const urlRegex = /https?:\/\/[^\s]+/g;
+  const map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;',
+  };
+
+  text = text.replace(/[&<>"']/g, function (m) {
+    return map[m];
+  });
+
+  // const urlRegex = /https?:\/\/[^\s]+/g;
+  // const urlRegex = /^http[s]?:\/\/([\S]{3,})/gi;ss
+  const urlRegex = /https?:\/\/(?!.*&gt;)[^\s]+/g;
   const replaceUrlText = text.replace(
     urlRegex,
-    '<a href="$&" target="_blank">$&</a>',
+    '<a href="$&" target="_blank" data-url-render>$&</a>',
   );
 
-  // let makeHtml = `${replaceUrlText}`;
-  let makeHtml = `<div class='msg-inner'>${replaceUrlText}</div>`;
+  // let makeHtml = replaceUrlText;
+  // // let makeHtml = `<div class='msg-inner'>${replaceUrlText}</div>`;
   // makeHtml += '<div class="more-btn"><span>더보기</span></div>';
-  return makeHtml;
+  return replaceUrlText;
 };
 
 const renderYoutubeIframe = text => {
@@ -766,7 +788,7 @@ watch(
 
       //소켓 send
       const data = {
-        messageType: 'FILE',
+        messageType: 'UPLOAD_FILE',
         fileList: response.data,
         channelId: accessedChannelId.value,
         chatId: chatId,

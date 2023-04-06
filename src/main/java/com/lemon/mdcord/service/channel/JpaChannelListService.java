@@ -56,10 +56,10 @@ public class JpaChannelListService implements ChannelListService, MessageTypeInt
      * dept 2 : 생성된 채널의 dept 0에 속한 사람들이 알아야 함 + 생성된 채널을 소켓 목록에 추가하고, 이용 중인 사용자를 담아야 함
      */
     @Override
-    public void handleModifiedMessage(String messageType, String payload, Map<Long, List<WebSocketSession>> channelMap) throws IOException {
+    public void handle(String messageType, String payload, Map<Long, List<WebSocketSession>> channelMap) throws IOException {
         ChannelCreateRequest request = new Gson().fromJson(payload, ChannelCreateRequest.class);
 
-        // 1일 때는 소켓에 대한 것 x -> 바로 리턴
+        // 1일 때는 소켓에 대한 것 x -> 처리 x
         // 2일 때는 소켓에 대한 설정 o
         Integer createdChannelDept = request.getChannelDept();
 
@@ -79,7 +79,6 @@ public class JpaChannelListService implements ChannelListService, MessageTypeInt
                     .findAny()
                     .get();
 
-            // TODO - 이거 제대로 들어감????????? 안될거같은데
             if(anyTargetChannel != null) {
                 channelMap.put(request.getChannelId(), channelMap.get(anyTargetChannel));
             }
@@ -100,14 +99,11 @@ public class JpaChannelListService implements ChannelListService, MessageTypeInt
         Optional<ChannelList> checkDuplicated = channelListRepository.findByNameAndParentId(dto.getName(), dto.getParentId());
         if(checkDuplicated.isPresent()) throw new ChannelListDuplicatedException(dto.getName());
 
-        int channelOrder = dto.getChannelOrder() == null ? 1 : dto.getChannelOrder();
-        channelListRepository.increaseChannelOrderGreaterThanEqual(channelOrder);
-
         ChannelList channelList = ChannelList.builder()
                 .name(dto.getName())
                 .parentId(dto.getParentId())
                 .dept(dto.getDept())
-                .channelOrder(channelOrder)
+                .channelOrder(dto.getChannelOrder())
                 .createBy(getAuthentication().getName())
                 .build();
 

@@ -18,6 +18,7 @@ import com.lemon.mdcord.repository.ChannelMemberRepository;
 import com.lemon.mdcord.service.MessageTypeInterface;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,7 +27,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.io.IOException;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -56,7 +59,7 @@ public class JpaAttachFileService implements AttachFileService, MessageTypeInter
     }
 
     @Override
-    public void handleModifiedMessage(String messageType, String payload, Map<Long, List<WebSocketSession>> channelMap) throws IOException {
+    public void handle(String messageType, String payload, Map<Long, List<WebSocketSession>> channelMap) throws IOException {
         ChatCreateRequest request = new Gson().fromJson(payload, ChatCreateRequest.class);
 
         // 메시지 소켓 통신
@@ -69,16 +72,28 @@ public class JpaAttachFileService implements AttachFileService, MessageTypeInter
 
     @Override
     public byte[] getImageFileInfo(Long channelId, String fileName) {
+        if(!fileName.contains(".")) throw new AttachFileNotFoundException(fileName);
         validateImageFileInfo(fileName);
 
         String filePath = getFilePath(channelId);
+        String fileExt = fileName.split("\\.")[1];
 
+        ByteArrayOutputStream os = null;
         byte[] imageBytes = null;
         try {
             Path path = Paths.get(filePath, fileName);
             imageBytes = Files.readAllBytes(path);
+            if(imageBytes != null && fileExt.equals("gif")) {
+                return imageBytes;
+            }
+
+            File file = new File(path.toString());
+            BufferedImage bi = ImageIO.read(file);
+            os = new ByteArrayOutputStream();
+            setThumbnailOptions(bi.getWidth(), bi.getHeight(), fileExt, os, imageBytes);
         }
         catch(Exception e) {
+            e.printStackTrace();
             log.error("channel ID : {}, file name : {}", channelId, fileName);
             log.error("getClass : {}", e.getClass());
             log.error("getLocalizedMessage : {}", e.getLocalizedMessage());
@@ -86,12 +101,13 @@ public class JpaAttachFileService implements AttachFileService, MessageTypeInter
             log.error("getCause : {}", e.getCause());
         }
 
-        if(imageBytes == null) {
+        if(imageBytes == null || os == null) {
+            log.error("file name : {}", fileName);
             log.error("current project path : {}", ROOT_PATH);
             log.error("file path : {}", filePath);
         }
 
-        return imageBytes;
+        return os.toByteArray();
     }
 
     @Override
@@ -125,6 +141,23 @@ public class JpaAttachFileService implements AttachFileService, MessageTypeInter
         Pair<byte[], String> result = Pair.of(imageBytes, originFileName);
 
         return result;
+    }
+
+    private void setThumbnailOptions(int fileWidth, int fileHeight, String fileExt, ByteArrayOutputStream os, byte[] imageBytes) throws IOException {
+        InputStream inputStream = new ByteArrayInputStream(imageBytes);
+        if( fileWidth > 450 ) {
+            float scale = 450.0f / fileWidth; // 450 : 클라이언트에서 정한 파일썸네일 가로 최대 길이
+            Thumbnails.of(inputStream)
+                    .outputFormat(fileExt)
+                    .forceSize((int)(fileWidth * scale), (int)(fileHeight * scale))
+                    .toOutputStream(os);
+        }
+        else {
+            Thumbnails.of(inputStream)
+                    .scale(1)
+                    .outputFormat(fileExt)
+                    .toOutputStream(os);
+        }
     }
 
     private String getFilePath(Long channelId) {

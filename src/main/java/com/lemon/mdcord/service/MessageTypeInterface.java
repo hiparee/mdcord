@@ -8,5 +8,5 @@ import java.util.Map;
 
 public interface MessageTypeInterface {
     boolean support(String messageType);
-    void handleModifiedMessage(String messageType, String payload, Map<Long, List<WebSocketSession>> channelMap) throws IOException;
+    void handle(String messageType, String payload, Map<Long, List<WebSocketSession>> channelMap) throws IOException;
 }
