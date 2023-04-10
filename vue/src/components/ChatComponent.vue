@@ -157,7 +157,7 @@
                           }}</span> -->
                           <button
                             class="file-delete tooltip-top"
-                            @click="fileDelete(index)"
+                            @click="fileDelete({ fileId: file.id })"
                             data-tooltip="첨부 파일 삭제"
                             @mouseover="showTooltip"
                             @mouseleave="hideTooltip"
@@ -223,7 +223,10 @@
                   />
                 </div>
                 <span class="file-name">{{ file.name }}</span>
-                <button class="file-delete" @click="fileDelete(index)">
+                <button
+                  class="file-delete"
+                  @click="fileDelete({ index: index })"
+                >
                   <i class="bi bi-trash3-fill text-danger"></i>
                 </button>
               </div>
@@ -522,8 +525,17 @@ const addFiles = async files => {
   }
 };
 
-const fileDelete = index => {
-  // fileList.value.
+const fileDelete = obj => {
+  if (Object.keys(obj).includes('fileId')) {
+    // file delete api
+    useToast({
+      duration: 1000,
+      position: 'bottom',
+      queue: true,
+    }).warning('준비중인 기능입니다.');
+  } else if (Object.keys(obj).includes('index')) {
+    fileList.value.splice(obj.index, 1);
+  }
 };
 
 const getIsImage = ext => {
