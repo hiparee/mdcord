@@ -73,7 +73,7 @@
       </div>
       <!--    탭 끝 -->
       <!--    상위 채널목록 -->
-      <div style="display: inline-flex; width: 100%">
+      <div style="display: inline-flex; width: 100%; overflow-x: hidden">
         <!-- 상위 채널이 존재할때    -->
         <div
           v-if="getSelectHighChannel.length !== 0"
@@ -81,25 +81,191 @@
           style="min-width: 200px; max-width: 200px; min-height: 500px"
         >
           <ul id="sidebar" class="list-unstyled ps-0" style="flex: 1">
+            <div style="margin-bottom: 5px">활성카테고리</div>
             <template
               v-for="(channel, index) in getSelectHighChannel"
               :key="index"
             >
               <li
-                v-if="channel.parentId === selectServerInfo.id"
-                class="mb-2 nav-item"
-                style="display: grid"
+                v-if="
+                  channel.parentId === selectServerInfo.id &&
+                  channel.useYn === 'Y'
+                "
+                :class="{
+                  'custom-button':
+                    channel.id === channelNumber && channelNumber !== null,
+                }"
+                class="mb-2 nav-item btn border-0"
+                style="display: flex; padding-top: 9px"
+                @click="channelListNumber(channel)"
+                @mouseleave="hoverList($event, channel)"
+                @mouseover="hoverList($event, channel)"
+                @contextmenu.prevent.stop="handleClick($event, channel)"
               >
-                <button
-                  :class="{ 'custom-button': channel.id === channelNumber }"
+                <div
                   :data-bs-target="`#channel${channel.id}`"
-                  class="btn border-0"
-                  style="color: #cfcfcf; text-align: left"
-                  @click="channelListNumber(channel)"
-                  @contextmenu.prevent.stop="handleClick($event, channel)"
+                  style="color: #cfcfcf; text-align: left; width: 125px"
                 >
-                  {{ channel.name }}
-                </button>
+                  <span
+                    v-if="channel.id !== editChannelId"
+                    style="
+                      color: #f2f3f5;
+                      margin-right: 5px;
+                      display: inline-block;
+                      max-width: 140px;
+                      overflow: hidden;
+                      text-overflow: ellipsis;
+                      white-space: nowrap;
+                    "
+                  >
+                    {{ channel.name }}
+                  </span>
+                  <input
+                    v-if="
+                      channel.id === editChannelId &&
+                      channel.id === channelNumber
+                    "
+                    :value="editChannelName"
+                    maxlength="10"
+                    style="
+                      max-width: 165px;
+                      color: #cfcfcf;
+                      background-color: #1e1f22;
+                      border-color: aliceblue;
+                      margin-right: 5px;
+                    "
+                    @input="editChannelNameInput($event)"
+                  />
+                </div>
+
+                <div style="bottom: -2.1px; position: relative">
+                  <i
+                    v-if="
+                      editChannelId !== channel.id &&
+                      channel.id === channelNumber
+                    "
+                    :class="{
+                      [hoverClass]: isHovered && channel.id === hoverListId,
+                    }"
+                    style="
+                      font-size: x-small;
+                      margin-left: 15px;
+                      display: inline-flex;
+                    "
+                    @click="editChannelNameList(channel)"
+                  ></i>
+                  <i
+                    v-if="
+                      editChannelId === channel.id &&
+                      channel.id === channelNumber
+                    "
+                    class="bi-check"
+                    @click="changeChannelName(channel)"
+                  ></i>
+                  <i
+                    v-if="
+                      channel.id === editChannelId &&
+                      channel.id === channelNumber
+                    "
+                    class="bi-x"
+                    style="font-size: large; position: relative"
+                    @click="closeEditInput()"
+                  ></i>
+                </div>
+              </li>
+            </template>
+            <hr />
+            <div style="margin-bottom: 5px">비활성카테고리</div>
+            <template
+              v-for="(channel, index) in getSelectHighChannel"
+              :key="index"
+            >
+              <li
+                v-if="
+                  channel.parentId === selectServerInfo.id &&
+                  channel.useYn === 'N'
+                "
+                :class="{
+                  'custom-button':
+                    channel.id === channelNumber && channelNumber !== null,
+                }"
+                class="mb-2 nav-item btn border-0"
+                style="display: flex; padding-top: 9px"
+                @click="channelListNumber(channel)"
+                @mouseleave="hoverList($event, channel)"
+                @mouseover="hoverList($event, channel)"
+                @contextmenu.prevent.stop="handleClick($event, channel)"
+              >
+                <div
+                  :data-bs-target="`#channel${channel.id}`"
+                  style="color: #cfcfcf; text-align: left; width: 125px"
+                >
+                  <span
+                    v-if="channel.id !== editChannelId"
+                    style="
+                      color: #f2f3f5;
+                      margin-right: 5px;
+                      display: inline-block;
+                      max-width: 140px;
+                      overflow: hidden;
+                      text-overflow: ellipsis;
+                      white-space: nowrap;
+                    "
+                  >
+                    {{ channel.name }}
+                  </span>
+                  <input
+                    v-if="
+                      channel.id === editChannelId &&
+                      channel.id === channelNumber
+                    "
+                    :value="editChannelName"
+                    maxlength="10"
+                    style="
+                      max-width: 165px;
+                      color: #cfcfcf;
+                      background-color: #1e1f22;
+                      border-color: aliceblue;
+                      margin-right: 5px;
+                    "
+                    @input="editChannelNameInput($event)"
+                  />
+                </div>
+
+                <div style="bottom: -2.1px; position: relative">
+                  <i
+                    v-if="
+                      editChannelId !== channel.id &&
+                      channel.id === channelNumber
+                    "
+                    :class="{
+                      [hoverClass]: isHovered && channel.id === hoverListId,
+                    }"
+                    style="
+                      font-size: x-small;
+                      margin-left: 15px;
+                      display: inline-flex;
+                    "
+                    @click="editChannelNameList(channel)"
+                  ></i>
+                  <i
+                    v-if="
+                      editChannelId === channel.id &&
+                      channel.id === channelNumber
+                    "
+                    class="bi-check"
+                    @click="changeChannelName(channel)"
+                  ></i>
+                  <i
+                    v-if="
+                      channel.id === editChannelId &&
+                      channel.id === channelNumber
+                    "
+                    class="bi-x"
+                    style="font-size: large; position: relative"
+                    @click="closeEditInput()"
+                  ></i>
+                </div>
               </li>
             </template>
           </ul>
@@ -111,17 +277,22 @@
             카테고리 추가
           </button>
           <VueContextMenu
-            ref="vueSimpleContextMenu"
-            :options="menuOptions"
-            element-id="myFirstMenu"
+            v-if="selectUseYn.useYn === 'Y'"
+            ref="vueSimpleContextMenuY"
+            :options="menuOptionsN"
+            element-id="myFirstMenuY"
+            @option-clicked="optionClicked"
+          ></VueContextMenu>
+          <VueContextMenu
+            v-else
+            ref="vueSimpleContextMenuN"
+            :options="menuOptionsY"
+            element-id="myFirstMenuN"
             @option-clicked="optionClicked"
           ></VueContextMenu>
         </div>
         <!--  채널이 존재하지 않을때    -->
-        <div
-          v-else
-          style="min-width: 1000px; margin-left: -150px; margin-top: 50px"
-        >
+        <div v-else style="min-width: 1000px; margin-top: 50px">
           <div class="container py-5 h-100">
             <div
               class="row d-flex justify-content-center align-items-center h-100"
@@ -142,7 +313,7 @@
         </div>
         <!--    <ul-->
         <!--      채널목록-->
-        <div style="width: 100%">
+        <div v-if="highChannelStatus === 'Y'" style="width: 100%">
           <div>
             <div>
               <VueDraggable
@@ -167,8 +338,8 @@
                 >
                   <div
                     class="custom-channel-list"
-                    @mouseleave="hoverList($event, element.id)"
-                    @mouseover="hoverList($event, element.id)"
+                    @mouseleave="hoverList($event, element)"
+                    @mouseover="hoverList($event, element)"
                   >
                     <div
                       :class="{
@@ -186,6 +357,7 @@
                       <input
                         v-else
                         :value="editChannelName"
+                        maxlength="10"
                         style="
                           color: #cfcfcf;
                           background-color: #1e1f22;
@@ -204,17 +376,13 @@
                       ></i>
                       <i
                         v-else
-                        class="bi-check-lg"
+                        class="bi-check"
                         @click="changeChannelName(element)"
                       ></i>
                       <i
                         v-if="element.id === editChannelId"
                         class="bi-x"
-                        style="
-                          font-size: large;
-                          bottom: -0.9px;
-                          position: relative;
-                        "
+                        style="font-size: large; position: relative"
                         @click="closeEditInput()"
                       ></i>
                     </div>
@@ -254,6 +422,47 @@
                   @click="openModal('channel')"
                 >
                   <i class="bi-plus-lg" style="flex: 1 0; color: #f2f3f5"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          v-else-if="highChannelStatus === ''"
+          style="min-width: 1000px; margin-top: 50px"
+        >
+          <div class="container py-5 h-100">
+            <div
+              class="row d-flex justify-content-center align-items-center h-100"
+            >
+              <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                <div class="card bg-dark text-white border-0 text-center">
+                  <div class="mt-3">
+                    <img src="@/assets/images/chat.svg" />
+                  </div>
+                  <div class="mt-4">
+                    <p class="h4 mb-3">선택한 채널이 없습니다</p>
+                    채널을 선택 해보세요
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div v-else style="min-width: 1000px; margin-top: 50px">
+          <div class="container py-5 h-100">
+            <div
+              class="row d-flex justify-content-center align-items-center h-100"
+            >
+              <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                <div class="card bg-dark text-white border-0 text-center">
+                  <div class="mt-3">
+                    <img src="@/assets/images/chat.svg" />
+                  </div>
+                  <div class="mt-4">
+                    <p class="h4 mb-3">비활성화된 카테고리</p>
+                    난처한 상황에 처하셨군요. 카테고리를 활성화 해보세요
+                  </div>
                 </div>
               </div>
             </div>
@@ -320,6 +529,7 @@ const selectServer = server => {
   selectServerInfo.value = server;
 };
 
+const selectUseYn = ref({});
 const showEditServerListModal = ref(false);
 const active = ref('채널목록');
 const inputChecked = ref([]);
@@ -332,10 +542,11 @@ const isHovered = ref(false);
 const hoverListId = ref(null);
 const editChannelId = ref(null);
 const editChannelName = ref('');
-
-const hoverList = (event, id) => {
-  hoverListId.value = id;
+const highChannelStatus = ref('');
+const hoverList = (event, item) => {
+  hoverListId.value = item.id;
   if (event.type === 'mouseover') {
+    selectUseYn.value = item;
     isHovered.value = true;
   } else {
     isHovered.value = false;
@@ -379,20 +590,24 @@ const closeEditInput = () => {
 
 // 활성화된 채널 구분
 const channelListNumber = (channel, type) => {
-  if (channel.id) {
-    inputChecked.value = [];
-    channelNumber.value = channel.id;
-    inputChecked.value = getSelectLowChannel.value
-      .filter(i => i.useYn === 'Y')
-      .map(i => i.id);
-  } else if (type === 'N') {
-    inputChecked.value = [];
-    inputChecked.value = getSelectLowChannel.value
-      .filter(i => i.useYn === 'Y')
-      .map(i => i.id);
-  } else {
-    channelNumber.value = channel;
-    inputChecked.value = [];
+  highChannelStatus.value = channel.useYn;
+  if (channel.id !== editChannelId.value) {
+    if (channel.id) {
+      inputChecked.value = [];
+      channelNumber.value = channel.id;
+      inputChecked.value = getSelectLowChannel.value
+        .filter(i => i.useYn === 'Y')
+        .map(i => i.id);
+      closeEditInput();
+    } else if (type === 'N') {
+      inputChecked.value = [];
+      inputChecked.value = getSelectLowChannel.value
+        .filter(i => i.useYn === 'Y')
+        .map(i => i.id);
+    } else {
+      channelNumber.value = channel;
+      inputChecked.value = [];
+    }
   }
 };
 // 채널 활성/비활성 로직
@@ -426,18 +641,26 @@ const changeChannelStatus = async channel => {
 };
 
 // 컨텍스트 메뉴
-const menuOptions = ref([
-  {
-    name: '채널이름 수정',
-    slug: 'edit-channel-name',
-    class: 'custom-context-name',
-  },
-  { type: 'divider' },
+const menuOptionsY = ref([
+  // {
+  //   name: '채널이름 수정',
+  //   slug: 'edit-channel-name',
+  //   class: 'custom-context-name',
+  // },
+  // { type: 'divider' },
   {
     name: '채널 활성화',
     slug: 'enable-channel',
     class: 'custom-context-name',
   },
+]);
+const menuOptionsN = ref([
+  // {
+  //   name: '채널이름 수정',
+  //   slug: 'edit-channel-name',
+  //   class: 'custom-context-name',
+  // },
+  // { type: 'divider' },
   {
     name: '채널 비활성화',
     slug: 'disable-channel',
@@ -445,11 +668,42 @@ const menuOptions = ref([
   },
 ]);
 const handleClick = (event, item) => {
-  vm.refs.vueSimpleContextMenu.showMenu(event, item);
+  if (item.useYn === 'Y') {
+    vm.refs.vueSimpleContextMenuY.showMenu(event, item);
+  } else {
+    vm.refs.vueSimpleContextMenuN.showMenu(event, item);
+  }
 };
-const optionClicked = event => {
-  event.preventDefault();
+const optionClicked = async event => {
+  const channelInfo = event.item;
+  const channelOption = event.option;
+
+  console.log('channelInfo', channelInfo);
+  console.log('channelOption', channelOption);
+  console.log('event1', event);
+  console.log('event2', event);
+  const params = {
+    id: channelInfo.id,
+    useYn: channelInfo.useYn,
+    channelName: channelInfo.name,
+    channelOrder: channelInfo.channelOrder,
+  };
+  try {
+    if (channelOption.slug === 'enable-channel') {
+      params.useYn = 'Y';
+
+      await fetchEditChannelName(params);
+    } else if (channelOption.slug === 'disable-channel') {
+      params.useYn = 'N';
+      await fetchEditChannelName(params);
+    }
+  } catch (e) {
+    console.log(e);
+  } finally {
+    await store.SET_CHANNEL_LIST();
+  }
 };
+
 const changeBackgroundColor = event => {
   listId.value = event.oldIndex;
   listClickd.value = true;
@@ -629,8 +883,10 @@ button.edit-button:active {
 .custom-button {
   background-color: #5561f4ff !important;
   color: #ffffff !important;
-  cursor: auto;
+  cursor: pointer;
+  //pointer-events: none;
   opacity: 1 !important;
+  border-radius: 3px;
 }
 
 .mb-2:hover {

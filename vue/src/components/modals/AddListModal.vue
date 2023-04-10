@@ -1,29 +1,29 @@
 <template>
   <div
     v-if="props.open"
-    @mousedown="closeModal()"
-    class="modal fade show d-block"
-    tabindex="-1"
     aria-hidden="true"
-    role="dialog"
+    class="modal fade show d-block"
     data-bs-backdrop="true"
+    role="dialog"
+    tabindex="-1"
+    @mousedown="closeModal()"
   >
     <div class="modal-dialog modal-dialog-centered">
       <div
         v-if="modalType === 'channel'"
-        @mousedown.stop
         class="modal-content"
         style="background-color: #313338; padding: 25px"
+        @mousedown.stop
       >
         <div class="custom-modal-header d-flex align-items-baseline">
           <h4 class="fw-bold text-center mb-4" style="color: #f3f4f5">
             채널 생성
           </h4>
           <button
-            type="button"
-            class="btn-close"
-            aria-label="Close"
             ref="modalCloseBtn"
+            aria-label="Close"
+            class="btn-close"
+            type="button"
             @click="closeModal()"
           ></button>
         </div>
@@ -34,22 +34,23 @@
                 <label class="d-block">채널명</label>
                 <input
                   v-model="name"
-                  class="mt-1 custom-input"
-                  type="text"
-                  placeholder="채널명을 작성해주세요."
                   autocomplete="off"
+                  class="mt-1 custom-input"
+                  maxlength="10"
+                  placeholder="채널명을 작성해주세요."
                   required
+                  type="text"
                 />
               </div>
               <span class="text-danger">{{ logMessage }}</span>
               <button
-                type="submit"
                 :class="`${
                   formValid() === false ? 'disabled' : ''
                 } btn custom-confirm-btn`"
                 :style="{
                   'pointer-events': loading === true ? 'none' : '',
                 }"
+                type="submit"
               >
                 <spinner-component v-if="loading" />
                 <div v-else type="button">생성하기</div>
@@ -60,20 +61,20 @@
       </div>
       <div
         v-else
-        @mousedown.stop
         class="modal-content"
         style="background-color: #313338; padding: 25px"
+        @mousedown.stop
       >
         <div class="custom-modal-header d-flex align-items-baseline">
           <h4 class="fw-bold text-center mb-4" style="color: #f3f4f5">
             카테고리 생성
           </h4>
           <button
-            type="button"
+            ref="modalCloseBtn"
+            aria-label="Close"
             class="btn-close"
             data-bs-dismiss="modal"
-            aria-label="Close"
-            ref="modalCloseBtn"
+            type="button"
             @click="closeModal()"
           ></button>
         </div>
@@ -84,22 +85,22 @@
                 <label class="d-block">카테고리명</label>
                 <input
                   v-model="name"
-                  class="mt-1 custom-input"
-                  type="text"
-                  placeholder="카테고리명을 작성해주세요."
                   autocomplete="off"
+                  class="mt-1 custom-input"
+                  placeholder="카테고리명을 작성해주세요."
                   required
+                  type="text"
                 />
               </div>
               <span class="text-danger">{{ logMessage }}</span>
               <button
-                type="submit"
                 :class="`${
                   formValid() === false ? 'disabled' : ''
                 } btn custom-confirm-btn`"
                 :style="{
                   'pointer-events': loading === true ? 'none' : '',
                 }"
+                type="submit"
               >
                 <spinner-component v-if="loading" />
                 <div v-else type="button">생성하기</div>
@@ -181,10 +182,8 @@ const submitForm = async () => {
         serverId: props.serverId,
       };
       socketStore.websocket.send(JSON.stringify(data));
-      console.log(socketStore.websocket.readyState);
       name.value = '';
       await store.SET_CHANNEL_LIST();
-      console.log(createdData.id);
       emits('selectNewChannel', createdData.id);
       closeModal();
     } catch (e) {
@@ -196,11 +195,9 @@ const submitForm = async () => {
     const channels = store.getChannelList.filter(
       item => item.id === props.channelId,
     );
-    console.log(channels);
     let newSubOrderList = channels.map(item => item.subChannel);
     newSubOrderList = newSubOrderList[0].map(item => item.channelOrder);
     newSubOrderList = Math.max(...newSubOrderList);
-    console.log('sssss', newSubOrderList);
     const params = {
       name: name.value,
       parentId: props.channelId,
@@ -217,10 +214,8 @@ const submitForm = async () => {
         serverId: props.serverId,
       };
       socketStore.websocket.send(JSON.stringify(data));
-      console.log(socketStore.websocket.readyState);
       name.value = '';
       await store.SET_CHANNEL_LIST();
-      console.log(createdData.id);
       emits('selectNewChannel', createdData.id);
       closeModal();
     } catch (e) {
