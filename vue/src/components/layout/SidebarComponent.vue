@@ -3,16 +3,16 @@
   <div id="sidebar-wrapper">
     <!-- 상단 server 리스트 영역 -->
     <div class="sidebar-heading">
-      <div class="navbar-collapse" id="navbarNavDarkDropdown">
+      <div id="navbarNavDarkDropdown" class="navbar-collapse">
         <ul class="navbar-nav">
           <li class="nav-item dropdown">
             <a
-              class="nav-link dropdown-toggle text-warning"
-              href="#"
               id="navbarDarkDropdownMenuLink"
-              role="button"
-              data-bs-toggle="dropdown"
               aria-expanded="false"
+              class="nav-link dropdown-toggle text-warning"
+              data-bs-toggle="dropdown"
+              href="#"
+              role="button"
             >
               <img
                 src="@/assets/images/icon.png"
@@ -21,8 +21,8 @@
               {{ getServername }}
             </a>
             <ul
-              class="dropdown-menu dropdown-menu-dark"
               aria-labelledby="navbarDarkDropdownMenuLink"
+              class="dropdown-menu dropdown-menu-dark"
             >
               <!-- <li>
                 <a class="dropdown-item" href="#" @click="emitEvent()"
@@ -53,24 +53,27 @@
     <hr class="m-0" />
 
     <div class="list-group list-group-flush">
-      <ul class="list-unstyled ps-0" id="sidebar">
+      <ul id="sidebar" class="list-unstyled ps-0">
         <template v-for="channel in store.getChannelList" :key="channel.id">
           <li
+            v-if="
+              channel.parentId == store.accessedChannelInfo.serverId &&
+              channel.useYn === 'Y'
+            "
             class="mb-2"
-            v-if="channel.parentId == store.accessedChannelInfo.serverId"
           >
             <button
-              class="btn btn-toggle align-items-center rounded"
-              data-bs-toggle="collapse"
               :data-bs-target="`#channel${channel.id}`"
               aria-expanded="true"
+              class="btn btn-toggle align-items-center rounded"
+              data-bs-toggle="collapse"
             >
               {{ channel.name }}
             </button>
 
             <i class="bi bi-plus float-end plus-icon"></i>
 
-            <div class="collapse show" :id="`channel${channel.id}`">
+            <div :id="`channel${channel.id}`" class="collapse show">
               <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
                 <li v-for="sub in channel.subChannel" :key="sub.id">
                   <div v-if="sub.useYn === 'Y'">
@@ -93,53 +96,53 @@
         <!-- 고정메뉴 -->
         <li class="mb-2">
           <button
-            class="btn btn-toggle align-items-center rounded"
-            data-bs-toggle="collapse"
-            data-bs-target="#channel4"
             aria-expanded="true"
+            class="btn btn-toggle align-items-center rounded"
+            data-bs-target="#channel4"
+            data-bs-toggle="collapse"
           >
             바로가기
           </button>
 
-          <div class="collapse show" id="channel4">
+          <div id="channel4" class="collapse show">
             <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
               <li>
                 <a
+                  class="rounded"
                   href="https://office.hiworks.com/lemonhc.com"
                   target="_blank"
-                  class="rounded"
                   >Hiworks</a
                 >
               </li>
               <li>
                 <a
+                  class="rounded"
                   href="https://auth.ncloud.com/nsa/cost"
                   target="_blank"
-                  class="rounded"
                   >Naver Cloud</a
                 >
               </li>
               <li>
                 <a
+                  class="rounded"
                   href="https://jira.lemonhc.com/secure/Dashboard.jspa"
                   target="_blank"
-                  class="rounded"
                   >Jira</a
                 >
               </li>
               <li>
                 <a
+                  class="rounded"
                   href="https://docs.lemonhc.com/login.action?os_destination=%2Findex.action&permissionViolation=true#all-updates"
                   target="_blank"
-                  class="rounded"
                   >Confluence</a
                 >
               </li>
               <li>
                 <a
+                  class="rounded"
                   href="https://m.search.naver.com/search.naver?sm=mtb_hty.top&where=m&oquery=%EB%A3%B0%EB%A0%9B&tqi=h33g5sp0iqdssfp0eEossssst1s-130140&query=%EB%A3%B0%EB%A0%9B"
                   target="_blank"
-                  class="rounded"
                   >룰렛돌리기</a
                 >
               </li>
@@ -155,8 +158,6 @@
           <div class="d-flex text-light">
             <div class="flex-shrink-0">
               <img
-                class="profile-img"
-                style="width: 30px; border-radius: 10px"
                 :src="
                   getImageUrl(
                     `profile/${userProfileIcon(
@@ -164,6 +165,8 @@
                     )}.png`,
                   )
                 "
+                class="profile-img"
+                style="width: 30px; border-radius: 10px"
               />
             </div>
             <div class="flex-grow-1 ms-3 align-self-center">
@@ -173,16 +176,16 @@
             </div>
             <div>
               <button
-                type="button"
                 class="btn btn-outline-secondary bottom-button"
+                type="button"
                 @click.stop="clickSignOut()"
               >
                 <span> <i class="bi bi-box-arrow-right"></i></span>
               </button>
               <button
                 v-if="userStore.userInfo.role === 'ADMIN'"
-                type="button"
                 class="btn btn-outline-secondary bottom-button"
+                type="button"
                 @click.stop="router.push('/settings')"
               >
                 <span> <i class="bi-gear"></i></span>
@@ -244,10 +247,12 @@ const clickSignOut = async () => {
   cursor: pointer;
   pointer-events: auto;
 }
+
 .router-link-active {
   background-color: #3c3f45;
   color: #ffffff !important;
 }
+
 .router-link-active::before {
   color: #ffffff;
 }
