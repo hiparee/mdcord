@@ -47,6 +47,7 @@
                   <div>
                     <input
                       :value="newServerName"
+                      maxlength="10"
                       placeholder="서버 이름"
                       style="
                         color: #cfcfcf;
@@ -82,6 +83,7 @@
                         <input
                           v-else
                           :value="editServerName"
+                          maxlength="10"
                           style="
                             color: #cfcfcf;
                             background-color: #1e1f22;
