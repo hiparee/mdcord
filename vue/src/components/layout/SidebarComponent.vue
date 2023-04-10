@@ -54,7 +54,10 @@
 
     <div class="list-group list-group-flush">
       <ul id="sidebar" class="list-unstyled ps-0">
-        <template v-for="channel in store.getChannelList" :key="channel.id">
+        <template
+          v-for="(channel, index) in store.getChannelList"
+          :key="channel.id"
+        >
           <li
             v-if="
               channel.parentId == store.accessedChannelInfo.serverId &&
@@ -89,6 +92,7 @@
               </ul>
             </div>
           </li>
+          <p v-if="index === 1">활성화된 채널이 없습니다</p>
         </template>
 
         <hr class="my-3" />
