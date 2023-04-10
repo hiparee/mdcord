@@ -92,7 +92,9 @@
               </ul>
             </div>
           </li>
-          <p v-if="index === 1">활성화된 채널이 없습니다</p>
+          <p v-if="index === 0 && channel.useYn === 'N'">
+            활성화된 채널이 없습니다
+          </p>
         </template>
 
         <hr class="my-3" />
