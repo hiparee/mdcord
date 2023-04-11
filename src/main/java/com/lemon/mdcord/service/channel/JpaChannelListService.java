@@ -62,32 +62,14 @@ public class JpaChannelListService implements ChannelListService, MessageTypeInt
         // 1일 때는 소켓에 대한 것 x -> 처리 x
         // 2일 때는 소켓에 대한 설정 o
         Integer createdChannelDept = request.getChannelDept();
+        Long targetChannel = request.getChannelId();
 
-        if(createdChannelDept.equals(2)) {
-            // 루트 채널(서버 채널) 아이디 받음
-            Long serverId = request.getServerId();
+        targetChannel = handleByChannelDept(channelMap, request, createdChannelDept, targetChannel);
 
-            // 루트 채널 아이디로 dept 1 채널 목록 찾음
-            Set<Long> parentChannelIds = this.findByParentId(Set.of(serverId)).stream()
-                    .map(o -> o.getId())
-                    .collect(Collectors.toSet());
-
-            // dept 1 채널 목록의 id 값들로 dept 2 채널 목록 아이디를 찾음. 그런데 생성된 채널 id는 빼고.
-            Long anyTargetChannel = this.findByParentId(parentChannelIds).stream()
-                    .filter(o -> o.getId() != request.getChannelId())
-                    .map(o -> o.getId())
-                    .findAny()
-                    .get();
-
-            if(anyTargetChannel != null) {
-                channelMap.put(request.getChannelId(), channelMap.get(anyTargetChannel));
-            }
-        }
-
-        ChannelList result = this.getTargetChannel(request.getChannelId());
+        ChannelList result = this.getTargetChannel(targetChannel);
 
         // 메시지 소켓 통신
-        List<WebSocketSession> webSocketSessions = channelMap.get(request.getChannelId());
+        List<WebSocketSession> webSocketSessions = channelMap.get(targetChannel);
         TextMessage modifiedMessage = modifiedMessage(payload, result);
         for(WebSocketSession webSocketSession : webSocketSessions) {
             webSocketSession.sendMessage(modifiedMessage);
@@ -176,6 +158,56 @@ public class JpaChannelListService implements ChannelListService, MessageTypeInt
     @Override
     public List<ChannelList> findByParentId(Set<Long> channelIds) {
         return channelListRepository.findByParentIdIn(channelIds);
+    }
+
+    /**
+     * 채널 생성 시 dept별 대상 소켓 채널 지정
+     * dept가 1일 경우, 최상위 카테고리(serverId)에서 생성된 채널 id(dept 1)를 제외한 나머지 채널(dept 1) 중 dept2인 채널 id 반환
+     * dept가 2일 경우, 동일한 하위 채널에서 생성된 채널 id를 제외한 나머지 중 1개 채널 id 반환
+     * 
+     * @param channelMap
+     * @param request
+     * @param createdChannelDept
+     * @param targetChannel
+     * @return
+     */
+    private Long handleByChannelDept(Map<Long, List<WebSocketSession>> channelMap, ChannelCreateRequest request, Integer createdChannelDept, Long targetChannel) {
+        // 루트 채널(서버 채널) 아이디 받음
+        Long serverId = request.getServerId();
+
+        if(createdChannelDept.equals(1)) {
+            // 루트 채널 아이디로 dept 1 채널 목록 찾음. 생성된 채널 id는 제외
+            Long anyParentChannel = this.findByParentId(Set.of(serverId)).stream()
+                    .filter(o -> o.getId() != request.getChannelId())
+                    .map(o -> o.getId())
+                    .findAny()
+                    .get();
+
+            Long anyTargetChannel = channelListRepository.findByParentIdAndUseYn(anyParentChannel, USE_Y).stream()
+                    .map(o -> o.getId())
+                    .findAny()
+                    .get();
+
+            return anyTargetChannel;
+        }
+        else if(createdChannelDept.equals(2)) {
+            // 루트 채널 아이디로 dept 1 채널 목록 찾음
+            Set<Long> parentChannelIds = this.findByParentId(Set.of(serverId)).stream()
+                    .map(o -> o.getId())
+                    .collect(Collectors.toSet());
+
+            // dept 1 채널 목록의 id 값들로 dept 2 채널 목록 아이디를 찾음. 생성된 채널 id는 제외
+            Long anyTargetChannel = this.findByParentId(parentChannelIds).stream()
+                    .filter(o -> o.getId() != request.getChannelId())
+                    .map(o -> o.getId())
+                    .findAny()
+                    .get();
+
+            if(anyTargetChannel != null) {
+                channelMap.put(targetChannel, channelMap.get(anyTargetChannel));
+            }
+        }
+        return targetChannel;
     }
 
     private List<ChannelList> createChannelListByMemberRole(String memberRole, List<ChannelList> channelLists) {
