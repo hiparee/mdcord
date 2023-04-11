@@ -87,6 +87,7 @@
                   v-model="name"
                   autocomplete="off"
                   class="mt-1 custom-input"
+                  maxlength="10"
                   placeholder="카테고리명을 작성해주세요."
                   required
                   type="text"
@@ -125,7 +126,11 @@ import { webSocketStore } from '@/store/modules/socket';
 const router = useRouter();
 const store = useChannelStore();
 const socketStore = webSocketStore();
-const emits = defineEmits(['update:showAddModal', 'selectNewChannel']);
+const emits = defineEmits([
+  'update:showAddModal',
+  'selectNewChannel',
+  'selectNewCategory',
+]);
 
 const props = defineProps({
   open: {
@@ -160,7 +165,7 @@ const $toast = useToast({
 
 const submitForm = async () => {
   loading.value = true;
-  if (props.modalType === 'catagory') {
+  if (props.modalType === 'category') {
     const channels = store.getChannelList.filter(
       item => item.parentId === props.serverId,
     );
@@ -175,16 +180,18 @@ const submitForm = async () => {
     try {
       const res = await fetchAddChanneList(params);
       const createdData = res.data;
+      console.log('콘솔지옥', createdData);
       const data = {
         messageType: 'CREATE_CHANNEL',
         channelId: createdData.id,
         channelDept: 1,
         serverId: props.serverId,
       };
+      console.log('웹소켓전송', data);
       socketStore.websocket.send(JSON.stringify(data));
       name.value = '';
       await store.SET_CHANNEL_LIST();
-      emits('selectNewChannel', createdData.id);
+      emits('selectNewCategory');
       closeModal();
     } catch (e) {
       console.log(e);
@@ -213,6 +220,7 @@ const submitForm = async () => {
         channelDept: 2,
         serverId: props.serverId,
       };
+      console.log('웹소켓전송', data);
       socketStore.websocket.send(JSON.stringify(data));
       name.value = '';
       await store.SET_CHANNEL_LIST();
