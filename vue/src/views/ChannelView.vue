@@ -186,7 +186,7 @@
                   channel.useYn === 'N'
                 "
                 :class="{
-                  'custom-button':
+                  'custom-button-red':
                     channel.id === channelNumber && channelNumber !== null,
                 }"
                 class="mb-2 nav-item btn border-0"
@@ -272,7 +272,7 @@
           <button
             class="btn border-0"
             style="color: #f2f3f5; width: 100%; background-color: #5764f0"
-            @click="openModal('catagory')"
+            @click="openModal('category')"
           >
             카테고리 추가
           </button>
@@ -326,7 +326,7 @@
               >
                 <div
                   v-for="(element, index) in getSelectLowChannel"
-                  :key="element.name"
+                  :key="index"
                   class="list-item"
                   style="
                     margin-bottom: 8px;
@@ -481,6 +481,7 @@
     :open="modalType !== ''"
     :serverId="selectServerInfo.id"
     @selectNewChannel="channelListNumber(getSelectHighChannelInfo, 'N')"
+    @selectNewCategory="addCatagory()"
     @update:showAddModal="modalType = ''"
   />
 </template>
@@ -504,7 +505,9 @@ const channelList = computed(() => {
 });
 // 선택한 서버정보
 const selectServerInfo = ref({});
-const selectChannelInfo = ref([]);
+
+// 선택한 상위채널 청ㅂ
+const selectChannelInfo = ref({});
 
 // 선택한 서버의 상위채널목록
 const getSelectHighChannel = computed(() =>
@@ -590,9 +593,12 @@ const closeEditInput = () => {
 
 // 활성화된 채널 구분
 const channelListNumber = (channel, type) => {
-  highChannelStatus.value = channel.useYn;
+  highChannelStatus.value = channel.useYn ? channel.useYn : channel[0].useYn;
+  console.log('1', channel);
   if (channel.id !== editChannelId.value) {
+    console.log('2', channel.id);
     if (channel.id) {
+      console.log('3', channel);
       inputChecked.value = [];
       channelNumber.value = channel.id;
       inputChecked.value = getSelectLowChannel.value
@@ -600,11 +606,14 @@ const channelListNumber = (channel, type) => {
         .map(i => i.id);
       closeEditInput();
     } else if (type === 'N') {
+      console.log('4', channel);
       inputChecked.value = [];
       inputChecked.value = getSelectLowChannel.value
         .filter(i => i.useYn === 'Y')
         .map(i => i.id);
+      // channelListNumber(channel);
     } else {
+      console.log('5', channel);
       channelNumber.value = channel;
       inputChecked.value = [];
     }
@@ -678,10 +687,6 @@ const optionClicked = async event => {
   const channelInfo = event.item;
   const channelOption = event.option;
 
-  console.log('channelInfo', channelInfo);
-  console.log('channelOption', channelOption);
-  console.log('event1', event);
-  console.log('event2', event);
   const params = {
     id: channelInfo.id,
     useYn: channelInfo.useYn,
@@ -701,6 +706,13 @@ const optionClicked = async event => {
     console.log(e);
   } finally {
     await store.SET_CHANNEL_LIST();
+    const selectChannel = getSelectHighChannel.value.filter(
+      i => i.id === channelInfo.id,
+    );
+    if (channelNumber.value === selectChannel[0].id) {
+      console.log('true');
+      channelListNumber(selectChannel[0]);
+    }
   }
 };
 
@@ -717,6 +729,12 @@ const openModal = type => {
   modalType.value = type;
 };
 const onDragStart = event => {};
+
+const addCatagory = () => {
+  channelNumber.value =
+    getSelectHighChannel.value[getSelectHighChannel.value.length - 1].id;
+  highChannelStatus.value = 'Y';
+};
 </script>
 
 <style lang="scss" scoped>
@@ -882,6 +900,14 @@ button.edit-button:active {
 
 .custom-button {
   background-color: #5561f4ff !important;
+  color: #ffffff !important;
+  cursor: pointer;
+  //pointer-events: none;
+  opacity: 1 !important;
+  border-radius: 3px;
+}
+.custom-button-red {
+  background-color: #e30029 !important;
   color: #ffffff !important;
   cursor: pointer;
   //pointer-events: none;
